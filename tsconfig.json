@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "rootDir": "./src/",
+    "outDir": "./dist/",
+    "noImplicitAny": false,
+    "lib": ["ES2019", "DOM"],
+    "module": "es6",
+    "target": "es5",
+    "allowJs": false,
+    "checkJs": false,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "downlevelIteration": true,
+    "sourceMap": true,
+    "strictNullChecks": false,
+    "strict": true
+  },
+  "include": ["src/**/*.ts", "index.d.ts"],
+  "exclude": ["node_modules"]
+}

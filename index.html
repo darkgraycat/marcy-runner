@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Murkit demo</title>
+    <script type="text/javascript" src="dist/main.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style type="text/css">
+        html,
+        body {
+            margin: 0px;
+            padding: 0px;
+            color: #d0d0d0;
+            background-color: #202020;
+        }
+        canvas {
+            image-rendering: crisp-edges;
+        }
+    </style>
+</head>
+<body>
+    <div id="content" style="background-color: #202020; color: #f0f0f0;">
+    </div>
+    <script type="text/javascript">
+        const content = document.getElementById('content');
+        const fullscreen = () => {
+            if (content.requestFullscreen) {
+                content.requestFullscreen();
+            } else if (content.mozRequestFullScreen) { // Firefox
+                content.mozRequestFullScreen();
+            } else if (content.webkitRequestFullscreen) { // Chrome, Safari and Opera
+                content.webkitRequestFullscreen();
+            } else if (content.msRequestFullscreen) { // IE/Edge
+                content.msRequestFullscreen();
+            }
+        }
+        const handleOrientationChange = () => {
+            if (window.innerHeight < window.innerWidth) {
+                content.classList.add('landscape');
+            } else {
+                content.classList.remove('landscape');
+            }
+        }
+
+        document.addEventListener('click', fullscreen);
+        document.addEventListener('touchstart', fullscreen);
+        // window.addEventListener('resize', handleOrientationChange);
+        // window.addEventListener('orientationchange', handleOrientationChange);
+        // document.addEventListener('fullscreenchange', handleOrientationChange);
+
+        // Initial check
+        handleOrientationChange();
+    </script>
+</body>
+</html>
