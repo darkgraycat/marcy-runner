@@ -6,9 +6,9 @@ export class Player extends PhysEntity({
     size: [20, 16],
     offset: [-4, 0],
 }) {
-    walk(force: number) {
-        this.flipX = force < 0;
-        this.body.velocity.x = force;
+    walk(velocity: number) {
+        this.flipX = velocity < 0;
+        this.body.velocity.x = velocity;
         if (this.touchingDown) {
             this.play(EntityAnimation.PlayerWalk, true)
         }
@@ -21,9 +21,9 @@ export class Player extends PhysEntity({
         }
     }
 
-    jump(force: number) {
+    jump(velocity: number) {
         if (this.touchingDown) {
-            this.body.velocity.y = -force;
+            this.body.velocity.y = -velocity;
             this.play(EntityAnimation.PlayerJump, true)
         }
     }

@@ -34,7 +34,6 @@ export class Foreground extends GroupEntity({
 }) {
     constructor(scene: Phaser.Scene, position: number, speed: number, frames: number[]) {
         const [w, h] = ForegroundTile.config.size;
-        // const tiles = frames.map((frame, i) => frame >= 0 &&
         const tiles = frames.map((frame, i) => frame >= 1 && // TODO: remove building frame from foregrounds.png
             new ForegroundTile(scene)
                 .setFrame(frame)

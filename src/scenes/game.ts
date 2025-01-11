@@ -7,7 +7,6 @@ import { Collectable, CollectableType } from "../entities/collectable";
 import { iterate, randomInt } from "../shared/utils";
 import { OverSceneParams } from "./over";
 import { GAME_DEFAULT_FONT, GAME_HEIGHT, GAME_WIDTH } from "../shared/constants";
-import { Foreground } from "../entities/foreground";
 import { SETTINGS } from "../shared/settings";
 
 export type GameSceneLevelThemeConfig = {
@@ -39,12 +38,14 @@ export class GameScene extends Scene(SceneKey.Game, {
     canJumpTicks: number;
 
     backgrounds: Phaser.GameObjects.Group;
-    foregrounds: Foreground;
     buildings: Phaser.GameObjects.Group;
     collectables: Phaser.GameObjects.Group;
     player: Player;
 
-    button: Phaser.Input.Keyboard.Key;
+    keyMoveLeft: Phaser.Input.Keyboard.Key;
+    keyMoveRight: Phaser.Input.Keyboard.Key;
+    keyJump: Phaser.Input.Keyboard.Key;
+
     cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys;
     scoreText: Phaser.GameObjects.BitmapText;
     statsText: Phaser.GameObjects.BitmapText;
@@ -79,8 +80,7 @@ export class GameScene extends Scene(SceneKey.Game, {
         const bgConfigsLen = bgConfigs.length;
         const rnd = randomInt(0, bgConfigsLen);
         const bgIdx = this.previosBg === rnd ? ((rnd + 1) % bgConfigsLen) : rnd;
-        // TODO: remove
-        // const bgIdx = 3;
+
         const { tints, frames, buildings, bg } = bgConfigs[bgIdx];
 
         this.previosBg = bgIdx;
@@ -106,17 +106,17 @@ export class GameScene extends Scene(SceneKey.Game, {
 
         /* player */
         this.player = new Player(this).setPosition(48, 64);
-        this.cameras.main.startFollow(this.player, !0, 1, 0, -72, 0);
-
-        const foregroundsFrames = iterate(10, () => randomInt(-1, 4));
-        this.foregrounds = new Foreground(this, 3.5, 0.5, foregroundsFrames);
+        this.cameras.main.startFollow(this.player, true, 1, 0, -72, 0);
 
         /* physics */
         this.physics.add.collider(this.buildings, this.player);
         this.physics.add.overlap(this.collectables, this.player, this.handleCollect, null, this);
 
         /* controls */
-        this.button = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+        this.keyMoveLeft = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[SETTINGS.keyboardKeys.moveLeft]);
+        this.keyMoveRight = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[SETTINGS.keyboardKeys.moveRight]);
+        this.keyJump = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[SETTINGS.keyboardKeys.jump]);
+
         this.cursorKeys = this.input.keyboard.createCursorKeys();
         this.buttonPressed = false;
 
@@ -136,8 +136,6 @@ export class GameScene extends Scene(SceneKey.Game, {
             this.params.maxPoints * 0.50 | 0, // 50%
             this.params.maxPoints * 0.75 | 0, // 75%
         ];
-
-        console.log(this.foregrounds.children.entries);
     }
 
     update() {
@@ -159,7 +157,6 @@ export class GameScene extends Scene(SceneKey.Game, {
         this.statsText.text = `${caffeineTxt}\nLifes`;
         this.livesText.text = heartsTxt;
         this.distanceText.text = distanceTxt;
-
     }
 
     handleLoseLife() {
@@ -173,11 +170,19 @@ export class GameScene extends Scene(SceneKey.Game, {
 
     handleControls() {
         const { initialSpeed: gameSpeed, initialHeight: jumpHeight } = this.params;
-        const isDown = this.button.isDown || this.input.activePointer.isDown;
+        const isJumping = this.keyJump.isDown || this.input.activePointer.isDown;
 
-        this.player.walk(gameSpeed + this.gameSpeedMod);
+        if (this.keyMoveLeft.isDown) {
+            this.player.walk((gameSpeed + this.gameSpeedMod) * -1);
 
-        if (isDown) {
+        } else if (this.keyMoveRight.isDown) {
+            this.player.walk(gameSpeed + this.gameSpeedMod);
+
+        } else {
+            this.player.idle();
+        }
+
+        if (isJumping) {
             if (!this.buttonPressed) {
                 this.player.jump(jumpHeight);
                 if (this.player.touchingDown) this.fxJump.play();
@@ -271,13 +276,13 @@ export class GameScene extends Scene(SceneKey.Game, {
             tintBgTop, tintBgFar, tintBgMid, tintBgBot,
         ] = tints;
         return this.add.group({ runChildUpdate: true })
-            .add(new Background(this, 0.8, 0, .25).setTint(tintSkyTop))
-            .add(new Background(this, 0.5, 0, .5).setTint(tintSkyMid))
-            .add(new Background(this, 0.0, 0, 1).setTint(tintSkyBot))
-            .add(new Background(this, 2.0, frames[0], .25).setTint(tintBgTop))
-            .add(new Background(this, 2.2, frames[1], .5).setTint(tintBgFar))
-            .add(new Background(this, 2.6, frames[2], 1).setTint(tintBgMid))
-            .add(new Background(this, 3.0, frames[3], 2).setTint(tintBgBot));
+            .add(new Background(this, 0.8, 1, 0.1, true).setTint(tintSkyTop))
+            .add(new Background(this, 0.5, 1, 0.2, true).setTint(tintSkyMid))
+            .add(new Background(this, 0.0, 1, 0.4, true).setTint(tintSkyBot))
+            .add(new Background(this, 2.0, frames[0], 0.1).setTint(tintBgTop))
+            .add(new Background(this, 2.2, frames[1], 0.2).setTint(tintBgFar))
+            .add(new Background(this, 2.6, frames[2], 0.3).setTint(tintBgMid))
+            .add(new Background(this, 3.0, frames[3], 0.5).setTint(tintBgBot));
     }
 
 

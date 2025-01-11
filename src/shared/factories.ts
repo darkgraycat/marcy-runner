@@ -1,13 +1,14 @@
 import Phaser from "phaser";
 
 
-// TODO: use namspaces
 
 /* Common */
 namespace Common {
     export type Size = [width: number, height: number];
     export type Point = [x: number, y: number];
 }
+
+
 
 /* Scenes */
 

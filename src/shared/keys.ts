@@ -24,6 +24,7 @@ export const UiKey = {
 
 export const DataKey = {
     LevelTheme: "data_level_theme",
+    Strings: "data_strings",
 }
 
 export const EntityAnimation = {

@@ -13,6 +13,12 @@ export const SETTINGS = {
     volumeMute: false,
     volumeMusic: 0.5,
     volumeEffects: 0.3,
+    // TODO: implement touch zones and Input class
+    keyboardKeys: {
+        moveLeft: "Q",
+        moveRight: "W",
+        jump: "P"
+    }
 }
 
 export const SPAWN_RATES = {
@@ -24,6 +30,6 @@ export const SPAWN_RATES = {
 }
 
 export const DEBUG = {
-    fastRestart: false,
+    fastRestart: true,
     debugPhysics: false,
 }

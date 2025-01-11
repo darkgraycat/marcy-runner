@@ -8,17 +8,23 @@ export class Background extends TileEntity({
     origin: [0, 0],
     tilesize: 32,
 }) {
-    speed: number;
+    scrollScale: number;
+    autoScroll: boolean;
 
-    constructor(scene: Phaser.Scene, position: number, frame: number, speed: number) {
+    constructor(scene: Phaser.Scene, position: number, frame: number, scrollScale: number, autoScroll: boolean = false) {
         super(scene);
         this.setPosition(0, Background.tilesize * position)
             .setFrame(frame)
             .setScrollFactor(0);
-        this.speed = speed;
+        this.scrollScale = scrollScale;
+        this.autoScroll = autoScroll;
     }
 
     update() {
-        this.tilePositionX += this.speed;
+        if (this.autoScroll) {
+            this.tilePositionX += this.scrollScale;
+        } else {
+            this.tilePositionX = this.scene.cameras.main.scrollX * this.scrollScale;
+        }
     }
 }

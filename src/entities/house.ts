@@ -2,7 +2,7 @@ import { EntityKey } from "../shared/keys";
 import { Entity } from "../shared/factories";
 import { randomInt } from "../shared/utils";
 
-class H extends Entity({
+class HouseBlock extends Entity({
     key: EntityKey.Building,
     size: [48, 32],
     origin: [.5, 0],
@@ -14,7 +14,7 @@ export class House extends Phaser.GameObjects.Group {
         y = 96 + y;
         for (let t = 0; t < size; t++) {
             this.add(
-                new H(scene).setPosition(x, y - 32 * t)
+                new HouseBlock(scene).setPosition(x, y - 32 * t)
             );
         }
 
