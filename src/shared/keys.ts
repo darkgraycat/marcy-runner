@@ -5,14 +5,16 @@ export const SceneKey = {
 }
 
 export const EntityKey = {
-    Player: "asset_player",
-    Building: "asset_building",
-    BuildingTop: "asset_building_top",
-    Collectable: "asset_collectable",
-    Background: "asset_bg",
-    Foreground: "asset_fg",
-    Object: "asset_objects",
-    Block: "asset_block",
+    Player: "entity_player",
+    Buildings: "entity_buildings",
+    BuildingTops: "entity_building_tops",
+    Building: "asset_building", // to deprecate
+    BuildingTop: "asset_building_top", // to deprecate
+    Collectable: "asset_collectable", // to deprecate
+    Background: "asset_bg", // to deprecate
+    Foreground: "asset_fg", // to deprecate
+    Object: "asset_objects", // to deprecate
+    Block: "asset_block", // to deprecate
 }
 
 export const UiKey = {
