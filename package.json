@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "npm run serve & npm run watch",
-    "serve": "npx live-server --port=8080 --watch=dist",
+    "serve": "npx live-server --port=8080 --watch=dist,assets",
     "watch": "npx esbuild src/main.ts --bundle --outdir=dist --sourcemap=inline --watch",
     "build": "npx esbuild src/main.ts --bundle --minify --outdir=dist",
     "test": "echo \"Error: no test specified\" && exit 1"

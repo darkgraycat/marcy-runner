@@ -178,5 +178,44 @@ export function GroupEntity<T extends EntityClass>(config: GroupEntityConfig<T>)
             });
             scene.add.existing(this);
         }
+
+        forEach<K = void>(callback: (child: T, index?: number) => K) {
+            this.getChildren().forEach((go, i) => {
+                callback(go as any, i)
+            });
+        }
+    }
+}
+
+
+type GroupPhysEntityCallback<T extends PhysEntityClass> = (entity: T) => void;
+
+type GroupPhysEntityConfig<T extends PhysEntityClass> = {
+    class: T;
+    update: boolean;
+    capacity: number;
+    onCreate?: GroupPhysEntityCallback<T>;
+    onRemove?: GroupPhysEntityCallback<T>;
+}
+
+export function GroupPhysEntity<T extends PhysEntityClass>(config: GroupPhysEntityConfig<T>) {
+    return class GroupPhysEntity extends Phaser.Physics.Arcade.Group {
+        static readonly config = config;
+        constructor(scene: Phaser.Scene, children?: Phaser.Physics.Arcade.Sprite[] | Phaser.GameObjects.TileSprite[]) {
+            super(scene.physics.world, scene, children, {
+                classType: config.class,
+                maxSize: config.capacity,
+                runChildUpdate: config.update,
+                createCallback: config.onCreate as any,
+                removeCallback: config.onRemove as any,
+            });
+            scene.add.existing(this);
+        }
+
+        forEach<K = void>(callback: (child: T, index?: number) => K) {
+            this.getChildren().forEach((go, i) => {
+                callback(go as any, i)
+            });
+        }
     }
 }

@@ -1,20 +1,17 @@
 export const SceneKey = {
     Boot: "scene_boot",
     Game: "scene_game",
+    Game2: "scene_game2",
+    Input: "scene_input",
     Over: "scene_over",
 }
 
 export const EntityKey = {
     Player: "entity_player",
+    Backgrounds: "entity_backgrounds",
     Buildings: "entity_buildings",
     BuildingTops: "entity_building_tops",
-    Building: "asset_building", // to deprecate
-    BuildingTop: "asset_building_top", // to deprecate
-    Collectable: "asset_collectable", // to deprecate
-    Background: "asset_bg", // to deprecate
-    Foreground: "asset_fg", // to deprecate
-    Object: "asset_objects", // to deprecate
-    Block: "asset_block", // to deprecate
+    Collectables: "asset_collectables",
 }
 
 export const UiKey = {
@@ -27,6 +24,7 @@ export const UiKey = {
 export const DataKey = {
     LevelTheme: "data_level_theme",
     Strings: "data_strings",
+    Levels: "data_levels",
 }
 
 export const EntityAnimation = {

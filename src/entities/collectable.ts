@@ -1,6 +1,6 @@
 import { EntityKey, EntityAnimation } from "../shared/keys";
 import { PhysEntity } from "../shared/factories";
-import { random, randomInt, snapToTile } from "../shared/utils";
+import { random, randomInt, snap } from "../shared/utils";
 import { GAME_WIDTH } from "../shared/constants";
 import { SPAWN_RATES } from "../shared/settings";
 
@@ -20,7 +20,7 @@ const ANIMATIONS = {
 }
 
 export class Collectable extends PhysEntity({
-    key: EntityKey.Collectable,
+    key: EntityKey.Collectables,
     size: [16, 16],
     offset: [0, 0],
     static: true,
@@ -50,7 +50,7 @@ export class Collectable extends PhysEntity({
     reset() {
         this.collectableType = Collectable.getRandomCollectableType();
 
-        const x = snapToTile(this.x + GAME_WIDTH * 2, 16);
+        const x = snap(this.x + GAME_WIDTH * 2, this.width);
         const y = randomInt(1, 5) * 16;
 
         this.setPosition(x, y)

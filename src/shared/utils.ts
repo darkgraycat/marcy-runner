@@ -1,5 +1,3 @@
-export type RoundMethod = 'floor' | 'round' | 'ceil';
-
 export function random(lo: number, hi: number) {
     return Math.random() * (hi - lo) + lo;
 }
@@ -18,6 +16,10 @@ export function iterate<T>(times: number, handler: (idx: number) => T): T[] {
     return result;
 }
 
+export function lerp(from: number, to: number, step: number): number {
+    return from + (to - from) * step;
+}
+
 export function chunks<T>(array: T[], size: number): T[][] {
     let idx = 0;
     const chunks: T[][] = [];
@@ -26,6 +28,6 @@ export function chunks<T>(array: T[], size: number): T[][] {
     return chunks;
 }
 
-export function snapToTile(x: number, tilesize: number, method: RoundMethod = 'floor') {
-    return Math[method](x / tilesize) * tilesize;
+export function snap(n: number, size: number) {
+    return ((n / size) | 0) * size;
 }

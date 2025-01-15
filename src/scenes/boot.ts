@@ -1,7 +1,9 @@
 import { Scene } from "../shared/factories";
-import { EntityKey, EntityAnimation, SceneKey, UiKey, AudioKey, FontKey, DataKey } from "../shared/keys";
 import { DEBUG, GAMEPLAY } from "../shared/settings";
-import { GameSceneLevelThemeConfig, GameSceneParams } from "./game";
+import { EntityKey, EntityAnimation, SceneKey, UiKey, AudioKey, FontKey, DataKey } from "../shared/keys";
+import { GameSceneParams } from "./game";
+import { LevelsJsonData } from "../shared/types";
+import { randomInt } from "../shared/utils";
 
 export class BootScene extends Scene(SceneKey.Boot, {}) {
     preload() {
@@ -20,17 +22,18 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
             { key: UiKey.UiMenu, path: "assets/images/ui_menu.png" },
         ].forEach(({ key, path }) => this.load.image(key, path));
 
-
         [   /* json */
             { key: DataKey.Strings, path: "assets/json/strings.json" },
+            { key: DataKey.Levels, path: "assets/json/levels.json" },
             { key: DataKey.LevelTheme, path: "assets/json/level_theme.json" },
         ].forEach(({ key, path }) => this.load.json(key, path));
-
 
         [   /* spritesheet */
             { key: EntityKey.Player, path: "assets/images/player.png", size: [16, 16] },
             { key: EntityKey.Buildings, path: "assets/images/buildings2.png", size: [48, 32] },
             { key: EntityKey.BuildingTops, path: "assets/images/building-tops2.png", size: [48, 16] },
+            { key: EntityKey.Backgrounds, path: "assets/images/backgrounds2.png", size: [64, 32] },
+            { key: EntityKey.Collectables, path: "assets/images/collectables.png", size: [16, 16] },
         ].forEach(({ key, path, size: [frameWidth, frameHeight] }) =>
             this.load.spritesheet(key, path, { frameWidth, frameHeight })
         );
@@ -50,11 +53,11 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
             { key: EntityAnimation.PlayerIdle, assetKey: EntityKey.Player, frames: [0, 1], frameRate: 8, repeat: -1 },
             { key: EntityAnimation.PlayerWalk, assetKey: EntityKey.Player, frames: [5, 6, 6, 7], frameRate: 16, repeat: -1 },
             { key: EntityAnimation.PlayerJump, assetKey: EntityKey.Player, frames: [4, 4, 6, 6], frameRate: 16, repeat: 0 },
-            { key: EntityAnimation.CollectablePillIdle, assetKey: EntityKey.Collectable, frames: [0, 1], frameRate: 8, repeat: -1 },
-            { key: EntityAnimation.CollectablePillDie, assetKey: EntityKey.Collectable, frames: [2, 3], frameRate: 8, repeat: -1 },
-            { key: EntityAnimation.CollectableDonutIdle, assetKey: EntityKey.Collectable, frames: [5], frameRate: 8, repeat: -1 },
-            { key: EntityAnimation.CollectableBeanIdle, assetKey: EntityKey.Collectable, frames: [4], frameRate: 8, repeat: -1 },
-            { key: EntityAnimation.CollectablePanacatIdle, assetKey: EntityKey.Collectable, frames: [6, 7], frameRate: 8, repeat: -1 },
+            { key: EntityAnimation.CollectablePillIdle, assetKey: EntityKey.Collectables, frames: [0, 1], frameRate: 8, repeat: -1 },
+            { key: EntityAnimation.CollectablePillDie, assetKey: EntityKey.Collectables, frames: [2, 3], frameRate: 8, repeat: -1 },
+            { key: EntityAnimation.CollectableDonutIdle, assetKey: EntityKey.Collectables, frames: [5], frameRate: 8, repeat: -1 },
+            { key: EntityAnimation.CollectableBeanIdle, assetKey: EntityKey.Collectables, frames: [4], frameRate: 8, repeat: -1 },
+            { key: EntityAnimation.CollectablePanacatIdle, assetKey: EntityKey.Collectables, frames: [6, 7], frameRate: 8, repeat: -1 },
         ].forEach(({ key, assetKey, frames, frameRate, repeat }) =>
             this.anims.create({
                 key,
@@ -67,35 +70,37 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
         this.cameras.main.fadeIn(5000, 0x000000);
         this.cameras.main.setBackgroundColor(0xffffff)
 
-        const txt = (message: string, x: number, y: number, scale = 1) => this.add.bitmapText(x, y, FontKey.Minogram, message).setOrigin(0.5).setScale(scale);
-        txt("boot screen", 132, 32).setTint(0x000000);
+        this.add.bitmapText(132, 32, FontKey.Minogram, "boot screen").setOrigin(0.5);
 
+
+        // if (DEBUG.fastRestart) return this.startGame();
         if (DEBUG.fastRestart) return this.startGame();
 
-        setTimeout(() => {
-            this.input.keyboard.on('keydown', () => this.startGame());
-            this.input.on('pointerdown', () => this.startGame());
-        }, 2000);
+        // setTimeout(() => {
+        //     this.input.keyboard.on('keydown', () => this.startGame());
+        //     this.input.on('pointerdown', () => this.startGame());
+        // }, 2000);
     }
 
     private startGame() {
-        const backgroundConfigs = this.cache.json.get(DataKey.LevelTheme) as any[];
-        const backgrounds: GameSceneLevelThemeConfig[] = backgroundConfigs.map(cfg => ({
-            tints: cfg.tints.map((tint: string) => parseInt(`0x${tint}`, 16)),
-            frames: cfg.frames,
-            bg: parseInt(`0x${cfg.bg}`, 16),
-            buildings: parseInt(`0x${cfg.buildings}`, 16),
-        }));
-
-        this.scene.start(SceneKey.Game, {
-            maxLifes: GAMEPLAY.maximumLifes,
-            maxPoints: GAMEPLAY.maximumPoints,
-            initialSpeed: GAMEPLAY.initialSpeed,
-            initialHeight: GAMEPLAY.initialHeight,
-            speedBonusMax: GAMEPLAY.speedBonusMax,
-            speedBonusStep: GAMEPLAY.speedBonusStep,
-            speedBonusTick: GAMEPLAY.speedBonusTick,
-            backgrounds,
+        const levelData: LevelsJsonData[] = this.cache.json.get(DataKey.Levels);
+        this.scene.start(SceneKey.Game2, {
+            player: {
+                moveVelocity: GAMEPLAY.initialSpeed,
+                jumpVelocity: GAMEPLAY.initialHeight,
+                maxJumps: 1,
+            },
+            state: {
+                targetPoints: GAMEPLAY.maximumPoints,
+                initialLifes: GAMEPLAY.maximumLifes,
+                speedBonus: GAMEPLAY.speedBonusStep,
+                speedBonusMax: GAMEPLAY.speedBonusMax,
+                speedBonusTick: GAMEPLAY.speedBonusTick,
+            },
+            level: {
+                // levelIdx: randomInt(0, levelData.length),
+                levelIdx: 0,
+            },
         } as GameSceneParams);
     }
 }

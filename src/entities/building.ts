@@ -1,22 +1,22 @@
 import { GAME_HEIGHT, GAME_WIDTH } from "../shared/constants";
-import { TilePhysEntity, TileEntity } from "../shared/factories";
+import { TilePhysEntity } from "../shared/factories";
 import { EntityKey } from "../shared/keys";
-import { randomInt, snapToTile } from "../shared/utils";
+import { randomInt, snap } from "../shared/utils";
 
 export class Building extends TilePhysEntity({
-    key: EntityKey.Building,
+    key: EntityKey.Buildings,
     size: [48, 32],
     offset: [0, 0],
     tilesize: 48,
     static: true,
 }) {
-    readonly buildingTop: BuildingTop;
+    readonly buildingTop: Phaser.GameObjects.Sprite;
     private static lastBuildingSize: number = 0;
 
-    constructor(scene: Phaser.Scene, x: number, height: number, frame: number) {
+    constructor(scene: Phaser.Scene, x: number, y: number, frame: number) {
         super(scene);
-        this.setPosition(x, GAME_HEIGHT - Building.tilesize * height)
-            .setSize(48, Building.tilesize * height)
+        this.setPosition(x, GAME_HEIGHT - y)
+            .setSize(48, y)
             .setFrame(frame)
             .setOrigin(0);
 
@@ -26,21 +26,20 @@ export class Building extends TilePhysEntity({
 
         this.body.updateFromGameObject();
 
-        this.buildingTop = new BuildingTop(scene);
-        this.buildingTop.updateByParent(this);
+        this.buildingTop = scene.add
+            .sprite(this.x, this.y - 16, EntityKey.BuildingTops)
+            .setOrigin(0, 0);
+    }
+
+    setColor(color: number | string) {
+        this.setTint(+color);
+        this.buildingTop.setTint(+color);
+        return this;
     }
 
     update(): void {
         const { scrollX } = this.scene.cameras.main;
         if (this.x + Building.tilesize < scrollX) {
-
-            // TODO:
-            // 1. Separate Building class - make BuildingGenerator (optional)
-            // 2. Fix spawn - sometimes it spawns -0.5 then 3
-            //
-            // IDEA:
-            // Add Base or Trait(Mixin) to have Generatable for Buildings and Collectables
-
             const floors = Building.lastBuildingSize >= 2 // allow "empty" spawn only after building with 2 blocks
                 ? randomInt(0, 3) - 0.5 // chance to spawn empty space
                 : randomInt(0, 2) + 0.5
@@ -58,32 +57,14 @@ export class Building extends TilePhysEntity({
 
         const height = h * floors;
 
-        const x = snapToTile(this.x + GAME_WIDTH * 2, w);
+        const x = snap(this.x + GAME_WIDTH * 2, w);
         const y = GAME_HEIGHT - height;
-
-        // console.log(x, y);
-        // console.log('HEIGHT', height);
-        // console.log('RESET', `from ${(this.x / 48).toFixed(1)} to ${(x / 48).toFixed(0)}`);
 
         this.setPosition(x, y)
             .setSize(48, height)
             .setFrame(frame);
         this.body.updateFromGameObject();
-        this.buildingTop.updateByParent(this);
-        this.buildingTop.setFrame(randomInt(0, 3));
-    }
-}
-
-class BuildingTop extends TileEntity({
-    key: EntityKey.BuildingTop,
-    size: [48, 16],
-    origin: [0, 0],
-    tilesize: 16,
-}) {
-    updateByParent(building: Building) {
-        const { x, y } = building.body;
-        this.setPosition(x, y - 16);
-        this.setTint(building.tint);
-        return this;
+        this.buildingTop.setPosition(this.x, this.y - 16);
+        this.buildingTop.setFrame(randomInt(0, 4));
     }
 }
