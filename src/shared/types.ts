@@ -1,5 +1,4 @@
-export type LevelsJsonData = {
-    sky: string,
-    backgrounds: [frame: number, y: number, color: string, scrollScale: number, autoScroll?: boolean][]
-    buildings: string,
-}
+export type Size = [width: number, height: number];
+
+export type Point = [x: number, y: number];
+

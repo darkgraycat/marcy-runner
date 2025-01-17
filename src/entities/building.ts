@@ -10,8 +10,12 @@ export class Building extends TilePhysEntity({
     tilesize: 48,
     static: true,
 }) {
-    readonly buildingTop: Phaser.GameObjects.Sprite;
-    private static lastBuildingSize: number = 0;
+    static readonly EventSpawned = 'events_building_spawned';
+
+    private static lastBuildingWidth: number = 0;
+    private static lastBuildingHeight: number = 0;
+
+    private buildingTop: Phaser.GameObjects.Sprite;
 
     constructor(scene: Phaser.Scene, x: number, y: number, frame: number) {
         super(scene);
@@ -38,33 +42,35 @@ export class Building extends TilePhysEntity({
     }
 
     update(): void {
-        const { scrollX } = this.scene.cameras.main;
-        if (this.x + Building.tilesize < scrollX) {
-            const floors = Building.lastBuildingSize >= 2 // allow "empty" spawn only after building with 2 blocks
-                ? randomInt(0, 3) - 0.5 // chance to spawn empty space
-                : randomInt(0, 2) + 0.5
+        if (this.x + Building.tilesize < this.scene.cameras.main.scrollX) {
+            const lastFloors = Math.ceil(Building.lastBuildingHeight);
+            const maxWidth = randomInt(2, 8);
+            let floors = 0;
+            if (Building.lastBuildingWidth >= maxWidth) {
+                floors = 0;
+                Building.lastBuildingWidth = 0;
+            } else {
+                Building.lastBuildingWidth++;
+                floors = randomInt(
+                    Math.max(lastFloors - 1, 1),
+                    Math.min(lastFloors + 2, 4),
+                );
+            }
 
-            const randFrame = randomInt(0, 5);
-            this.reset(floors, randFrame);
+            Building.lastBuildingHeight = floors;
+            this.respawn(floors - 0.5); // subtract 0.5 to make sure it invisible in case floors is 0
         }
     }
 
-    reset(floors = 1, frame = 0) {
+    respawn(floors = 1, frame = 0) {
         const [w, h] = Building.config.size;
-
-        if (floors < 0) Building.lastBuildingSize = 0;
-        else Building.lastBuildingSize++;
-
         const height = h * floors;
-
         const x = snap(this.x + GAME_WIDTH * 2, w);
         const y = GAME_HEIGHT - height;
 
-        this.setPosition(x, y)
-            .setSize(48, height)
-            .setFrame(frame);
+        this.setPosition(x, y).setSize(48, height).setFrame(frame);
         this.body.updateFromGameObject();
-        this.buildingTop.setPosition(this.x, this.y - 16);
-        this.buildingTop.setFrame(randomInt(0, 4));
+        this.buildingTop.setPosition(this.x, this.y - 16).setFrame(randomInt(0, 4));
+        this.scene.events.emit(Building.EventSpawned, [x, y]);
     }
 }

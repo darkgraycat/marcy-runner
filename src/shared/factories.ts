@@ -1,14 +1,5 @@
 import Phaser from "phaser";
-
-
-
-/* Common */
-namespace Common {
-    export type Size = [width: number, height: number];
-    export type Point = [x: number, y: number];
-}
-
-
+import { Point, Size } from "./types";
 
 /* Scenes */
 
@@ -43,15 +34,14 @@ export function Scene<Params>(key: string, defaultParams: Params) {
 
 
 /* Entities */
-
-type EntityClass =
+export type EntityClass =
     ReturnType<typeof Entity> |
     ReturnType<typeof TileEntity>;
 
-type EntityConfig = {
+export type EntityConfig = {
     key: string,
-    size: Common.Size,
-    origin: Common.Point
+    size: Size,
+    origin?: Point,
 }
 
 export function Entity(config: EntityConfig) {
@@ -60,7 +50,7 @@ export function Entity(config: EntityConfig) {
         constructor(scene: Phaser.Scene) {
             super(scene, 0, 0, config.key);
             const [w, h] = config.size;
-            const [x, y] = config.origin;
+            const [x, y] = config.origin || [0, 0];
             scene.add
                 .existing(this)
                 .setSize(w, h)
@@ -97,14 +87,14 @@ export function TileEntity(config: EntityConfig & { tilesize: number }) {
 
 /* Phys Entities */
 
-type PhysEntityClass =
+export type PhysEntityClass =
     ReturnType<typeof PhysEntity> |
     ReturnType<typeof TilePhysEntity>;
 
-type PhysEntityConfig = {
+export type PhysEntityConfig = {
     key: string,
-    size: Common.Size,         // TODO: fix. Currently size ignored if static = true
-    offset: Common.Point,      // TODO: fix. Currently offset ignored if static = true
+    size: Size,
+    offset?: Point,
     static?: boolean,
 }
 
@@ -115,11 +105,15 @@ export function PhysEntity(config: PhysEntityConfig) {
         constructor(scene: Phaser.Scene) {
             super(scene, 0, 0, config.key);
             const [w, h] = config.size;
-            const [x, y] = config.offset;
+            const [x, y] = config.offset || [0, 0];
             scene.physics.add
                 .existing(scene.add.existing(this), config.static)
                 .setSize(w, h)
                 .setOffset(x, y);
+        }
+        updateBody() {
+            this.body.updateFromGameObject();
+            return this;
         }
     }
 }
@@ -148,16 +142,19 @@ export function TilePhysEntity(config: PhysEntityConfig & { tilesize: number }) 
             this.body.updateFromGameObject();
             return this;
         }
+        updateBody() {
+            this.body.updateFromGameObject();
+            return this;
+        }
     }
 }
 
 
 
 /* Groups */
+type GroupEntityCallback<T extends EntityClass | PhysEntityClass> = (entity: T) => void;
 
-type GroupEntityCallback<T extends EntityClass> = (entity: T) => void;
-
-type GroupEntityConfig<T extends EntityClass> = {
+type GroupEntityConfig<T extends EntityClass | PhysEntityClass> = {
     class: T;
     update: boolean;
     capacity: number;
@@ -165,7 +162,7 @@ type GroupEntityConfig<T extends EntityClass> = {
     onRemove?: GroupEntityCallback<T>;
 }
 
-export function GroupEntity<T extends EntityClass>(config: GroupEntityConfig<T>) {
+export function GroupEntity<T extends EntityClass | PhysEntityClass>(config: GroupEntityConfig<T>) {
     return class GroupEntity extends Phaser.GameObjects.Group {
         static readonly config = config;
         constructor(scene: Phaser.Scene, children?: Phaser.GameObjects.Sprite[] | Phaser.GameObjects.TileSprite[]) {
@@ -179,7 +176,7 @@ export function GroupEntity<T extends EntityClass>(config: GroupEntityConfig<T>)
             scene.add.existing(this);
         }
 
-        forEach<K = void>(callback: (child: T, index?: number) => K) {
+        forEach<K = void>(callback: (child: InstanceType<T>, index?: number) => K) {
             this.getChildren().forEach((go, i) => {
                 callback(go as any, i)
             });
@@ -188,8 +185,10 @@ export function GroupEntity<T extends EntityClass>(config: GroupEntityConfig<T>)
 }
 
 
+// UNUSED DUE TO ERRORS
 type GroupPhysEntityCallback<T extends PhysEntityClass> = (entity: T) => void;
 
+// UNUSED DUE TO ERRORS
 type GroupPhysEntityConfig<T extends PhysEntityClass> = {
     class: T;
     update: boolean;
@@ -198,6 +197,7 @@ type GroupPhysEntityConfig<T extends PhysEntityClass> = {
     onRemove?: GroupPhysEntityCallback<T>;
 }
 
+// UNUSED DUE TO ERRORS
 export function GroupPhysEntity<T extends PhysEntityClass>(config: GroupPhysEntityConfig<T>) {
     return class GroupPhysEntity extends Phaser.Physics.Arcade.Group {
         static readonly config = config;
@@ -219,3 +219,18 @@ export function GroupPhysEntity<T extends PhysEntityClass>(config: GroupPhysEnti
         }
     }
 }
+
+
+type EntityContainerConfig<T extends EntityClass | PhysEntityClass> = {
+
+}
+
+export function EntityContainer<T extends EntityClass | PhysEntityClass>(config: EntityContainerConfig<T>) {
+    return class EntityContainer extends Phaser.GameObjects.Container {
+        constructor(scene: Phaser.Scene, children?: (Phaser.GameObjects.Sprite | Phaser.Physics.Arcade.Sprite)[]) {
+            super(scene, 0, 0, children);
+            scene.add.existing(this);
+        }
+    }
+}
+

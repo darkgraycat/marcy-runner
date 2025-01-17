@@ -1,9 +1,10 @@
 import { Scene } from "../shared/factories";
 import { DEBUG, GAMEPLAY } from "../shared/settings";
-import { EntityKey, EntityAnimation, SceneKey, UiKey, AudioKey, FontKey, DataKey } from "../shared/keys";
+import { EntityKey, EntityAnimation, SceneKey, UiKey, AudioKey, FontKey } from "../shared/keys";
 import { GameSceneParams } from "./game";
-import { LevelsJsonData } from "../shared/types";
 import { randomInt } from "../shared/utils";
+import strings from "../data/strings";
+import levels from "../data/levels";
 
 export class BootScene extends Scene(SceneKey.Boot, {}) {
     preload() {
@@ -21,12 +22,6 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
             { key: UiKey.Title, path: "assets/images/title.png" },
             { key: UiKey.UiMenu, path: "assets/images/ui_menu.png" },
         ].forEach(({ key, path }) => this.load.image(key, path));
-
-        [   /* json */
-            { key: DataKey.Strings, path: "assets/json/strings.json" },
-            { key: DataKey.Levels, path: "assets/json/levels.json" },
-            { key: DataKey.LevelTheme, path: "assets/json/level_theme.json" },
-        ].forEach(({ key, path }) => this.load.json(key, path));
 
         [   /* spritesheet */
             { key: EntityKey.Player, path: "assets/images/player.png", size: [16, 16] },
@@ -53,8 +48,8 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
             { key: EntityAnimation.PlayerIdle, assetKey: EntityKey.Player, frames: [0, 1], frameRate: 8, repeat: -1 },
             { key: EntityAnimation.PlayerWalk, assetKey: EntityKey.Player, frames: [5, 6, 6, 7], frameRate: 16, repeat: -1 },
             { key: EntityAnimation.PlayerJump, assetKey: EntityKey.Player, frames: [4, 4, 6, 6], frameRate: 16, repeat: 0 },
-            { key: EntityAnimation.CollectablePillIdle, assetKey: EntityKey.Collectables, frames: [0, 1], frameRate: 8, repeat: -1 },
-            { key: EntityAnimation.CollectablePillDie, assetKey: EntityKey.Collectables, frames: [2, 3], frameRate: 8, repeat: -1 },
+            { key: EntityAnimation.CollectableLifeIdle, assetKey: EntityKey.Collectables, frames: [0, 1], frameRate: 8, repeat: -1 },
+            { key: EntityAnimation.CollectableLifeDie, assetKey: EntityKey.Collectables, frames: [2, 3], frameRate: 8, repeat: -1 },
             { key: EntityAnimation.CollectableDonutIdle, assetKey: EntityKey.Collectables, frames: [5], frameRate: 8, repeat: -1 },
             { key: EntityAnimation.CollectableBeanIdle, assetKey: EntityKey.Collectables, frames: [4], frameRate: 8, repeat: -1 },
             { key: EntityAnimation.CollectablePanacatIdle, assetKey: EntityKey.Collectables, frames: [6, 7], frameRate: 8, repeat: -1 },
@@ -70,8 +65,7 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
         this.cameras.main.fadeIn(5000, 0x000000);
         this.cameras.main.setBackgroundColor(0xffffff)
 
-        this.add.bitmapText(132, 32, FontKey.Minogram, "boot screen").setOrigin(0.5);
-
+        this.add.bitmapText(132, 32, FontKey.Minogram, strings.bootScene.title).setOrigin(0.5);
 
         // if (DEBUG.fastRestart) return this.startGame();
         if (DEBUG.fastRestart) return this.startGame();
@@ -83,23 +77,21 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
     }
 
     private startGame() {
-        const levelData: LevelsJsonData[] = this.cache.json.get(DataKey.Levels);
-        this.scene.start(SceneKey.Game2, {
+        this.scene.start(SceneKey.Game, {
             player: {
                 moveVelocity: GAMEPLAY.initialSpeed,
                 jumpVelocity: GAMEPLAY.initialHeight,
                 maxJumps: 1,
             },
             state: {
-                targetPoints: GAMEPLAY.maximumPoints,
-                initialLifes: GAMEPLAY.maximumLifes,
+                targetPoints: GAMEPLAY.targetPoints,
+                initialLifes: GAMEPLAY.initialLifes,
                 speedBonus: GAMEPLAY.speedBonusStep,
                 speedBonusMax: GAMEPLAY.speedBonusMax,
                 speedBonusTick: GAMEPLAY.speedBonusTick,
             },
             level: {
-                // levelIdx: randomInt(0, levelData.length),
-                levelIdx: 0,
+                levelIdx: randomInt(0, levels.length),
             },
         } as GameSceneParams);
     }

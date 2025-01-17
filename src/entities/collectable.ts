@@ -1,22 +1,27 @@
 import { EntityKey, EntityAnimation } from "../shared/keys";
 import { PhysEntity } from "../shared/factories";
-import { random, randomInt, snap } from "../shared/utils";
-import { GAME_WIDTH } from "../shared/constants";
+import { randomByProbability, randomElement } from "../shared/utils";
 import { SPAWN_RATES } from "../shared/settings";
 
 export enum CollectableType {
     Panacat,
-    Bean
+    Bean,
+    Life,
 }
 
-const TINTS = {
-    [CollectableType.Panacat]: [0xffeedd, 0xffddcc, 0xffccbb, 0xffbbaa, 0xffaa99],
-    [CollectableType.Bean]: [0x884422, 0x995533, 0x663311],
-}
-
-const ANIMATIONS = {
-    [CollectableType.Panacat]: [EntityAnimation.CollectablePanacatIdle, null],
-    [CollectableType.Bean]: [EntityAnimation.CollectableBeanIdle, null],
+const CollectableConfig = {
+    [CollectableType.Panacat]: {
+        tints: [0xffeedd, 0xffddcc, 0xffccbb, 0xffbbaa, 0xffaa99],
+        animations: [EntityAnimation.CollectablePanacatIdle, null],
+    },
+    [CollectableType.Bean]: {
+        tints: [0x884422, 0x995533, 0x663311],
+        animations: [EntityAnimation.CollectableBeanIdle, null],
+    },
+    [CollectableType.Life]: {
+        tints: [0xff8833],
+        animations: [EntityAnimation.CollectableLifeIdle, EntityAnimation.CollectableLifeDie],
+    },
 }
 
 export class Collectable extends PhysEntity({
@@ -26,9 +31,6 @@ export class Collectable extends PhysEntity({
     static: true,
 }) {
     private static probabilityMap = SPAWN_RATES.COLLECTABLES;
-    private static totalProbability = Object
-        .values(SPAWN_RATES.COLLECTABLES)
-        .reduce((acc, v) => acc += v, 0);
 
     private collectableType: CollectableType;
 
@@ -41,54 +43,54 @@ export class Collectable extends PhysEntity({
     }
 
     update() {
-        const { scrollX } = this.scene.cameras.main;
-        if (this.x + 16 < scrollX) {
-            this.reset();
+        if (this.x + 16 < this.scene.cameras.main.scrollX) {
+            this.setActive(false).setVisible(false).disableBody();
         }
     }
 
-    reset() {
-        this.collectableType = Collectable.getRandomCollectableType();
+    collect() {
+        this.disableBody();
+        if (this.animation.die) {
+            this.play(this.animation.die);
+            setTimeout(() => this.setActive(false).setVisible(false), 200);
+        } else {
+            this.setActive(false).setVisible(false);
+        }
+        return this;
+    }
 
-        const x = snap(this.x + GAME_WIDTH * 2, this.width);
-        const y = randomInt(1, 5) * 16;
-
-        this.setPosition(x, y)
-            .setTint(this.getRandomTint())
-            .play(this.getAnimationIdle())
-        this.body.updateFromGameObject();
+    respawn(x: number, y: number, type: CollectableType) {
+        this.collectableType = type;
+        return this.setActive(true).setVisible(true).enableBody()
+            .setPosition(x, y)
+            .updateBody()
+            .setTint(this.randomTint)
+            .play(this.animation.idle)
     }
 
     getType() {
         return this.collectableType;
     }
 
-    getRandomTint(): number {
-        const tints = TINTS[this.collectableType];
-        return tints[randomInt(0, tints.length)];
+    get currentType() {
+        return this.collectableType;
     }
 
-    getAnimationIdle(): string {
-        return ANIMATIONS[this.collectableType][0];
+    get animation() {
+        const [idle, die] = CollectableConfig[this.collectableType].animations;
+        return { idle, die };
     }
 
-    getAnimationDie(): string {
-        return ANIMATIONS[this.collectableType][1];
+    get randomTint(): number {
+        return randomElement(CollectableConfig[this.collectableType].tints);
     }
 
-    static getRandomCollectableType(): CollectableType {
-        const rand = random(0, Collectable.totalProbability);
-
-        let cumulativeProbability = 0;
-
-        for (const [key, probability] of Object.entries(Collectable.probabilityMap)) {
-            cumulativeProbability += probability;
-            if (rand < cumulativeProbability) {
-                switch (key) {
-                    case 'panacat': return CollectableType.Panacat;
-                    case 'bean': return CollectableType.Bean;
-                }
-            }
+    static get randomType(): CollectableType {
+        const key = randomByProbability(Collectable.probabilityMap);
+        switch (key) {
+            case 'panacat': return CollectableType.Panacat;
+            case 'bean': return CollectableType.Bean;
+            case 'life': return CollectableType.Life;
         }
         return CollectableType.Panacat;
     }

@@ -3,8 +3,8 @@ import { PhysEntity } from "../shared/factories";
 
 export class Player extends PhysEntity({
     key: EntityKey.Player,
-    size: [20, 16],
-    offset: [-4, 0],
+    size: [24, 16],
+    offset: [-8, 0],
 }) {
     move(velocity: number) {
         this.flipX = velocity < 0;

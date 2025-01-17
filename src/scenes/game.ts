@@ -1,14 +1,15 @@
+import levels from "../data/levels";
 import { Background } from "../entities/background";
 import { Building } from "../entities/building";
-import { Building2 } from "../entities/building2";
 import { Collectable, CollectableType } from "../entities/collectable";
 import { Player } from "../entities/player";
 import { Sun } from "../entities/sun";
 import { GAME_DEFAULT_FONT, GAME_HEIGHT, GAME_WIDTH } from "../shared/constants";
 import { Scene } from "../shared/factories";
-import { AudioKey, DataKey, FontKey, SceneKey } from "../shared/keys";
+import { AudioKey, FontKey, SceneKey } from "../shared/keys";
 import { SETTINGS } from "../shared/settings";
-import { LevelsJsonData } from "../shared/types";
+import { Point } from "../shared/types";
+import { randomInt } from "../shared/utils";
 import { OverSceneParams } from "./over";
 
 export type GameSceneParams = {
@@ -28,7 +29,7 @@ export type GameSceneParams = {
     }
 }
 
-export class GameScene extends Scene(SceneKey.Game2, {
+export class GameScene extends Scene(SceneKey.Game, {
     player: { moveVelocity: 100, jumpVelocity: 200 },
     state: { targetPoints: 100, initialLifes: 3, speedBonus: 25, speedBonusTick: 1, speedBonusMax: 10 },
     level: { levelIdx: 0 },
@@ -65,7 +66,7 @@ export class GameScene extends Scene(SceneKey.Game2, {
 
     create() {
         super.create();
-        const levelData: LevelsJsonData = this.cache.json.get(DataKey.Levels)[this.params.level.levelIdx];
+        const level = levels[this.params.level.levelIdx];
 
         /* fx */
         this.fxJump = this.sound.add(AudioKey.Jump, { volume: SETTINGS.volumeEffects * 0.1, detune: -200 });
@@ -78,18 +79,18 @@ export class GameScene extends Scene(SceneKey.Game2, {
         this.sun = new Sun(this, 64, 32, 6);
 
         this.backgrounds = this.add.group({ runChildUpdate: true });
-        for (const [frame, y, color, scrollScale, autoScroll] of levelData.backgrounds) {
+        for (const [frame, y, color, scrollScale, autoScroll] of level.backgrounds) {
             this.backgrounds.add(new Background(this, frame, y, scrollScale, autoScroll).setColor(color))
         }
 
         this.buildings = this.add.group({ runChildUpdate: true });
         const totalBuildings = Math.round(2 * GAME_WIDTH / Building.tilesize);
         for (let i = 0; i < totalBuildings; i++) {
-            this.buildings.add(new Building(this, Building.tilesize * i, 48, 0).setColor(levelData.buildings))
+            this.buildings.add(new Building(this, Building.tilesize * i, 48, i % 5).setColor(level.buildings))
         }
 
         this.collectables = this.add.group({ runChildUpdate: true });
-        const totalCollectables = 10;
+        const totalCollectables = 12;
         for (let i = 0; i < totalCollectables; i++) {
             this.collectables.add(new Collectable(this, 32 * i, 400, 0xffffff));
         }
@@ -97,8 +98,8 @@ export class GameScene extends Scene(SceneKey.Game2, {
         this.player = new Player(this).setPosition(48, 64);
 
         /* controls */
-        this.input.keyboard.on(`keyup-SPACE`, () => this.handleActionKey(false));
         this.input.keyboard.on(`keydown-SPACE`, () => this.handleActionKey(true));
+        this.input.keyboard.on(`keyup-SPACE`, () => this.handleActionKey(false));
         this.input.on('pointerdown', () => this.handleActionKey(true));
         this.input.on('pointerup', () => this.handleActionKey(false));
 
@@ -120,21 +121,27 @@ export class GameScene extends Scene(SceneKey.Game2, {
             .setAlpha(0);
 
         /* other */
-        this.cameras.main.setBackgroundColor(levelData.sky);
-        this.cameras.main.startFollow(this.player, true, 0.2, 0, -96, 0);
+        this.cameras.main
+            .setBackgroundColor(level.sky)
+            .startFollow(this.player, true, 0.2, 0, -96, 0);
+
         this.statePointMilestones = [
             this.params.state.targetPoints * 0.25 | 0, // 25%
             this.params.state.targetPoints * 0.50 | 0, // 50%
             this.params.state.targetPoints * 0.75 | 0, // 75%
         ];
+        this.stateLifesLeft = this.params.state.initialLifes;
 
-        this.startRunning();
+        this.events.on(Building.EventSpawned, (payload: Point) => this.handleBuildingRespawn(payload));
+
+        this.handlePlayerRespawn();
     }
 
     update(time: number, delta: number): void {
         this.handlePlayer(delta);
         this.handleSpeedChange();
         this.handleUiText();
+
     }
 
     private handleActionKey(isDown: boolean) {
@@ -153,17 +160,17 @@ export class GameScene extends Scene(SceneKey.Game2, {
             this.player.idle();
         }
 
-        if (this.inputJumping) {
-            if (!this.inputJumpInProgress) {
-                this.player.jump(jumpVelocity);
-                this.inputJumpInProgress = true;
-                if (this.player.onGround)
-                    this.fxJump.play();
-            }
-        } else if (!this.player.onGround && this.player.body.velocity.y < 0) {
-            this.player.body.velocity.y /= 2;
-        } else {
+        if (this.player.onGround) {
             this.inputJumpInProgress = false;
+        } else if (!this.inputJumping && this.player.body.velocity.y < 0) {
+            this.player.body.velocity.y /= 2; // still in air, but jump key no longer active
+        }
+
+        if (this.inputJumping && !this.inputJumpInProgress) {
+            this.player.jump(jumpVelocity);
+            this.inputJumpInProgress = true;
+            if (this.player.onGround)
+                this.fxJump.play();
         }
 
         if (this.player.y > GAME_HEIGHT) {
@@ -175,13 +182,13 @@ export class GameScene extends Scene(SceneKey.Game2, {
         if (this.stateLifesLeft > 0) {
             this.stateLifesLeft--;
             this.stateIsRunning = false;
-            this.handleRespawn();
+            this.handlePlayerRespawn();
         } else {
             this.lose();
         }
     }
 
-    private handleRespawn() {
+    private handlePlayerRespawn() {
         const entries = this.buildings.getChildren() as Building[];
         const safeBuilding = entries
             .filter((b) => b.x > this.player.x)
@@ -195,6 +202,40 @@ export class GameScene extends Scene(SceneKey.Game2, {
 
         this.startRunning();
     }
+
+    handleBuildingRespawn(payload: Point) {
+        const [x, y] = payload;
+        if (y > GAME_HEIGHT * 0.8) return;
+
+        const typeToSpawn = Collectable.randomType;
+        const amountToSpawn = typeToSpawn == CollectableType.Life
+            ? 1 // life is only spawned as 1
+            : randomInt(1, 4); // 1, 2, or 3
+
+        const collectablesToRespawn = this.collectables
+            .getChildren()
+            .filter(c => !c.active)
+            .slice(0, amountToSpawn) as Collectable[];
+        if (!collectablesToRespawn.length) return;
+
+        const offsets = {
+            1: [[24, -16]],
+            2: [[24 - 8, -16], [24 + 8, -16]],
+            3: [[24 - 8, -16], [24 + 8, -16], [24, -16 - 8]],
+        }[collectablesToRespawn.length];
+
+        const height = {
+            [CollectableType.Bean]: 16,
+            [CollectableType.Life]: 32,
+        }[typeToSpawn] || 0;
+
+        collectablesToRespawn.forEach((c, i) => c.respawn(
+            x + offsets[i][0],
+            y + offsets[i][1] - height,
+            typeToSpawn,
+        ));
+    }
+
 
     private handleSpeedChange() {
         this.stateSpeedMod -= this.params.state.speedBonusTick;
@@ -210,9 +251,8 @@ export class GameScene extends Scene(SceneKey.Game2, {
 
     private handleCollect(obj: any) {
         const collectable = obj as Collectable;
-        const collectableType = collectable.getType();
 
-        switch (collectableType) {
+        switch (collectable.currentType) {
             case CollectableType.Panacat: {
                 this.fxCollect.play();
                 this.statePoints++;
@@ -233,13 +273,14 @@ export class GameScene extends Scene(SceneKey.Game2, {
                 this.stateSpeedMod += this.params.state.speedBonus;
                 break;
             }
-            default: {
-                console.warn('Unhandled collectable type ' + collectableType);
+            case CollectableType.Life: {
+                this.fxMeowHigh.play();
+                this.stateLifesLeft++;
                 break;
             }
         }
 
-        collectable.reset();
+        collectable.collect();
     }
 
     private handleUiText() {
@@ -269,6 +310,7 @@ export class GameScene extends Scene(SceneKey.Game2, {
         );
     }
 
+    // TODO: refactor
     private startRunning() {
         this.showMainText("3", () => {
             this.showMainText("2", () => {
@@ -282,14 +324,16 @@ export class GameScene extends Scene(SceneKey.Game2, {
     }
 
 
+    // TODO: refactor, dont like one-shot approach
     private showMainText(text: string, callback: () => void) {
+        const duration = 111;
         this.textMain.setText(text);
         this.tweens.chain({
             targets: this.textMain,
             tweens: [
-                { alpha: 1, duration: 300 },
-                { alpha: 1, duration: 400 },
-                { alpha: 0, duration: 300 }
+                { alpha: 1, duration },
+                { alpha: 1, duration },
+                { alpha: 0, duration },
             ],
             onComplete: callback
         });
