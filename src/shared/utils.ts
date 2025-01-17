@@ -64,3 +64,8 @@ export function colorToRgb(hex: number) {
 export function colorToHex([r, g, b]: number[]) {
     return (r << 16) | (g << 8) | b;
 }
+
+export function formatString(str: string, ...args: (string | number)[]) {
+    let index = 0;
+    return str.replace(/%s/g, (match) => `${args[index++]}` ?? match);
+}

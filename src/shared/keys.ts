@@ -41,6 +41,7 @@ export const AudioKey = {
 }
 
 export const FontKey = {
+    MKit: "AssetFontMKit",
     Minogram: "AssetFontMinogram",
     Round: "AssetFontRound",
     Square: "AssetFontSquare",

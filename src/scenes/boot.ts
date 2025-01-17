@@ -1,12 +1,16 @@
 import { Scene } from "../shared/factories";
-import { DEBUG, GAMEPLAY } from "../shared/settings";
+import { DEBUG, GAMEPLAY, SETTINGS } from "../shared/settings";
 import { EntityKey, EntityAnimation, SceneKey, UiKey, AudioKey, FontKey } from "../shared/keys";
 import { GameSceneParams } from "./game";
 import { randomInt } from "../shared/utils";
 import strings from "../data/strings";
 import levels from "../data/levels";
+import { UiText } from "../entities/ui";
 
 export class BootScene extends Scene(SceneKey.Boot, {}) {
+    textTitle: UiText;
+    textObjectives: UiText;
+
     preload() {
         [   /* audio */
             { key: AudioKey.MainTheme, path: "assets/audio/main_theme.mp3" },
@@ -38,7 +42,9 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
             { key: FontKey.Round, path: "assets/fonts/round_6x6.png", xml: "assets/fonts/round_6x6.xml" },
             { key: FontKey.Square, path: "assets/fonts/square_6x6.png", xml: "assets/fonts/square_6x6.xml" },
             { key: FontKey.Thick, path: "assets/fonts/thick_8x8.png", xml: "assets/fonts/thick_8x8.xml" },
+            { key: FontKey.MKit, path: "assets/fonts/mkit-bitmap.png", xml: "assets/fonts/mkit-bitmap.xml" },
         ].forEach(({ key, path, xml }) => this.load.bitmapFont(key, path, xml));
+
     }
 
     create() {
@@ -62,18 +68,27 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
             })
         );
 
-        this.cameras.main.fadeIn(5000, 0x000000);
-        this.cameras.main.setBackgroundColor(0xffffff)
+        this.cameras.main.setBackgroundColor(0x000000);
+        //this.cameras.main.fadeOut(5000, 0xff0000);
+        // this.cameras.main.setBackgroundColor(0xffffff)
 
-        this.add.bitmapText(132, 32, FontKey.Minogram, strings.bootScene.title).setOrigin(0.5);
+        const { width, height } = this.scale;
+        this.textTitle = new UiText(this, strings.bootScene.title)
+            .setTextArgs(SETTINGS.userName)
+            .setOrigin(0.5)
+            .setPosition(132, 32);
+        this.textObjectives = new UiText(this, strings.bootScene.objectives)
+            .setTextArgs(GAMEPLAY.targetPoints)
+            .setOrigin(0.5)
+            .setTint(0xff8822)
+            .setPosition(width / 2, height - 32);
 
-        // if (DEBUG.fastRestart) return this.startGame();
         if (DEBUG.fastRestart) return this.startGame();
 
-        // setTimeout(() => {
-        //     this.input.keyboard.on('keydown', () => this.startGame());
-        //     this.input.on('pointerdown', () => this.startGame());
-        // }, 2000);
+        setTimeout(() => {
+            this.input.keyboard.on('keydown', () => this.startGame());
+            this.input.on('pointerdown', () => this.startGame());
+        }, 1000);
     }
 
     private startGame() {

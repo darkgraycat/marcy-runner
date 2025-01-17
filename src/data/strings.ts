@@ -1,5 +1,14 @@
 export default {
     bootScene: {
-        title: "Hello Marsichka!"
+        title: "Привіт %s!",
+        objectives: "Збери %s панакотиків\nТа отримай приз!",
+        buttonStart: "Почати гру",
+        hints: "",
+    },
+    gameScene: {
+        panacatsCollected: "%s :",
+        lifesLeft: "§ %s",
+        caffeine: "%s",
     }
+
 }

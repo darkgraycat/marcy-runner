@@ -13,6 +13,7 @@ export const SETTINGS = {
     volumeMusic: 0.5,
     // volumeEffects: 0.3,
     volumeEffects: 0.0,
+    userName: "Марсічка",
 }
 
 export const SPAWN_RATES = {
@@ -24,6 +25,6 @@ export const SPAWN_RATES = {
 }
 
 export const DEBUG = {
-    fastRestart: true,
+    fastRestart: false,
     debugPhysics: false,
 }

@@ -13,7 +13,6 @@ export default new Phaser.Game({
     width: GAME_WIDTH,
     height: GAME_HEIGHT,
     pixelArt: true,
-    backgroundColor: "#fed",
     scene: [BootScene, GameScene, OverScene],
     parent: "content",
     scale: {

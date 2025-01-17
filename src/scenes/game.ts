@@ -1,9 +1,11 @@
 import levels from "../data/levels";
+import strings from "../data/strings";
 import { Background } from "../entities/background";
 import { Building } from "../entities/building";
 import { Collectable, CollectableType } from "../entities/collectable";
 import { Player } from "../entities/player";
 import { Sun } from "../entities/sun";
+import { UiText } from "../entities/ui";
 import { GAME_DEFAULT_FONT, GAME_HEIGHT, GAME_WIDTH } from "../shared/constants";
 import { Scene } from "../shared/factories";
 import { AudioKey, FontKey, SceneKey } from "../shared/keys";
@@ -56,11 +58,10 @@ export class GameScene extends Scene(SceneKey.Game, {
     fxMeowHigh: Phaser.Sound.NoAudioSound | Phaser.Sound.HTML5AudioSound | Phaser.Sound.WebAudioSound;
     fxCollect: Phaser.Sound.NoAudioSound | Phaser.Sound.HTML5AudioSound | Phaser.Sound.WebAudioSound;
 
-    textPoints: Phaser.GameObjects.BitmapText;
-    textStats: Phaser.GameObjects.BitmapText;
-    textLifes: Phaser.GameObjects.BitmapText;
-    textDistance: Phaser.GameObjects.BitmapText;
-    textMain: Phaser.GameObjects.BitmapText;
+    textPanacats: UiText;
+    textCaffeine: UiText;
+    textLifes: UiText;
+    textMain: UiText;
 
     debugText: Phaser.GameObjects.BitmapText;
 
@@ -110,14 +111,19 @@ export class GameScene extends Scene(SceneKey.Game, {
         this.debugText = this.add.bitmapText(16, 16, FontKey.Minogram, "").setScrollFactor(0);
 
         /* text */
-        this.textPoints = this.add.bitmapText(GAME_WIDTH / 2, GAME_HEIGHT - 8, GAME_DEFAULT_FONT).setScrollFactor(0).setOrigin(0.5);
-        this.textDistance = this.add.bitmapText(GAME_WIDTH, 4, GAME_DEFAULT_FONT).setScrollFactor(0).setOrigin(0);
-        this.textStats = this.add.bitmapText(4, 4, GAME_DEFAULT_FONT).setScrollFactor(0).setOrigin(0);
-        this.textLifes = this.add.bitmapText(32, 13, GAME_DEFAULT_FONT).setScrollFactor(0).setOrigin(0);
-
-        this.textMain = this.add.bitmapText(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_DEFAULT_FONT, "", 32)
-            .setScrollFactor(0)
+        this.textLifes = new UiText(this, strings.gameScene.lifesLeft)
+            .setOrigin(0, 0)
+            .setPosition(4, 4);
+        this.textPanacats = new UiText(this, strings.gameScene.panacatsCollected)
+            .setOrigin(1, 0)
+            .setPosition(GAME_WIDTH - 4, 4);
+        this.textCaffeine = new UiText(this, strings.gameScene.caffeine)
             .setOrigin(0.5)
+            .setPosition(GAME_WIDTH / 2, GAME_HEIGHT - 8);
+        this.textMain = new UiText(this)
+            .setOrigin(0.5)
+            .setPosition(GAME_WIDTH / 2, GAME_HEIGHT / 2)
+            .setScale(4)
             .setAlpha(0);
 
         /* other */
@@ -284,15 +290,9 @@ export class GameScene extends Scene(SceneKey.Game, {
     }
 
     private handleUiText() {
-        const scoreTxt = `Collected [${this.statePoints} of ${this.params.state.targetPoints}]`;
-        const heartsTxt = ';'.repeat(this.stateLifesLeft)
-        const caffeineTxt = 'Caffeine ' + '_'.repeat(Math.round(this.stateSpeedMod / this.params.state.speedBonus));
-        const distanceTxt = `Distance ${this.cameras.main.scrollX.toFixed(0).padStart(6, '0')}`;
-
-        this.textPoints.text = scoreTxt;
-        this.textStats.text = `${caffeineTxt}\nLifes`;
-        this.textLifes.text = heartsTxt;
-        this.textDistance.text = distanceTxt;
+        this.textPanacats.setTextArgs(this.statePoints);
+        this.textCaffeine.setTextArgs('`'.repeat(Math.round(this.stateSpeedMod / this.params.state.speedBonus)));
+        this.textLifes.setTextArgs(';'.repeat(this.stateLifesLeft));
     }
 
     private lose() {
