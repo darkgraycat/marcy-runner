@@ -1,4 +1,4 @@
-import { EntityKey, EntityAnimation } from "../shared/keys";
+import { EntityKey, AnimationKey } from "../shared/keys";
 import { PhysEntity } from "../shared/factories";
 import { randomByProbability, randomElement } from "../shared/utils";
 import { SPAWN_RATES } from "../shared/settings";
@@ -11,16 +11,16 @@ export enum CollectableType {
 
 const CollectableConfig = {
     [CollectableType.Panacat]: {
-        tints: [0xffeedd, 0xffddcc, 0xffccbb, 0xffbbaa, 0xffaa99],
-        animations: [EntityAnimation.CollectablePanacatIdle, null],
+        tints: [0xff9e70, 0xffdf5f, 0xff8195, 0xdcff81],
+        animations: [AnimationKey.CollectablePanacatIdle, AnimationKey.CollectablePanacatDie],
     },
     [CollectableType.Bean]: {
-        tints: [0x884422, 0x995533, 0x663311],
-        animations: [EntityAnimation.CollectableBeanIdle, null],
+        tints: [0xbd7856, 0xc5764f, 0x824923],
+        animations: [AnimationKey.CollectableBeanIdle, AnimationKey.CollectableBeanDie],
     },
     [CollectableType.Life]: {
-        tints: [0xff8833],
-        animations: [EntityAnimation.CollectableLifeIdle, EntityAnimation.CollectableLifeDie],
+        tints: [0xff593a],
+        animations: [AnimationKey.CollectableLifeIdle, AnimationKey.CollectableLifeDie],
     },
 }
 
@@ -38,8 +38,8 @@ export class Collectable extends PhysEntity({
         super(scene);
         this.setPosition(x, y)
             .setTint(color)
-            .play(EntityAnimation.CollectablePanacatIdle);
-        this.body.updateFromGameObject();
+            .play(AnimationKey.CollectablePanacatIdle);
+        this.updateBody();
     }
 
     update() {

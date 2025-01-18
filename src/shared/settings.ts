@@ -1,11 +1,11 @@
 export const GAMEPLAY = {
-    targetPoints: 100,
-    initialLifes: 9,
+    targetPoints: 333,
+    initialLifes: 3,
     initialSpeed: 100,
     initialHeight: 200,
     speedBonusMax: 100,
-    speedBonusStep: 20,
-    speedBonusTick: 0.05,
+    speedBonusStep: 13,
+    speedBonusTick: 0.06,
 }
 
 export const SETTINGS = {
@@ -13,18 +13,19 @@ export const SETTINGS = {
     volumeMusic: 0.5,
     // volumeEffects: 0.3,
     volumeEffects: 0.0,
-    userName: "Марсічка",
+    // userName: "Марсічка",
+    userName: "Кицюня Кицик Котічка Кошеня Кицюрівна Кицька Киця".split(' ')[Math.random() * 6 | 0]
 }
 
 export const SPAWN_RATES = {
     COLLECTABLES: {
         panacat: 0.9,
-        bean: 0.6,
+        bean: 0.5,
         life: 0.05,
     },
 }
 
 export const DEBUG = {
-    fastRestart: true,
+    fastRestart: false,
     debugPhysics: false,
 }

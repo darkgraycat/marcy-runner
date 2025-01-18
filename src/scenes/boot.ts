@@ -1,6 +1,6 @@
 import { Scene } from "../shared/factories";
 import { DEBUG, GAMEPLAY, SETTINGS } from "../shared/settings";
-import { EntityKey, EntityAnimation, SceneKey, UiKey, AudioKey, FontKey } from "../shared/keys";
+import { EntityKey, AnimationKey, SceneKey, UiKey, AudioKey, FontKey } from "../shared/keys";
 import { GameSceneParams } from "./game";
 import { randomInt } from "../shared/utils";
 import strings from "../data/strings";
@@ -32,7 +32,7 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
             { key: EntityKey.Buildings, path: "assets/images/buildings2.png", size: [48, 32] },
             { key: EntityKey.BuildingTops, path: "assets/images/building-tops2.png", size: [48, 16] },
             { key: EntityKey.Backgrounds, path: "assets/images/backgrounds2.png", size: [64, 32] },
-            { key: EntityKey.Collectables, path: "assets/images/collectables.png", size: [16, 16] },
+            { key: EntityKey.Collectables, path: "assets/images/collectables2.png", size: [16, 16] },
         ].forEach(({ key, path, size: [frameWidth, frameHeight] }) =>
             this.load.spritesheet(key, path, { frameWidth, frameHeight })
         );
@@ -51,14 +51,18 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
         super.create();
 
         [   /* animaton */
-            { key: EntityAnimation.PlayerIdle, assetKey: EntityKey.Player, frames: [0, 1], frameRate: 8, repeat: -1 },
-            { key: EntityAnimation.PlayerWalk, assetKey: EntityKey.Player, frames: [5, 6, 6, 7], frameRate: 16, repeat: -1 },
-            { key: EntityAnimation.PlayerJump, assetKey: EntityKey.Player, frames: [4, 4, 6, 6], frameRate: 16, repeat: 0 },
-            { key: EntityAnimation.CollectableLifeIdle, assetKey: EntityKey.Collectables, frames: [0, 1], frameRate: 8, repeat: -1 },
-            { key: EntityAnimation.CollectableLifeDie, assetKey: EntityKey.Collectables, frames: [2, 3], frameRate: 8, repeat: -1 },
-            { key: EntityAnimation.CollectableDonutIdle, assetKey: EntityKey.Collectables, frames: [5], frameRate: 8, repeat: -1 },
-            { key: EntityAnimation.CollectableBeanIdle, assetKey: EntityKey.Collectables, frames: [4], frameRate: 8, repeat: -1 },
-            { key: EntityAnimation.CollectablePanacatIdle, assetKey: EntityKey.Collectables, frames: [6, 7], frameRate: 8, repeat: -1 },
+            { key: AnimationKey.PlayerIdle, assetKey: EntityKey.Player, frames: [0, 1], frameRate: 8, repeat: -1 },
+            { key: AnimationKey.PlayerWalk, assetKey: EntityKey.Player, frames: [5, 6, 6, 7], frameRate: 16, repeat: -1 },
+            { key: AnimationKey.PlayerJump, assetKey: EntityKey.Player, frames: [4, 4, 6, 6], frameRate: 16, repeat: 0 },
+
+            { key: AnimationKey.CollectablePanacatIdle, assetKey: EntityKey.Collectables, frames: [0, 1], frameRate: 8, repeat: -1 },
+            { key: AnimationKey.CollectablePanacatDie, assetKey: EntityKey.Collectables, frames: [2, 3], frameRate: 16, repeat: 0 },
+
+            { key: AnimationKey.CollectableBeanIdle, assetKey: EntityKey.Collectables, frames: [4, 5], frameRate: 8, repeat: -1 },
+            { key: AnimationKey.CollectableBeanDie, assetKey: EntityKey.Collectables, frames: [6, 7], frameRate: 16, repeat: 0 },
+
+            { key: AnimationKey.CollectableLifeIdle, assetKey: EntityKey.Collectables, frames: [8, 9], frameRate: 8, repeat: -1 },
+            { key: AnimationKey.CollectableLifeDie, assetKey: EntityKey.Collectables, frames: [10, 11], frameRate: 16, repeat: 0 },
         ].forEach(({ key, assetKey, frames, frameRate, repeat }) =>
             this.anims.create({
                 key,
@@ -68,20 +72,20 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
             })
         );
 
-        this.cameras.main.setBackgroundColor(0x000000);
-        //this.cameras.main.fadeOut(5000, 0xff0000);
-        // this.cameras.main.setBackgroundColor(0xffffff)
-
         const { width, height } = this.scale;
         this.textTitle = new UiText(this, strings.bootScene.title)
             .setTextArgs(SETTINGS.userName)
             .setOrigin(0.5)
-            .setPosition(132, 32);
+            .setPosition(width / 2, 32);
         this.textObjectives = new UiText(this, strings.bootScene.objectives)
             .setTextArgs(GAMEPLAY.targetPoints)
             .setOrigin(0.5)
             .setTint(0xff8822)
             .setPosition(width / 2, height - 32);
+
+        this.cameras.main.setBackgroundColor(0x000000);
+        //this.cameras.main.fadeOut(5000, 0xff0000);
+        //this.cameras.main.setBackgroundColor(0xffffff)
 
         if (DEBUG.fastRestart) return this.startGame();
 
@@ -106,7 +110,8 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
                 speedBonusTick: GAMEPLAY.speedBonusTick,
             },
             level: {
-                levelIdx: randomInt(0, levels.length),
+                // levelIdx: randomInt(0, levels.length),
+                levelIdx: 0
             },
         } as GameSceneParams);
     }

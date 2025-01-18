@@ -20,16 +20,19 @@ export const UiKey = {
     LogoBig: "asset_logo_big",
 }
 
-export const EntityAnimation = {
+export const AnimationKey = {
     PlayerWalk: "anim_player_walk",
     PlayerIdle: "anim_player_idle",
     PlayerJump: "anim_player_jump",
 
+    CollectablePanacatIdle: "anim_coll_panacat_idle",
+    CollectablePanacatDie: "anim_coll_panacat_die",
+
+    CollectableBeanIdle: "anim_coll_bean_idle",
+    CollectableBeanDie: "anim_coll_bean_die",
+
     CollectableLifeIdle: "anim_coll_life_idle",
     CollectableLifeDie: "anim_coll_life_die",
-    CollectableBeanIdle: "anim_coll_bean_idle",
-    CollectablePanacatIdle: "anim_coll_panacat_idle",
-    CollectableDonutIdle: "anim_coll_donut_idle",
 }
 
 export const AudioKey = {
