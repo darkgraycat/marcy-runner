@@ -1,18 +1,19 @@
 import levels from "../data/levels";
 import strings from "../data/strings";
 import { Background } from "../entities/background";
-import { Building } from "../entities/building";
 import { Collectable, CollectableType } from "../entities/collectable";
 import { Player } from "../entities/player";
 import { Sun } from "../entities/sun";
 import { UiText } from "../entities/ui";
-import { GAME_DEFAULT_FONT, GAME_HEIGHT, GAME_WIDTH } from "../shared/constants";
 import { Scene } from "../shared/factories";
-import { AudioKey, FontKey, SceneKey } from "../shared/keys";
-import { SETTINGS } from "../shared/settings";
+import { AudioKey, EventKey, SceneKey } from "../shared/keys";
 import { Point } from "../shared/types";
 import { randomInt } from "../shared/utils";
 import { OverSceneParams } from "./over";
+import { SETTINGS } from "../shared/settings";
+import { GAME_HEIGHT, GAME_WIDTH } from "../shared/constants";
+import { Building } from "../entities/building";
+import { BuildingRoof } from "../entities/building-roof";
 
 export type GameSceneParams = {
     player: {
@@ -40,6 +41,7 @@ export class GameScene extends Scene(SceneKey.Game, {
     sun: Sun;
     backgrounds: Phaser.GameObjects.Group;
     buildings: Phaser.GameObjects.Group;
+    buildingRoofs: Phaser.GameObjects.Group;
     collectables: Phaser.GameObjects.Group;
 
     inputJumping: boolean = false;
@@ -63,54 +65,59 @@ export class GameScene extends Scene(SceneKey.Game, {
     textLifes: UiText;
     textMain: UiText;
 
-    debugText: Phaser.GameObjects.BitmapText;
-
     create() {
         super.create();
         const level = levels[this.params.level.levelIdx];
 
-        /* fx */
+        /* #sound */
         this.fxJump = this.sound.add(AudioKey.Jump, { volume: SETTINGS.volumeEffects * 0.1, detune: -200 });
         this.fxWarp = this.sound.add(AudioKey.Warp, { volume: SETTINGS.volumeEffects * 0.3, detune: -200 });
         this.fxMeowLow = this.sound.add(AudioKey.Meow, { volume: SETTINGS.volumeEffects * 0.4, detune: -600 });
         this.fxMeowHigh = this.sound.add(AudioKey.Meow, { volume: SETTINGS.volumeEffects * 0.4, detune: 400 });
         this.fxCollect = this.sound.add(AudioKey.Collect, { volume: SETTINGS.volumeEffects * 0.4, detune: 400 });
 
-        /* entities */
+        /* #entities */
         this.sun = new Sun(this, 64, 32, 6);
 
         this.backgrounds = this.add.group({ runChildUpdate: true });
-        for (const [frame, y, color, scrollScale, autoScroll] of level.backgrounds) {
-            this.backgrounds.add(new Background(this, frame, y, scrollScale, autoScroll).setColor(color))
+        for (const [frame, y, color, scrollScale] of level.backgrounds) {
+            this.backgrounds.add(new Background(this, frame, y, scrollScale).setTint(color))
         }
 
+        const totalBuildings = Math.round(2 * GAME_WIDTH / Building.config.tilesize[0]);
         this.buildings = this.add.group({ runChildUpdate: true });
-        const totalBuildings = Math.round(2 * GAME_WIDTH / Building.tilesize);
+        this.buildingRoofs = this.add.group();
         for (let i = 0; i < totalBuildings; i++) {
-            this.buildings.add(new Building(this, Building.tilesize * i, 48, i % 5).setColor(level.buildings))
+            this.buildings.add(new Building(this, i, 1.5)
+                .setTint(level.buildings)
+                .setRandomFrame()
+            );
+            this.buildingRoofs.add(new BuildingRoof(this, i, 5)
+                .setRandomFrame()
+                .setTint(level.buildings)
+            );
         }
 
-        this.collectables = this.add.group({ runChildUpdate: true });
         const totalCollectables = 12;
+        this.collectables = this.add.group({ runChildUpdate: true });
         for (let i = 0; i < totalCollectables; i++) {
             this.collectables.add(new Collectable(this, 32 * i, 400, 0xffffff));
         }
 
+        /* #player */
         this.player = new Player(this).setPosition(48, 64);
 
-        /* controls */
+        /* #controls */
         this.input.keyboard.on(`keydown-SPACE`, () => this.handleActionKey(true));
         this.input.keyboard.on(`keyup-SPACE`, () => this.handleActionKey(false));
         this.input.on('pointerdown', () => this.handleActionKey(true));
         this.input.on('pointerup', () => this.handleActionKey(false));
 
-        /* physics */
+        /* #physics */
         this.physics.add.collider(this.buildings, this.player);
         this.physics.add.overlap(this.collectables, this.player, this.handleCollect, null, this);
 
-        this.debugText = this.add.bitmapText(16, 16, FontKey.Minogram, "").setScrollFactor(0);
-
-        /* text */
+        /* #ui */
         this.textLifes = new UiText(this, strings.gameScene.lifesLeft)
             .setOrigin(0, 0)
             .setPosition(4, 4);
@@ -138,7 +145,7 @@ export class GameScene extends Scene(SceneKey.Game, {
         ];
         this.stateLifesLeft = this.params.state.initialLifes;
 
-        this.events.on(Building.EventSpawned, (payload: Point) => this.handleBuildingRespawn(payload));
+        this.events.on(EventKey.BuildingSpawned, (payload: Point) => this.handleBuildingRespawn(payload));
 
         this.handlePlayerRespawn();
     }
@@ -150,12 +157,6 @@ export class GameScene extends Scene(SceneKey.Game, {
 
     }
 
-    private handleActionKey(isDown: boolean) {
-        if (this.stateIsRunning) {
-            this.inputJumping = isDown;
-        } else {
-        }
-    }
 
     private handlePlayer(delta: number) {
         const { player: { moveVelocity, jumpVelocity } } = this.params;
@@ -167,16 +168,15 @@ export class GameScene extends Scene(SceneKey.Game, {
         }
 
         if (this.player.onGround) {
-            this.inputJumpInProgress = false;
+            if (!this.inputJumping) this.inputJumpInProgress = false;
         } else if (!this.inputJumping && this.player.body.velocity.y < 0) {
             this.player.body.velocity.y /= 2; // still in air, but jump key no longer active
         }
 
         if (this.inputJumping && !this.inputJumpInProgress) {
-            this.player.jump(jumpVelocity);
             this.inputJumpInProgress = true;
-            if (this.player.onGround)
-                this.fxJump.play();
+            this.player.jump(jumpVelocity); // continue jump
+            if (this.player.onGround) this.fxJump.play();
         }
 
         if (this.player.y > GAME_HEIGHT) {
@@ -200,8 +200,12 @@ export class GameScene extends Scene(SceneKey.Game, {
             .filter((b) => b.x > this.player.x)
             .sort((a, b) => a.x - b.x)
             .filter((b) => b.y > 32)[0];
-        this.player.x = safeBuilding.x + 8;
-        this.player.y = safeBuilding.y - 16;
+        if (safeBuilding) {
+            this.player.x = safeBuilding.x + 8;
+            this.player.y = safeBuilding.y - 16;
+        } else {
+            this.player.y = 32;
+        }
         this.stateSpeedMod = 0;
         this.inputJumping = false;
         this.inputJumpInProgress = false;
@@ -211,35 +215,48 @@ export class GameScene extends Scene(SceneKey.Game, {
 
     handleBuildingRespawn(payload: Point) {
         const [x, y] = payload;
-        if (y > GAME_HEIGHT * 0.8) return;
+        // decorate new building
+        {
+            const [tileWidth] = Building.config.tilesize;
+            const findFree = (bd: any) => (bd.x + tileWidth) < this.cameras.main.scrollX;
+            const roof = this.buildingRoofs
+                .getChildren()
+                .find(findFree) as BuildingRoof;
+            if (roof) roof.setPosition(x, y).setRandomFrame();
+        }
 
-        const typeToSpawn = Collectable.randomType;
-        const amountToSpawn = typeToSpawn == CollectableType.Life
-            ? 1 // life is only spawned as 1
-            : randomInt(1, 4); // 1, 2, or 3
+        // respawn collectables
+        if (y < GAME_HEIGHT * 0.8) {
+            const typeToSpawn = Collectable.randomType;
+            const amountToSpawn = typeToSpawn == CollectableType.Life || typeToSpawn == CollectableType.Bean
+                ? 1 // life is only spawned as 1
+                : randomInt(1, 4); // 1, 2, or 3
 
-        const collectablesToRespawn = this.collectables
-            .getChildren()
-            .filter(c => !c.active)
-            .slice(0, amountToSpawn) as Collectable[];
-        if (!collectablesToRespawn.length) return;
+            const collectablesToRespawn = this.collectables
+                .getChildren()
+                .filter(c => !c.active)
+                .slice(0, amountToSpawn) as Collectable[];
 
-        const offsets = {
-            1: [[24, -16]],
-            2: [[24 - 8, -16], [24 + 8, -16]],
-            3: [[24 - 8, -16], [24 + 8, -16], [24, -16 - 8]],
-        }[collectablesToRespawn.length];
+            if (collectablesToRespawn.length) {
+                // TODO: move logic into Collectable class, and define spawn based on type
+                const offsets = {
+                    1: [[24, -8]],
+                    2: [[16, -8], [32, -8]],
+                    3: [[16, -8], [32, -8], [24, -16]],
+                }[collectablesToRespawn.length];
 
-        const height = {
-            [CollectableType.Bean]: 16,
-            [CollectableType.Life]: 32,
-        }[typeToSpawn] || 0;
+                const height = {
+                    [CollectableType.Bean]: 16,
+                    [CollectableType.Life]: 32,
+                }[typeToSpawn] || 0;
 
-        collectablesToRespawn.forEach((c, i) => c.respawn(
-            x + offsets[i][0],
-            y + offsets[i][1] - height,
-            typeToSpawn,
-        ));
+                collectablesToRespawn.forEach((c, i) => c.respawn(
+                    x + offsets[i][0],
+                    y + offsets[i][1] - height,
+                    typeToSpawn,
+                ));
+            }
+        }
     }
 
 
@@ -339,6 +356,21 @@ export class GameScene extends Scene(SceneKey.Game, {
         });
     }
 
+    private handleActionKey(isDown: boolean) {
+        this.inputJumping = isDown;
+    }
+
+    // TODO: doesnt, works - pauses own unpause event
+    // create overlay scene with ui and pause options
+    // or even have GameScene - as global overlay
+    private handlePauseKey() {
+        const { key } = this.scene;
+        if (this.scene.isSleeping(key)) {
+            this.scene.wake(key);
+        } else {
+            this.scene.pause(key);
+        }
+    }
 
     startOver(message: string, finished: boolean) {
         this.scene.start(SceneKey.Over, {

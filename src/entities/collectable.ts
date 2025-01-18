@@ -30,7 +30,7 @@ export class Collectable extends PhysEntity({
     offset: [0, 0],
     static: true,
 }) {
-    private static probabilityMap = SPAWN_RATES.COLLECTABLES;
+    static readonly probabilityMap = SPAWN_RATES.COLLECTABLES;
 
     private collectableType: CollectableType;
 
@@ -94,4 +94,5 @@ export class Collectable extends PhysEntity({
         }
         return CollectableType.Panacat;
     }
+
 }

@@ -1,76 +1,67 @@
 import { GAME_HEIGHT, GAME_WIDTH } from "../shared/constants";
 import { TilePhysEntity } from "../shared/factories";
-import { EntityKey } from "../shared/keys";
-import { randomInt, snap } from "../shared/utils";
+import { EntityKey, EventKey } from "../shared/keys";
+import { randomInt } from "../shared/utils";
 
 export class Building extends TilePhysEntity({
     key: EntityKey.Buildings,
     size: [48, 32],
     offset: [0, 0],
-    tilesize: 48,
+    tilesize: [48, 32],
     static: true,
 }) {
-    static readonly EventSpawned = 'events_building_spawned';
+    private static lastWidth: number = 0;
+    private static lastHeight: number = 0;
 
-    private static lastBuildingWidth: number = 0;
-    private static lastBuildingHeight: number = 0;
-
-    private buildingTop: Phaser.GameObjects.Sprite;
-
-    constructor(scene: Phaser.Scene, x: number, y: number, frame: number) {
+    constructor(scene: Phaser.Scene, col: number, row: number, frame?: number) {
         super(scene);
-        this.setPosition(x, GAME_HEIGHT - y)
-            .setSize(48, y)
-            .setFrame(frame)
+        this.placeByTile(col, row)
+            .resizeByTile(1, row)
+            .setFrame(frame | 0)
             .setOrigin(0);
-
         this.body.checkCollision.down = false;
         this.body.checkCollision.left = false;
         this.body.checkCollision.right = false;
-
-        this.body.updateFromGameObject();
-
-        this.buildingTop = scene.add
-            .sprite(this.x, this.y - 16, EntityKey.BuildingTops)
-            .setOrigin(0, 0);
+        this.updateBody();
     }
 
-    setColor(color: number | string) {
-        this.setTint(+color);
-        this.buildingTop.setTint(+color);
-        return this;
+    placeByTile(col: number, row: number): this {
+        const lastIndex = GAME_HEIGHT / Building.config.tilesize[1]
+        return super.placeByTile(col, lastIndex - row);
     }
 
     update(): void {
-        if (this.x + Building.tilesize < this.scene.cameras.main.scrollX) {
-            const lastFloors = Math.ceil(Building.lastBuildingHeight);
-            const maxWidth = randomInt(2, 8);
-            let floors = 0;
-            if (Building.lastBuildingWidth >= maxWidth) {
-                floors = 0;
-                Building.lastBuildingWidth = 0;
-            } else {
-                Building.lastBuildingWidth++;
-                floors = randomInt(
-                    Math.max(lastFloors - 1, 1),
-                    Math.min(lastFloors + 2, 4),
-                );
-            }
-
-            Building.lastBuildingHeight = floors;
-            this.respawn(floors - 0.5); // subtract 0.5 to make sure it invisible in case floors is 0
+        const [tileWidth] = Building.config.tilesize;
+        if (this.x + tileWidth < this.scene.cameras.main.scrollX) {
+            this.respawn();
         }
     }
 
-    respawn(floors = 1, frame = 0) {
-        const [w, h] = Building.config.size;
-        const height = h * floors;
-        const x = snap(this.x + GAME_WIDTH * 2, w);
-        const y = GAME_HEIGHT - height;
+    respawn() {
+        const maxBuildingWidth = randomInt(2, 8);
+        if (Building.lastWidth >= maxBuildingWidth)
+            Building.lastWidth = 0;
+        else Building.lastWidth++;
 
-        this.setPosition(x, y).setSize(48, height).setFrame(frame);
-        this.body.updateFromGameObject();
-        this.buildingTop.setPosition(this.x, this.y - 16).setFrame(randomInt(0, 4));
-        this.scene.events.emit(Building.EventSpawned, [x, y]);
+        const height = Building.lastWidth > 0
+            ? randomInt(
+                Math.max(Building.lastHeight - 1, 1),
+                Math.min(Building.lastHeight + 2, 4),
+            )
+            : -1; // empty space
+
+        Building.lastHeight = height;
+
+        const [tileWidth] = Building.config.tilesize;
+        const col = (GAME_WIDTH * 2 + this.x) / tileWidth | 0;
+        this.placeByTile(col, height - 0.5) // to make it appear half
+            .setRandomFrame()
+            .resizeByTile(1, height)
+            .updateBody();
+        this.scene.events.emit(EventKey.BuildingSpawned, [this.x, this.y]);
+    }
+
+    setRandomFrame() {
+        return this.setFrame(randomInt(0, 6))
     }
 }

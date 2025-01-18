@@ -59,26 +59,29 @@ export function Entity(config: EntityConfig) {
     }
 }
 
-export function TileEntity(config: EntityConfig & { tilesize: number }) {
+export function TileEntity(config: EntityConfig & { tilesize: Point }) {
     return class TileEntity extends Phaser.GameObjects.TileSprite {
         static readonly config = config;
-        static readonly tilesize = config.tilesize;
         constructor(scene: Phaser.Scene) {
             super(scene, 0, 0, 0, 0, config.key);
             const [w, h] = config.size;
-            const [x, y] = config.origin;
+            const [x, y] = config.origin || [0, 0];
             scene.add
                 .existing(this)
                 .setSize(w, h)
                 .setOrigin(x, y);
         }
-        resize(cols: number, rows: number) {
-            this.setSize(TileEntity.tilesize * cols, TileEntity.tilesize * rows);
-            return this;
+        resizeByTile(cols: number, rows: number) {
+            return this.setSize(
+                TileEntity.config.tilesize[0] * cols | 0,
+                TileEntity.config.tilesize[1] * rows | 0,
+            );
         }
-        place(col: number, row: number) {
-            this.setPosition(TileEntity.tilesize * col, TileEntity.tilesize * row);
-            return this;
+        placeByTile(col: number, row: number) {
+            return this.setPosition(
+                TileEntity.config.tilesize[0] * col | 0,
+                TileEntity.config.tilesize[1] * row | 0,
+            );
         }
     }
 }
@@ -118,33 +121,34 @@ export function PhysEntity(config: PhysEntityConfig) {
     }
 }
 
-export function TilePhysEntity(config: PhysEntityConfig & { tilesize: number }) {
+export function TilePhysEntity(config: PhysEntityConfig & { tilesize: Point }) {
     return class TilePhysEntity extends Phaser.GameObjects.TileSprite {
         static readonly config = config;
-        static readonly tilesize = config.tilesize;
         public body: Phaser.Physics.Arcade.Body | Phaser.Physics.Arcade.StaticBody
         constructor(scene: Phaser.Scene) {
             super(scene, 0, 0, 0, 0, config.key);
             const [w, h] = config.size;
-            const [x, y] = config.offset;
+            const [x, y] = config.offset || [0, 0];
             scene.physics.add
                 .existing(scene.add.existing(this), config.static)
                 .setSize(w, h);
             this.body.setOffset(x, y);
         }
-        resize(cols: number, rows: number) {
-            this.setSize(TilePhysEntity.tilesize * cols, TilePhysEntity.tilesize * rows);
-            this.body.updateFromGameObject();
-            return this;
-        }
-        place(col: number, row: number) {
-            this.setPosition(TilePhysEntity.tilesize * col, TilePhysEntity.tilesize * row);
-            this.body.updateFromGameObject();
-            return this;
-        }
         updateBody() {
             this.body.updateFromGameObject();
             return this;
+        }
+        resizeByTile(cols: number, rows: number) {
+            return this.setSize(
+                TilePhysEntity.config.tilesize[0] * cols | 0,
+                TilePhysEntity.config.tilesize[1] * rows | 0,
+            );
+        }
+        placeByTile(col: number, row: number) {
+            return this.setPosition(
+                TilePhysEntity.config.tilesize[0] * col | 0,
+                TilePhysEntity.config.tilesize[1] * row | 0,
+            );
         }
     }
 }

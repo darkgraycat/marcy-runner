@@ -3,9 +3,9 @@ export const GAMEPLAY = {
     initialLifes: 9,
     initialSpeed: 100,
     initialHeight: 200,
-    speedBonusMax: 150,
-    speedBonusStep: 15,
-    speedBonusTick: 0.2,
+    speedBonusMax: 100,
+    speedBonusStep: 20,
+    speedBonusTick: 0.05,
 }
 
 export const SETTINGS = {
@@ -25,6 +25,6 @@ export const SPAWN_RATES = {
 }
 
 export const DEBUG = {
-    fastRestart: false,
+    fastRestart: true,
     debugPhysics: false,
 }

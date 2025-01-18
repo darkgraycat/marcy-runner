@@ -29,6 +29,6 @@ export class Player extends PhysEntity({
     }
 
     get onGround() {
-        return this.body.touching.down || this.body.blocked.down;
+        return this.body.blocked.down;
     }
 }
