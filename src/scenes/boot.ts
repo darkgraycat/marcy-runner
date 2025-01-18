@@ -20,19 +20,19 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
             { key: AudioKey.Meow, path: "assets/audio/meow.mp3" },
         ].forEach(({ key, path }) => this.load.audio(key, path));
 
-        [   /* image */
-            { key: UiKey.Logo, path: "assets/images/murkit_logo.png" },
-            { key: UiKey.LogoBig, path: "assets/images/murkit_logo_big.png" },
-            { key: UiKey.Title, path: "assets/images/title.png" },
-            { key: UiKey.UiMenu, path: "assets/images/ui_menu.png" },
-        ].forEach(({ key, path }) => this.load.image(key, path));
+        // [   /* image */
+        //     { key: UiKey.Logo, path: "assets/images/murkit_logo.png" },
+        //     { key: UiKey.LogoBig, path: "assets/images/murkit_logo_big.png" },
+        //     { key: UiKey.Title, path: "assets/images/title.png" },
+        //     { key: UiKey.UiMenu, path: "assets/images/ui_menu.png" },
+        // ].forEach(({ key, path }) => this.load.image(key, path));
 
         [   /* spritesheet */
             { key: EntityKey.Player, path: "assets/images/player.png", size: [16, 16] },
-            { key: EntityKey.Buildings, path: "assets/images/buildings2.png", size: [48, 32] },
-            { key: EntityKey.BuildingTops, path: "assets/images/building-tops2.png", size: [48, 16] },
-            { key: EntityKey.Backgrounds, path: "assets/images/backgrounds2.png", size: [64, 32] },
-            { key: EntityKey.Collectables, path: "assets/images/collectables2.png", size: [16, 16] },
+            { key: EntityKey.Buildings, path: "assets/images/buildings.png", size: [48, 32] },
+            { key: EntityKey.BuildingTops, path: "assets/images/building-tops.png", size: [48, 16] },
+            { key: EntityKey.Backgrounds, path: "assets/images/backgrounds.png", size: [64, 32] },
+            { key: EntityKey.Collectables, path: "assets/images/collectables.png", size: [16, 16] },
         ].forEach(({ key, path, size: [frameWidth, frameHeight] }) =>
             this.load.spritesheet(key, path, { frameWidth, frameHeight })
         );
