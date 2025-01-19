@@ -31,7 +31,7 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
             { key: EntityKey.Player, path: "assets/images/player.png", size: [16, 16] },
             { key: EntityKey.Buildings, path: "assets/images/buildings.png", size: [48, 32] },
             { key: EntityKey.BuildingRoofs, path: "assets/images/building-roofs.png", size: [48, 16] },
-            { key: EntityKey.BuildingDecors, path: "assets/images/building-decos.png", size: [48, 32] },
+            { key: EntityKey.BuildingDecors, path: "assets/images/building-decors.png", size: [48, 32] },
             { key: EntityKey.Backgrounds, path: "assets/images/backgrounds.png", size: [64, 32] },
             { key: EntityKey.Collectables, path: "assets/images/collectables.png", size: [16, 16] },
         ].forEach(({ key, path, size: [frameWidth, frameHeight] }) =>
@@ -107,8 +107,8 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
                 speedBonusTick: GAMEPLAY.speedBonusTick,
             },
             level: {
-                // levelIdx: randomInt(0, levels.length),
-                levelIdx: 0
+                levelIdx: randomInt(0, levels.length),
+                //levelIdx: 0
             },
         } as GameSceneParams);
     }

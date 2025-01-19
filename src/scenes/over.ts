@@ -1,7 +1,6 @@
 import { FontKey, SceneKey } from "../shared/keys";
 import { Scene } from "../shared/factories";
 import { Background } from "../entities/background";
-import { House } from "../entities/house";
 import { GAME_HEIGHT, GAME_WIDTH, TILESIZE } from "../shared/constants";
 import { DEBUG } from "../shared/settings";
 
@@ -25,7 +24,6 @@ export class OverScene extends Scene(SceneKey.Over, {
     scrollA: number;
     scrollB: number;
     backgrounds: Phaser.GameObjects.Group;
-    houses: House[];
 
     create() {
         super.create();

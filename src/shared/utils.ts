@@ -6,6 +6,10 @@ export function randomInt(lo: number, hi: number) {
     return Math.floor(Math.random() * (hi - lo) + lo);
 }
 
+export function randomBool(chance: number) {
+    return Math.random() < chance;
+}
+
 export function randomElement<T>(array: T[]): T {
     return array[randomInt(0, array.length)]
 }

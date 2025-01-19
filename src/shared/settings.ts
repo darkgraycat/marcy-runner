@@ -26,6 +26,6 @@ export const SPAWN_RATES = {
 }
 
 export const DEBUG = {
-    fastRestart: false,
+    fastRestart: true,
     debugPhysics: false,
 }

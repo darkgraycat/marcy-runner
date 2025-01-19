@@ -3,22 +3,22 @@ import { PhysEntity } from "../shared/factories";
 import { randomByProbability, randomElement } from "../shared/utils";
 import { SPAWN_RATES } from "../shared/settings";
 
-export enum CollectableType {
+export enum CollectableKind {
     Panacat,
     Bean,
     Life,
 }
 
 const CollectableConfig = {
-    [CollectableType.Panacat]: {
+    [CollectableKind.Panacat]: {
         tints: [0xff9e70, 0xffdf5f, 0xff8195, 0xdcff81],
         animations: [AnimationKey.CollectablePanacatIdle, AnimationKey.CollectablePanacatDie],
     },
-    [CollectableType.Bean]: {
+    [CollectableKind.Bean]: {
         tints: [0xbd7856, 0xc5764f, 0x824923],
         animations: [AnimationKey.CollectableBeanIdle, AnimationKey.CollectableBeanDie],
     },
-    [CollectableType.Life]: {
+    [CollectableKind.Life]: {
         tints: [0xff593a],
         animations: [AnimationKey.CollectableLifeIdle, AnimationKey.CollectableLifeDie],
     },
@@ -32,13 +32,12 @@ export class Collectable extends PhysEntity({
 }) {
     static readonly probabilityMap = SPAWN_RATES.COLLECTABLES;
 
-    private collectableType: CollectableType;
+    kind: CollectableKind;
 
-    constructor(scene: Phaser.Scene, x: number, y: number, color: number) {
+    constructor(scene: Phaser.Scene, x: number, y: number, kind?: CollectableKind) {
         super(scene);
-        this.setPosition(x, y)
-            .setTint(color)
-            .play(AnimationKey.CollectablePanacatIdle);
+        this.kind = kind || CollectableKind.Panacat;
+        this.setPosition(x, y);
         this.updateBody();
     }
 
@@ -59,8 +58,8 @@ export class Collectable extends PhysEntity({
         return this;
     }
 
-    respawn(x: number, y: number, type: CollectableType) {
-        this.collectableType = type;
+    respawn(x: number, y: number, kind: CollectableKind) {
+        this.kind = kind;
         return this.setActive(true).setVisible(true).enableBody()
             .setPosition(x, y)
             .updateBody()
@@ -68,31 +67,26 @@ export class Collectable extends PhysEntity({
             .play(this.animation.idle)
     }
 
-    getType() {
-        return this.collectableType;
-    }
-
-    get currentType() {
-        return this.collectableType;
+    get currentKind() {
+        return this.kind;
     }
 
     get animation() {
-        const [idle, die] = CollectableConfig[this.collectableType].animations;
+        const [idle, die] = CollectableConfig[this.kind].animations;
         return { idle, die };
     }
 
     get randomTint(): number {
-        return randomElement(CollectableConfig[this.collectableType].tints);
+        return randomElement(CollectableConfig[this.kind].tints);
     }
 
-    static get randomType(): CollectableType {
+    static get randomKind(): CollectableKind {
         const key = randomByProbability(Collectable.probabilityMap);
         switch (key) {
-            case 'panacat': return CollectableType.Panacat;
-            case 'bean': return CollectableType.Bean;
-            case 'life': return CollectableType.Life;
+            case 'panacat': return CollectableKind.Panacat;
+            case 'bean': return CollectableKind.Bean;
+            case 'life': return CollectableKind.Life;
         }
-        return CollectableType.Panacat;
+        return CollectableKind.Panacat;
     }
-
 }

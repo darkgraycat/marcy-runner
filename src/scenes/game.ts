@@ -1,19 +1,20 @@
 import levels from "../data/levels";
 import strings from "../data/strings";
 import { Background } from "../entities/background";
-import { Collectable, CollectableType } from "../entities/collectable";
+import { Collectable, CollectableKind } from "../entities/collectable";
 import { Player } from "../entities/player";
 import { Sun } from "../entities/sun";
 import { UiText } from "../entities/ui";
 import { Scene } from "../shared/factories";
 import { AudioKey, EventKey, SceneKey } from "../shared/keys";
 import { Point } from "../shared/types";
-import { randomInt } from "../shared/utils";
+import { iterate, randomBool, randomInt } from "../shared/utils";
 import { OverSceneParams } from "./over";
 import { SETTINGS } from "../shared/settings";
 import { GAME_HEIGHT, GAME_WIDTH } from "../shared/constants";
 import { Building } from "../entities/building";
 import { BuildingRoof } from "../entities/building-roof";
+import { BuildingDecor, BuildingDecorKind } from "../entities/building-decor";
 
 export type GameSceneParams = {
     player: {
@@ -42,6 +43,7 @@ export class GameScene extends Scene(SceneKey.Game, {
     backgrounds: Phaser.GameObjects.Group;
     buildings: Phaser.GameObjects.Group;
     buildingRoofs: Phaser.GameObjects.Group;
+    buildingDecors: Phaser.GameObjects.Group;
     collectables: Phaser.GameObjects.Group;
 
     inputJumping: boolean = false;
@@ -68,6 +70,8 @@ export class GameScene extends Scene(SceneKey.Game, {
     create() {
         super.create();
         const level = levels[this.params.level.levelIdx];
+        const totalBuildings = Math.round(2 * GAME_WIDTH / Building.config.tilesize[0]);
+        const totalCollectables = 12;
 
         /* #sound */
         this.fxJump = this.sound.add(AudioKey.Jump, { volume: SETTINGS.volumeEffects * 0.1, detune: -200 });
@@ -84,25 +88,34 @@ export class GameScene extends Scene(SceneKey.Game, {
             this.backgrounds.add(new Background(this, frame, y, scrollScale).setTint(color))
         }
 
-        const totalBuildings = Math.round(2 * GAME_WIDTH / Building.config.tilesize[0]);
         this.buildings = this.add.group({ runChildUpdate: true });
-        this.buildingRoofs = this.add.group();
-        for (let i = 0; i < totalBuildings; i++) {
+        iterate(totalBuildings, i => 
             this.buildings.add(new Building(this, i, 1.5)
                 .setTint(level.buildings)
                 .setRandomFrame()
-            );
+            )
+        );
+
+        this.buildingRoofs = this.add.group();
+        iterate(totalBuildings, i => 
             this.buildingRoofs.add(new BuildingRoof(this, i, 5)
                 .setTint(level.buildings)
                 .setRandomFrame()
-            );
-        }
+            )
+        );
 
-        const totalCollectables = 12;
+        this.buildingDecors = this.add.group();
+        iterate(totalBuildings, i => 
+            this.buildingDecors.add(new BuildingDecor(this, i, 5)
+                .setTint(Phaser.Display.Color.IntegerToColor(level.buildings).darken(10).color)
+                .setRandomFrame()
+            )
+        );
+
         this.collectables = this.add.group({ runChildUpdate: true });
-        for (let i = 0; i < totalCollectables; i++) {
-            this.collectables.add(new Collectable(this, 32 * i, 400, 0xffffff));
-        }
+        iterate(totalCollectables, i => 
+            this.collectables.add(new Collectable(this, 32 * i, 400))
+        );
 
         /* #player */
         this.player = new Player(this).setPosition(48, 64);
@@ -179,15 +192,15 @@ export class GameScene extends Scene(SceneKey.Game, {
             if (this.player.onGround) this.fxJump.play();
         }
 
-        if (this.player.y > GAME_HEIGHT) {
+        if (this.player.y > GAME_HEIGHT + 128) {
             this.handleLoseLife();
         }
     }
 
     private handleLoseLife() {
+        this.stateIsRunning = false;
         if (this.stateLifesLeft > 0) {
             this.stateLifesLeft--;
-            this.stateIsRunning = false;
             this.handlePlayerRespawn();
         } else {
             this.lose();
@@ -215,20 +228,27 @@ export class GameScene extends Scene(SceneKey.Game, {
 
     handleBuildingRespawn(payload: Point) {
         const [x, y] = payload;
-        // decorate new building
+        // respawn building roofs and decorations
         {
             const [tileWidth] = Building.config.tilesize;
-            const findFree = (bd: any) => (bd.x + tileWidth) < this.cameras.main.scrollX;
-            const roof = this.buildingRoofs
-                .getChildren()
-                .find(findFree) as BuildingRoof;
+            const findFree = (e: any) => (e.x + tileWidth) < this.cameras.main.scrollX;
+
+            const roof = this.buildingRoofs.getChildren().find(findFree) as BuildingRoof;
             if (roof) roof.setPosition(x, y).setRandomFrame();
+
+            if (randomBool(.80)) {
+                const decor = this.buildingDecors.getChildren().find(findFree) as BuildingDecor;
+                if (decor) {
+                    decor.kind = randomBool(.70) ? BuildingDecorKind.Aerials : BuildingDecorKind.Block;
+                    decor.setPosition(x, y).setRandomFrame();
+                } 
+            }
         }
 
         // respawn collectables
         if (y < GAME_HEIGHT * 0.8) {
-            const typeToSpawn = Collectable.randomType;
-            const amountToSpawn = typeToSpawn == CollectableType.Life || typeToSpawn == CollectableType.Bean
+            const typeToSpawn = Collectable.randomKind;
+            const amountToSpawn = typeToSpawn == CollectableKind.Life || typeToSpawn == CollectableKind.Bean
                 ? 1 // life is only spawned as 1
                 : randomInt(1, 4); // 1, 2, or 3
 
@@ -246,8 +266,8 @@ export class GameScene extends Scene(SceneKey.Game, {
                 }[collectablesToRespawn.length];
 
                 const height = {
-                    [CollectableType.Bean]: 16,
-                    [CollectableType.Life]: 32,
+                    [CollectableKind.Bean]: 16,
+                    [CollectableKind.Life]: 32,
                 }[typeToSpawn] || 0;
 
                 collectablesToRespawn.forEach((c, i) => c.respawn(
@@ -275,8 +295,8 @@ export class GameScene extends Scene(SceneKey.Game, {
     private handleCollect(obj: any) {
         const collectable = obj as Collectable;
 
-        switch (collectable.currentType) {
-            case CollectableType.Panacat: {
+        switch (collectable.currentKind) {
+            case CollectableKind.Panacat: {
                 this.fxCollect.play();
                 this.statePoints++;
 
@@ -291,12 +311,12 @@ export class GameScene extends Scene(SceneKey.Game, {
                 }
                 break;
             }
-            case CollectableType.Bean: {
+            case CollectableKind.Bean: {
                 this.fxWarp.play();
                 this.stateSpeedMod += this.params.state.speedBonus;
                 break;
             }
-            case CollectableType.Life: {
+            case CollectableKind.Life: {
                 this.fxMeowHigh.play();
                 this.stateLifesLeft++;
                 break;
