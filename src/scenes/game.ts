@@ -196,14 +196,14 @@ export class GameScene extends Scene(SceneKey.Game, {
             if (this.player.onGround) this.fxJump.play();
         }
 
-        if (this.player.y > GAME_HEIGHT + 128) {
+        if (this.player.y > GAME_HEIGHT && this.stateIsRunning) {
             this.handleLoseLife();
         }
     }
 
     private handleLoseLife() {
         this.stateIsRunning = false;
-        if (this.stateLifesLeft > 0) {
+        if (this.stateLifesLeft > 1) {
             this.stateLifesLeft--;
             this.handlePlayerRespawn();
         } else {
@@ -215,13 +215,13 @@ export class GameScene extends Scene(SceneKey.Game, {
         const entries = this.buildings.getChildren() as Building[];
         const safeBuilding = entries
             .filter((b) => b.x > this.player.x)
-            .sort((a, b) => a.x - b.x)
-            .filter((b) => b.y > 32)[0];
+            .sort((a, b) => a.x - b.x)[0];
         if (safeBuilding) {
-            this.player.x = safeBuilding.x + 8;
+            this.player.x = safeBuilding.x + 16;
             this.player.y = safeBuilding.y - 16;
         } else {
-            this.player.y = 32;
+            console.warn("no safe building for spawn");
+            this.player.y = 0;
         }
         this.stateSpeedMod = 0;
         this.inputJumping = false;
