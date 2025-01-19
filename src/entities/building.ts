@@ -3,6 +3,10 @@ import { TilePhysEntity } from "../shared/factories";
 import { EntityKey, EventKey } from "../shared/keys";
 import { randomInt } from "../shared/utils";
 
+export type BuildingSpawnConfig = {
+
+}
+
 export class Building extends TilePhysEntity({
     key: EntityKey.Buildings,
     size: [48, 32],
@@ -13,11 +17,10 @@ export class Building extends TilePhysEntity({
     private static lastWidth: number = 0;
     private static lastHeight: number = 0;
 
-    constructor(scene: Phaser.Scene, col: number, row: number, frame?: number) {
+    constructor(scene: Phaser.Scene, col: number, row: number) {
         super(scene);
         this.placeByTile(col, row)
             .resizeByTile(1, row)
-            .setFrame(frame | 0)
             .setOrigin(0);
         this.body.checkCollision.down = false;
         this.body.checkCollision.left = false;

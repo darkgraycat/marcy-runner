@@ -9,7 +9,8 @@ export const EntityKey = {
     Player: "entity_player",
     Backgrounds: "entity_backgrounds",
     Buildings: "entity_buildings",
-    BuildingTops: "entity_building_tops",
+    BuildingRoofs: "entity_building_roofs",
+    BuildingDecors: "entity_building_decors",
     Collectables: "asset_collectables",
 }
 

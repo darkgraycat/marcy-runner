@@ -3,7 +3,7 @@ import { EntityKey } from "../shared/keys";
 import { randomInt } from "../shared/utils";
 
 export class BuildingRoof extends TileEntity({
-    key: EntityKey.BuildingTops,
+    key: EntityKey.BuildingRoofs,
     size: [48, 16],
     tilesize: [48, 16],
 }) {

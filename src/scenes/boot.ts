@@ -30,7 +30,8 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
         [   /* spritesheet */
             { key: EntityKey.Player, path: "assets/images/player.png", size: [16, 16] },
             { key: EntityKey.Buildings, path: "assets/images/buildings.png", size: [48, 32] },
-            { key: EntityKey.BuildingTops, path: "assets/images/building-tops.png", size: [48, 16] },
+            { key: EntityKey.BuildingRoofs, path: "assets/images/building-roofs.png", size: [48, 16] },
+            { key: EntityKey.BuildingDecors, path: "assets/images/building-decos.png", size: [48, 32] },
             { key: EntityKey.Backgrounds, path: "assets/images/backgrounds.png", size: [64, 32] },
             { key: EntityKey.Collectables, path: "assets/images/collectables.png", size: [16, 16] },
         ].forEach(({ key, path, size: [frameWidth, frameHeight] }) =>

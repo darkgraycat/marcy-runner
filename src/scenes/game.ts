@@ -93,8 +93,8 @@ export class GameScene extends Scene(SceneKey.Game, {
                 .setRandomFrame()
             );
             this.buildingRoofs.add(new BuildingRoof(this, i, 5)
-                .setRandomFrame()
                 .setTint(level.buildings)
+                .setRandomFrame()
             );
         }
 
