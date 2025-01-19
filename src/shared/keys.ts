@@ -25,6 +25,8 @@ export const AnimationKey = {
     PlayerWalk: "anim_player_walk",
     PlayerIdle: "anim_player_idle",
     PlayerJump: "anim_player_jump",
+    PlayerBlink: "anim_player_blink",
+    PlayerRun: "anim_player_run",
 
     CollectablePanacatIdle: "anim_coll_panacat_idle",
     CollectablePanacatDie: "anim_coll_panacat_die",

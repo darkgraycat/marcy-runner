@@ -11,7 +11,7 @@ export enum CollectableKind {
 
 const CollectableConfig = {
     [CollectableKind.Panacat]: {
-        tints: [0xff9e70, 0xffdf5f, 0xff8195, 0xdcff81],
+        tints: [0xff9e70, 0xffdf5f, 0xff8195, 0x7a4841, 0x602c2c],
         animations: [AnimationKey.CollectablePanacatIdle, AnimationKey.CollectablePanacatDie],
     },
     [CollectableKind.Bean]: {

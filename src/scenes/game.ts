@@ -10,7 +10,7 @@ import { AudioKey, EventKey, SceneKey } from "../shared/keys";
 import { Point } from "../shared/types";
 import { iterate, randomBool, randomInt } from "../shared/utils";
 import { OverSceneParams } from "./over";
-import { SETTINGS } from "../shared/settings";
+import { DEBUG, SETTINGS } from "../shared/settings";
 import { GAME_HEIGHT, GAME_WIDTH } from "../shared/constants";
 import { Building } from "../entities/building";
 import { BuildingRoof } from "../entities/building-roof";
@@ -107,8 +107,9 @@ export class GameScene extends Scene(SceneKey.Game, {
         this.buildingDecors = this.add.group();
         iterate(totalBuildings, i => 
             this.buildingDecors.add(new BuildingDecor(this, i, 5)
-                .setTint(Phaser.Display.Color.IntegerToColor(level.buildings).darken(10).color)
+                .setTint(Phaser.Display.Color.IntegerToColor(level.buildings).darken(20).color)
                 .setRandomFrame()
+                .setDepth(1)
             )
         );
 
@@ -132,17 +133,20 @@ export class GameScene extends Scene(SceneKey.Game, {
 
         /* #ui */
         this.textLifes = new UiText(this, strings.gameScene.lifesLeft)
+            .setPosition(4, 4)
             .setOrigin(0, 0)
-            .setPosition(4, 4);
+            .setDepth(99);
         this.textPanacats = new UiText(this, strings.gameScene.panacatsCollected)
+            .setPosition(GAME_WIDTH / 2, 4)
+            .setOrigin(.5, 0)
+            .setDepth(99);
+        this.textCaffeine = new UiText(this, strings.gameScene.caffeine)
             .setOrigin(1, 0)
             .setPosition(GAME_WIDTH - 4, 4);
-        this.textCaffeine = new UiText(this, strings.gameScene.caffeine)
-            .setOrigin(0.5)
-            .setPosition(GAME_WIDTH / 2, GAME_HEIGHT - 8);
         this.textMain = new UiText(this)
-            .setOrigin(0.5)
             .setPosition(GAME_WIDTH / 2, GAME_HEIGHT / 2)
+            .setOrigin(.5, .5)
+            .setDepth(99)
             .setScale(4)
             .setAlpha(0);
 
@@ -236,10 +240,12 @@ export class GameScene extends Scene(SceneKey.Game, {
             const roof = this.buildingRoofs.getChildren().find(findFree) as BuildingRoof;
             if (roof) roof.setPosition(x, y).setRandomFrame();
 
-            if (randomBool(.80)) {
+            if (randomBool(.70)) {
                 const decor = this.buildingDecors.getChildren().find(findFree) as BuildingDecor;
                 if (decor) {
-                    decor.kind = randomBool(.70) ? BuildingDecorKind.Aerials : BuildingDecorKind.Block;
+                    decor.kind = (y < GAME_HEIGHT / 2 && randomBool(.5))
+                        ? BuildingDecorKind.Block
+                        : BuildingDecorKind.Aerials;
                     decor.setPosition(x, y).setRandomFrame();
                 } 
             }
@@ -349,9 +355,11 @@ export class GameScene extends Scene(SceneKey.Game, {
 
     // TODO: refactor
     private startRunning() {
+        this.textMain.setTint(0xffffff);
         this.showMainText("3", () => {
             this.showMainText("2", () => {
                 this.showMainText("1", () => {
+                        this.textMain.setTint(0x88ff44);
                     this.showMainText("GO", () => {
                         this.stateIsRunning = true;
                     });
@@ -363,7 +371,7 @@ export class GameScene extends Scene(SceneKey.Game, {
 
     // TODO: refactor, dont like one-shot approach
     private showMainText(text: string, callback: () => void) {
-        const duration = 111;
+        const duration = DEBUG.fastRespawn ? 33 : 333;
         this.textMain.setText(text);
         this.tweens.chain({
             targets: this.textMain,

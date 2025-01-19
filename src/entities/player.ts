@@ -1,5 +1,6 @@
 import { EntityKey, AnimationKey } from "../shared/keys";
 import { PhysEntity } from "../shared/factories";
+import { GAMEPLAY } from "../shared/settings";
 
 export class Player extends PhysEntity({
     key: EntityKey.Player,
@@ -10,7 +11,9 @@ export class Player extends PhysEntity({
         this.flipX = velocity < 0;
         this.body.velocity.x = velocity;
         if (this.onGround) {
-            this.play(AnimationKey.PlayerWalk, true)
+            this.play(velocity > GAMEPLAY.initialSpeed
+                ? AnimationKey.PlayerRun
+                : AnimationKey.PlayerWalk, true)
         }
     }
 

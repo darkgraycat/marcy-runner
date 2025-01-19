@@ -11,7 +11,7 @@ export default {
         hints: "",
     },
     gameScene: {
-        panacatsCollected: "%s :",
+        panacatsCollected: ":%s:",
         lifesLeft: "§ %s",
         caffeine: "%s",
     }

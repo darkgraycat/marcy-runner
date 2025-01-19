@@ -48,9 +48,11 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
         super.create();
 
         [   /* animaton */
-            { key: AnimationKey.PlayerIdle, assetKey: EntityKey.Player, frames: [0, 1], frameRate: 8, repeat: -1 },
+            // { key: AnimationKey.PlayerIdle, assetKey: EntityKey.Player, frames: [0, 1], frameRate: 8, repeat: -1 },
+            { key: AnimationKey.PlayerIdle, assetKey: EntityKey.Player, frames: [0, 1, 2, 3, 4, 5], frameRate: 8, repeat: -1 },
             { key: AnimationKey.PlayerWalk, assetKey: EntityKey.Player, frames: [5, 6, 6, 7], frameRate: 16, repeat: -1 },
             { key: AnimationKey.PlayerJump, assetKey: EntityKey.Player, frames: [4, 4, 6, 6], frameRate: 16, repeat: 0 },
+            { key: AnimationKey.PlayerRun, assetKey: EntityKey.Player, frames: [8, 9, 9, 10], frameRate: 20, repeat: -1 },
 
             { key: AnimationKey.CollectablePanacatIdle, assetKey: EntityKey.Collectables, frames: [0, 1], frameRate: 8, repeat: -1 },
             { key: AnimationKey.CollectablePanacatDie, assetKey: EntityKey.Collectables, frames: [2, 3], frameRate: 16, repeat: 0 },
@@ -107,8 +109,8 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
                 speedBonusTick: GAMEPLAY.speedBonusTick,
             },
             level: {
-                levelIdx: randomInt(0, levels.length),
-                //levelIdx: 0
+                // levelIdx: randomInt(0, levels.length),
+                levelIdx: 2
             },
         } as GameSceneParams);
     }
