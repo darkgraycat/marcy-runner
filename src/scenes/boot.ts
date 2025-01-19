@@ -109,8 +109,8 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
                 speedBonusTick: GAMEPLAY.speedBonusTick,
             },
             level: {
-                // levelIdx: randomInt(0, levels.length),
-                levelIdx: 2
+                levelIdx: randomInt(0, levels.length),
+                //levelIdx: 2
             },
         } as GameSceneParams);
     }
