@@ -1,4 +1,4 @@
-import { GAME_DEFAULT_FONT } from "../shared/constants";
+import { FontKey } from "../shared/keys";
 import { formatString } from "../shared/utils";
 
 export class UiText extends Phaser.GameObjects.BitmapText {
@@ -8,7 +8,7 @@ export class UiText extends Phaser.GameObjects.BitmapText {
         text: string = "",
         x: number = 0,
         y: number = 0,
-        font: string = GAME_DEFAULT_FONT,
+        font: string = FontKey.MKitText,
     ) {
         super(scene, x, y, font, text);
         scene.add.existing(this);
@@ -32,7 +32,7 @@ export class UiButton extends Phaser.GameObjects.Container {
         text: string = "",
         x: number = 0,
         y: number = 0,
-        font: string = GAME_DEFAULT_FONT,
+        font: string = FontKey.MKitText,
     ) {
         super(scene, 0, 0, []);
         // super(scene, 0, 0, font, text);

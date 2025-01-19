@@ -38,11 +38,7 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
         );
 
         [   /* font */
-            { key: FontKey.Minogram, path: "assets/fonts/minogram_6x10.png", xml: "assets/fonts/minogram_6x10.xml" },
-            { key: FontKey.Round, path: "assets/fonts/round_6x6.png", xml: "assets/fonts/round_6x6.xml" },
-            { key: FontKey.Square, path: "assets/fonts/square_6x6.png", xml: "assets/fonts/square_6x6.xml" },
-            { key: FontKey.Thick, path: "assets/fonts/thick_8x8.png", xml: "assets/fonts/thick_8x8.xml" },
-            { key: FontKey.MKit, path: "assets/fonts/mkit-bitmap.png", xml: "assets/fonts/mkit-bitmap.xml" },
+            { key: FontKey.MKitText, path: "assets/fonts/mkit-text-7x8.png", xml: "assets/fonts/mkit-text-7x8.xml" },
         ].forEach(({ key, path, xml }) => this.load.bitmapFont(key, path, xml));
 
     }

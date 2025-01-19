@@ -44,11 +44,7 @@ export const AudioKey = {
 }
 
 export const FontKey = {
-    MKit: "font_mkit",
-    Minogram: "font_minogram",
-    Round: "font_round",
-    Square: "font_square",
-    Thick: "font_thick",
+    MKitText: "font_mkit_text",
 }
 
 export const EventKey = {
