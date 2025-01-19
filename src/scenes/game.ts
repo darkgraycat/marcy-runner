@@ -106,10 +106,9 @@ export class GameScene extends Scene(SceneKey.Game, {
 
         this.buildingDecors = this.add.group();
         iterate(totalBuildings, i => 
-            this.buildingDecors.add(new BuildingDecor(this, i, 5)
+            this.buildingDecors.add(new BuildingDecor(this, i - 12, 5)
                 .setTint(Phaser.Display.Color.IntegerToColor(level.buildings).darken(20).color)
                 .setRandomFrame()
-                .setDepth(1)
             )
         );
 
@@ -196,7 +195,7 @@ export class GameScene extends Scene(SceneKey.Game, {
             if (this.player.onGround) this.fxJump.play();
         }
 
-        if (this.player.y > GAME_HEIGHT && this.stateIsRunning) {
+        if (this.player.y > GAME_HEIGHT * 2 && this.stateIsRunning) {
             this.handleLoseLife();
         }
     }
@@ -214,7 +213,7 @@ export class GameScene extends Scene(SceneKey.Game, {
     private handlePlayerRespawn() {
         const entries = this.buildings.getChildren() as Building[];
         const safeBuilding = entries
-            .filter((b) => b.x > this.player.x)
+            .filter((b) => b.x > this.player.x && b.y < GAME_HEIGHT)
             .sort((a, b) => a.x - b.x)[0];
         if (safeBuilding) {
             this.player.x = safeBuilding.x + 16;
@@ -223,6 +222,7 @@ export class GameScene extends Scene(SceneKey.Game, {
             console.warn("no safe building for spawn");
             this.player.y = 0;
         }
+        console.log("respawned at", { x: this.player.x, y: this.player.y });
         this.stateSpeedMod = 0;
         this.inputJumping = false;
         this.inputJumpInProgress = false;
@@ -240,10 +240,10 @@ export class GameScene extends Scene(SceneKey.Game, {
             const roof = this.buildingRoofs.getChildren().find(findFree) as BuildingRoof;
             if (roof) roof.setPosition(x, y).setRandomFrame();
 
-            if (randomBool(.70)) {
+            if (randomBool(.50)) {
                 const decor = this.buildingDecors.getChildren().find(findFree) as BuildingDecor;
                 if (decor) {
-                    decor.kind = (y < GAME_HEIGHT / 2 && randomBool(.5))
+                    decor.kind = (y < GAME_HEIGHT / 2 && randomBool(.50))
                         ? BuildingDecorKind.Block
                         : BuildingDecorKind.Aerials;
                     decor.setPosition(x, y).setRandomFrame();
