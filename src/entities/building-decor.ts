@@ -10,13 +10,13 @@ export enum BuildingDecorKind {
 
 const BuildingDecorConfig = {
     [BuildingDecorKind.Wires]: {
-        frames: [0],
+        frames: [0, 1],
     },
     [BuildingDecorKind.Aerials]: {
-        frames: [1, 2, 3],
+        frames: [2, 3, 4],
     },
     [BuildingDecorKind.Block]: {
-        frames: [4, 5],
+        frames: [5, 6],
     },
 }
 

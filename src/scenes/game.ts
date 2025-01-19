@@ -170,7 +170,6 @@ export class GameScene extends Scene(SceneKey.Game, {
         this.handlePlayer(delta);
         this.handleSpeedChange();
         this.handleUiText();
-
     }
 
 
@@ -237,17 +236,21 @@ export class GameScene extends Scene(SceneKey.Game, {
             const [tileWidth] = Building.config.tilesize;
             const findFree = (e: any) => (e.x + tileWidth) < this.cameras.main.scrollX;
 
-            const roof = this.buildingRoofs.getChildren().find(findFree) as BuildingRoof;
-            if (roof) roof.setPosition(x, y).setRandomFrame();
+            const decor = this.buildingDecors.getChildren().find(findFree) as BuildingDecor;
 
-            if (randomBool(.50)) {
-                const decor = this.buildingDecors.getChildren().find(findFree) as BuildingDecor;
-                if (decor) {
+            if (y < GAME_HEIGHT) {
+                const roof = this.buildingRoofs.getChildren().find(findFree) as BuildingRoof;
+                if (roof) roof.setPosition(x, y).setRandomFrame();
+
+                if (decor && randomBool(.50)) {
                     decor.kind = (y < GAME_HEIGHT / 2 && randomBool(.50))
                         ? BuildingDecorKind.Block
                         : BuildingDecorKind.Aerials;
                     decor.setPosition(x, y).setRandomFrame();
                 } 
+            } else if (randomBool(.60)) {
+                decor.kind = BuildingDecorKind.Wires;
+                decor.setPosition(x, y - 64).setRandomFrame();
             }
         }
 
