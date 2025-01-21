@@ -1,5 +1,5 @@
 import { BootScene } from "./scenes/boot";
-import { DeveloperScene } from "./scenes/developer";
+import { DevmodeScene } from "./scenes/devmode";
 import { GameScene } from "./scenes/game";
 import { OverScene } from "./scenes/over";
 import { TutorialScene } from "./scenes/tutorial";
@@ -16,7 +16,7 @@ export default new Phaser.Game({
     width: GAME_WIDTH,
     height: GAME_HEIGHT,
     pixelArt: true,
-    scene: [BootScene, GameScene, OverScene, TutorialScene, DeveloperScene],
+    scene: [BootScene, GameScene, OverScene, TutorialScene, DevmodeScene],
     parent: "content",
     scale: {
         mode: Phaser.Scale.FIT,
@@ -30,6 +30,9 @@ export default new Phaser.Game({
             gravity: { y: 400, x: 0 },
             debug: DEBUG.debugPhysics,
         }
+    },
+    dom: {
+        createContainer: true
     },
     powerPreference: "low-power",
     autoMobilePipeline: true,

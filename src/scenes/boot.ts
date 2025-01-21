@@ -71,6 +71,7 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
         );
 
         if (DEBUG.fastRestart) return this.startGame();
+        if (DEBUG.fastDevmode) return this.startDevmode();
 
         /* #backgrounds */
         const level = levels[0];
@@ -108,7 +109,7 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
         this.input.keyboard.on('keydown', ({ key }) => {
             combination += key;
             if (key == ' ') combination = '';
-            if (combination == 'devmode') return this.startDeveloper();
+            if (combination == 'devmode') return this.startDevmode();
             if (combination == 'cocaine') return this.startGame({ speedBonus: 100, speedBonusMax: 500, jumpVelocity: 250 });
         });
     }
@@ -146,7 +147,7 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
         this.scene.start(SceneKey.Tutorial, {});
     }
 
-    private startDeveloper() {
-        this.scene.start(SceneKey.Developer, {});
+    private startDevmode() {
+        this.scene.start(SceneKey.Devmode, {});
     }
 }

@@ -4,7 +4,7 @@ export const SceneKey = {
     Input: "scene_input",
     Over: "scene_over",
     Tutorial: "scene_tutorial",
-    Developer: "scene_developer",
+    Devmode: "scene_devmode",
 }
 
 export const EntityKey = {
