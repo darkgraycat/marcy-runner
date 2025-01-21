@@ -5,11 +5,11 @@ import { GameSceneParams } from "./game";
 import { randomInt } from "../shared/utils";
 import strings from "../data/strings";
 import levels from "../data/levels";
-import { UiText } from "../entities/ui";
+import { UiButton, UiText } from "../entities/ui";
+import { Background } from "../entities/background";
 
 export class BootScene extends Scene(SceneKey.Boot, {}) {
-    textTitle: UiText;
-    textObjectives: UiText;
+    backgrounds: Phaser.GameObjects.Group;
 
     preload() {
         [   /* audio */
@@ -48,7 +48,6 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
         super.create();
 
         [   /* animaton */
-            // { key: AnimationKey.PlayerIdle, assetKey: EntityKey.Player, frames: [0, 1], frameRate: 8, repeat: -1 },
             { key: AnimationKey.PlayerIdle, assetKey: EntityKey.Player, frames: [0, 1, 2, 3, 4, 5], frameRate: 8, repeat: -1 },
             { key: AnimationKey.PlayerWalk, assetKey: EntityKey.Player, frames: [5, 6, 6, 7], frameRate: 16, repeat: -1 },
             { key: AnimationKey.PlayerJump, assetKey: EntityKey.Player, frames: [4, 4, 6, 6], frameRate: 16, repeat: 0 },
@@ -68,30 +67,49 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
                 repeat,
                 frameRate,
                 frames: this.anims.generateFrameNames(assetKey, { frames }),
-            })
+            }),
         );
-
-        const { width, height } = this.scale;
-        this.textTitle = new UiText(this, strings.bootScene.title)
-            .setTextArgs(SETTINGS.userName)
-            .setOrigin(0.5)
-            .setPosition(width / 2, 32);
-        this.textObjectives = new UiText(this, strings.bootScene.objectives)
-            .setTextArgs(GAMEPLAY.targetPoints)
-            .setOrigin(0.5)
-            .setTint(0xff8822)
-            .setPosition(width / 2, height - 32);
-
-        this.cameras.main.setBackgroundColor(0x000000);
-        //this.cameras.main.fadeOut(5000, 0xff0000);
-        //this.cameras.main.setBackgroundColor(0xffffff)
 
         if (DEBUG.fastRestart) return this.startGame();
 
-        setTimeout(() => {
-            this.input.keyboard.on('keydown', () => this.startGame());
-            this.input.on('pointerdown', () => this.startGame());
-        }, 1000);
+        /* #backgrounds */
+        const level = levels[0];
+        this.cameras.main.setBackgroundColor(level.sky);
+        this.backgrounds = this.add.group({ runChildUpdate: false });
+        for (const [frame, y, color, scrollScale] of level.backgrounds) {
+            this.backgrounds.add(new Background(this, frame, y, scrollScale).setTint(color))
+        }
+
+        /* #ui */
+        const { width, height } = this.scale;
+        new UiText(this, strings.bootScene.title)
+            .setTextArgs(SETTINGS.userName)
+            .setPosition(width / 2, 32);
+
+        new UiText(this, strings.bootScene.objectives)
+            .setTextArgs(GAMEPLAY.targetPoints)
+            .setTint(0xff8822)
+            .setPosition(width / 2, height - 16);
+
+        new UiButton(this, strings.bootScene.buttonStart)
+            .setPosition(width / 2, height - 64)
+            .setOnClick(() => this.startGame())
+            .setTint(0xE6AC0C)
+            .setSize(100, 16);
+
+        new UiButton(this, strings.bootScene.buttonTutorial)
+            .setPosition(width / 2, height - 40)
+            .setOnClick(() => this.startTutorial())
+            .setTint(0xE6AC0C)
+            .setSize(100, 16);
+
+    }
+
+    update(time: number, delta: number): void {
+        this.backgrounds.getChildren().forEach((c, index) => {
+            const bg = c as Background;
+            bg.tilePositionX += levels[0].backgrounds[index][3];
+        });
     }
 
     private startGame() {
@@ -110,8 +128,11 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
             },
             level: {
                 levelIdx: randomInt(0, levels.length),
-                //levelIdx: 2
             },
         } as GameSceneParams);
+    }
+
+    private startTutorial() {
+        this.scene.start(SceneKey.Tutorial, {});
     }
 }

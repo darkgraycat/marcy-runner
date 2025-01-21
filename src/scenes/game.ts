@@ -137,14 +137,13 @@ export class GameScene extends Scene(SceneKey.Game, {
             .setDepth(99);
         this.textPanacats = new UiText(this, strings.gameScene.panacatsCollected)
             .setPosition(GAME_WIDTH / 2, 4)
-            .setOrigin(.5, 0)
+            .setOrigin(0.5, 0)
             .setDepth(99);
         this.textCaffeine = new UiText(this, strings.gameScene.caffeine)
             .setOrigin(1, 0)
             .setPosition(GAME_WIDTH - 4, 4);
         this.textMain = new UiText(this)
             .setPosition(GAME_WIDTH / 2, GAME_HEIGHT / 2)
-            .setOrigin(.5, .5)
             .setDepth(99)
             .setScale(4)
             .setAlpha(0);
@@ -248,7 +247,7 @@ export class GameScene extends Scene(SceneKey.Game, {
                         : BuildingDecorKind.Aerials;
                     decor.setPosition(x, y).setRandomFrame();
                 } 
-            } else if (randomBool(.60)) {
+            } else if (decor && randomBool(.60)) {
                 decor.kind = BuildingDecorKind.Wires;
                 decor.setPosition(x, y - 64).setRandomFrame();
             }
@@ -363,17 +362,15 @@ export class GameScene extends Scene(SceneKey.Game, {
             this.showMainText("2", () => {
                 this.showMainText("1", () => {
                         this.textMain.setTint(0x88ff44);
-                    this.showMainText("GO", () => {
                         this.stateIsRunning = true;
-                    });
+                    this.showMainText("GO");
                 });
             });
         });
     }
 
-
     // TODO: refactor, dont like one-shot approach
-    private showMainText(text: string, callback: () => void) {
+    private showMainText(text: string, callback?: () => void) {
         const duration = DEBUG.fastRespawn ? 33 : 333;
         this.textMain.setText(text);
         this.tweens.chain({

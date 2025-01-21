@@ -1,6 +1,8 @@
 import { BootScene } from "./scenes/boot";
 import { GameScene } from "./scenes/game";
 import { OverScene } from "./scenes/over";
+import { TutorialScene } from "./scenes/tutorial";
+
 
 import {
     GAME_HEIGHT,
@@ -13,7 +15,7 @@ export default new Phaser.Game({
     width: GAME_WIDTH,
     height: GAME_HEIGHT,
     pixelArt: true,
-    scene: [BootScene, GameScene, OverScene],
+    scene: [BootScene, GameScene, OverScene, TutorialScene],
     parent: "content",
     scale: {
         mode: Phaser.Scale.FIT,
