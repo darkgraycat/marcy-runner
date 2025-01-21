@@ -11,7 +11,7 @@ export class Player extends PhysEntity({
         this.flipX = velocity < 0;
         this.body.velocity.x = velocity;
         if (this.onGround) {
-            this.play(velocity > GAMEPLAY.initialSpeed
+            this.play(velocity > GAMEPLAY.initialMoveVelocity
                 ? AnimationKey.PlayerRun
                 : AnimationKey.PlayerWalk, true)
         }

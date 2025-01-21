@@ -103,6 +103,14 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
             .setTint(0xE6AC0C)
             .setSize(100, 16);
 
+        /* cheats */
+        let combination = '';
+        this.input.keyboard.on('keydown', ({ key }) => {
+            combination += key;
+            if (key == ' ') combination = '';
+            if (combination == 'devmode') return this.startDeveloper();
+            if (combination == 'cocaine') return this.startGame({ speedBonus: 100, speedBonusMax: 500, jumpVelocity: 250 });
+        });
     }
 
     update(time: number, delta: number): void {
@@ -112,27 +120,33 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
         });
     }
 
-    private startGame() {
+    private startGame(override: {
+        moveVelocity?: number,
+        jumpVelocity?: number,
+        targetPoints?: number,
+        initialLifes?: number,
+        speedBonus?: number,
+        speedBonusMax?: number,
+        levelIdx?: number,
+    } = {}) {
         this.scene.start(SceneKey.Game, {
-            player: {
-                moveVelocity: GAMEPLAY.initialSpeed,
-                jumpVelocity: GAMEPLAY.initialHeight,
-                maxJumps: 1,
-            },
-            state: {
-                targetPoints: GAMEPLAY.targetPoints,
-                initialLifes: GAMEPLAY.initialLifes,
-                speedBonus: GAMEPLAY.speedBonusStep,
-                speedBonusMax: GAMEPLAY.speedBonusMax,
-                speedBonusTick: GAMEPLAY.speedBonusTick,
-            },
-            level: {
-                levelIdx: randomInt(0, levels.length),
-            },
+            moveVelocity: override.moveVelocity || GAMEPLAY.initialMoveVelocity,
+            jumpVelocity: override.jumpVelocity || GAMEPLAY.initialJumpVelocity,
+            maxJumps: 1,
+            targetPoints: override.targetPoints || GAMEPLAY.targetPoints,
+            initialLifes: override.initialLifes || GAMEPLAY.initialLifes,
+            speedBonus: override.speedBonus || GAMEPLAY.speedBonusStep,
+            speedBonusMax: override.speedBonusMax || GAMEPLAY.speedBonusMax,
+            speedBonusTick: GAMEPLAY.speedBonusTick,
+            levelIdx: randomInt(0, levels.length),
         } as GameSceneParams);
     }
 
     private startTutorial() {
         this.scene.start(SceneKey.Tutorial, {});
+    }
+
+    private startDeveloper() {
+        this.scene.start(SceneKey.Developer, {});
     }
 }

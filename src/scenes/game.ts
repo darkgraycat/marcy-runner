@@ -17,26 +17,25 @@ import { BuildingRoof } from "../entities/building-roof";
 import { BuildingDecor, BuildingDecorKind } from "../entities/building-decor";
 
 export type GameSceneParams = {
-    player: {
-        moveVelocity: number,
-        jumpVelocity: number,
-    },
-    state: {
-        targetPoints: number,
-        initialLifes: number,
-        speedBonus: number,
-        speedBonusMax: number,
-        speedBonusTick: number,
-    },
-    level: {
-        levelIdx: number,
-    }
+    moveVelocity: number,
+    jumpVelocity: number,
+    targetPoints: number,
+    initialLifes: number,
+    speedBonus: number,
+    speedBonusMax: number,
+    speedBonusTick: number,
+    levelIdx: number,
 }
 
 export class GameScene extends Scene(SceneKey.Game, {
-    player: { moveVelocity: 100, jumpVelocity: 200 },
-    state: { targetPoints: 100, initialLifes: 3, speedBonus: 25, speedBonusTick: 1, speedBonusMax: 10 },
-    level: { levelIdx: 0 },
+    moveVelocity: 100,
+    jumpVelocity: 200,
+    targetPoints: 100,
+    initialLifes: 3,
+    speedBonus: 25,
+    speedBonusTick: 1,
+    speedBonusMax: 10,
+    levelIdx: 0,
 } as GameSceneParams) {
     player: Player;
     sun: Sun;
@@ -46,15 +45,16 @@ export class GameScene extends Scene(SceneKey.Game, {
     buildingDecors: Phaser.GameObjects.Group;
     collectables: Phaser.GameObjects.Group;
 
-    inputJumping: boolean = false;
-    inputJumpInProgress: boolean = false;
+    isJumping: boolean = false;
+    isJumpInProgress: boolean = false;
 
-    stateIsRunning: boolean = false;
-    stateSpeedMod: number = 0;
-    stateSpeedModMax: number = 0;
-    statePoints: number = 0;
-    statePointMilestones: number[];
-    stateLifesLeft: number = 3;
+    isRunning: boolean = false;
+    speedBonus: number = 0;
+    speedBonusMax: number = 0;
+
+    pointsCollected: number = 0;
+    pointMilestones: number[];
+    lifesLeft: number = 3;
 
     fxJump: Phaser.Sound.NoAudioSound | Phaser.Sound.HTML5AudioSound | Phaser.Sound.WebAudioSound;
     fxWarp: Phaser.Sound.NoAudioSound | Phaser.Sound.HTML5AudioSound | Phaser.Sound.WebAudioSound;
@@ -69,7 +69,7 @@ export class GameScene extends Scene(SceneKey.Game, {
 
     create() {
         super.create();
-        const level = levels[this.params.level.levelIdx];
+        const level = levels[this.params.levelIdx];
         const totalBuildings = Math.round(2 * GAME_WIDTH / Building.config.tilesize[0]);
         const totalCollectables = 12;
 
@@ -89,7 +89,7 @@ export class GameScene extends Scene(SceneKey.Game, {
         }
 
         this.buildings = this.add.group({ runChildUpdate: true });
-        iterate(totalBuildings, i => 
+        iterate(totalBuildings, i =>
             this.buildings.add(new Building(this, i, 1.5)
                 .setTint(level.buildings)
                 .setRandomFrame()
@@ -97,7 +97,7 @@ export class GameScene extends Scene(SceneKey.Game, {
         );
 
         this.buildingRoofs = this.add.group();
-        iterate(totalBuildings, i => 
+        iterate(totalBuildings, i =>
             this.buildingRoofs.add(new BuildingRoof(this, i, 5)
                 .setTint(level.buildings)
                 .setRandomFrame()
@@ -105,7 +105,7 @@ export class GameScene extends Scene(SceneKey.Game, {
         );
 
         this.buildingDecors = this.add.group();
-        iterate(totalBuildings, i => 
+        iterate(totalBuildings, i =>
             this.buildingDecors.add(new BuildingDecor(this, i - 12, 5)
                 .setTint(Phaser.Display.Color.IntegerToColor(level.buildings).darken(20).color)
                 .setRandomFrame()
@@ -113,7 +113,7 @@ export class GameScene extends Scene(SceneKey.Game, {
         );
 
         this.collectables = this.add.group({ runChildUpdate: true });
-        iterate(totalCollectables, i => 
+        iterate(totalCollectables, i =>
             this.collectables.add(new Collectable(this, 32 * i, 400))
         );
 
@@ -153,12 +153,12 @@ export class GameScene extends Scene(SceneKey.Game, {
             .setBackgroundColor(level.sky)
             .startFollow(this.player, true, 0.2, 0, -96, 0);
 
-        this.statePointMilestones = [
-            this.params.state.targetPoints * 0.25 | 0, // 25%
-            this.params.state.targetPoints * 0.50 | 0, // 50%
-            this.params.state.targetPoints * 0.75 | 0, // 75%
+        this.pointMilestones = [
+            this.params.targetPoints * 0.25 | 0, // 25%
+            this.params.targetPoints * 0.50 | 0, // 50%
+            this.params.targetPoints * 0.75 | 0, // 75%
         ];
-        this.stateLifesLeft = this.params.state.initialLifes;
+        this.lifesLeft = this.params.initialLifes;
 
         this.events.on(EventKey.BuildingSpawned, (payload: Point) => this.handleBuildingRespawn(payload));
 
@@ -173,35 +173,35 @@ export class GameScene extends Scene(SceneKey.Game, {
 
 
     private handlePlayer(delta: number) {
-        const { player: { moveVelocity, jumpVelocity } } = this.params;
+        const { moveVelocity, jumpVelocity } = this.params;
 
-        if (this.stateIsRunning) {
-            this.player.move(moveVelocity + this.stateSpeedMod);
+        if (this.isRunning) {
+            this.player.move(moveVelocity + this.speedBonus);
         } else {
             this.player.idle();
         }
 
         if (this.player.onGround) {
-            if (!this.inputJumping) this.inputJumpInProgress = false;
-        } else if (!this.inputJumping && this.player.body.velocity.y < 0) {
+            if (!this.isJumping) this.isJumpInProgress = false;
+        } else if (!this.isJumping && this.player.body.velocity.y < 0) {
             this.player.body.velocity.y /= 2; // still in air, but jump key no longer active
         }
 
-        if (this.inputJumping && !this.inputJumpInProgress) {
-            this.inputJumpInProgress = true;
+        if (this.isJumping && !this.isJumpInProgress) {
+            this.isJumpInProgress = true;
             this.player.jump(jumpVelocity); // continue jump
             if (this.player.onGround) this.fxJump.play();
         }
 
-        if (this.player.y > GAME_HEIGHT * 2 && this.stateIsRunning) {
+        if (this.player.y > GAME_HEIGHT * 2 && this.isRunning) {
             this.handleLoseLife();
         }
     }
 
     private handleLoseLife() {
-        this.stateIsRunning = false;
-        if (this.stateLifesLeft > 1) {
-            this.stateLifesLeft--;
+        this.isRunning = false;
+        if (this.lifesLeft > 1) {
+            this.lifesLeft--;
             this.handlePlayerRespawn();
         } else {
             this.lose();
@@ -221,9 +221,9 @@ export class GameScene extends Scene(SceneKey.Game, {
             this.player.y = 0;
         }
         console.log("respawned at", { x: this.player.x, y: this.player.y });
-        this.stateSpeedMod = 0;
-        this.inputJumping = false;
-        this.inputJumpInProgress = false;
+        this.speedBonus = 0;
+        this.isJumping = false;
+        this.isJumpInProgress = false;
 
         this.startRunning();
     }
@@ -246,7 +246,7 @@ export class GameScene extends Scene(SceneKey.Game, {
                         ? BuildingDecorKind.Block
                         : BuildingDecorKind.Aerials;
                     decor.setPosition(x, y).setRandomFrame();
-                } 
+                }
             } else if (decor && randomBool(.60)) {
                 decor.kind = BuildingDecorKind.Wires;
                 decor.setPosition(x, y - 64).setRandomFrame();
@@ -289,14 +289,14 @@ export class GameScene extends Scene(SceneKey.Game, {
 
 
     private handleSpeedChange() {
-        this.stateSpeedMod -= this.params.state.speedBonusTick;
-        if (this.stateSpeedMod < 0) this.stateSpeedMod = 0;
-        if (this.stateSpeedMod > this.params.state.speedBonusMax) {
-            this.stateSpeedMod = this.params.state.speedBonusMax;
+        this.speedBonus -= this.params.speedBonusTick;
+        if (this.speedBonus < 0) this.speedBonus = 0;
+        if (this.speedBonus > this.params.speedBonusMax) {
+            this.speedBonus = this.params.speedBonusMax;
         }
 
-        if (this.stateSpeedModMax < this.stateSpeedMod) {
-            this.stateSpeedModMax = this.stateSpeedMod;
+        if (this.speedBonusMax < this.speedBonus) {
+            this.speedBonusMax = this.speedBonus;
         }
     }
 
@@ -306,27 +306,27 @@ export class GameScene extends Scene(SceneKey.Game, {
         switch (collectable.currentKind) {
             case CollectableKind.Panacat: {
                 this.fxCollect.play();
-                this.statePoints++;
+                this.pointsCollected++;
 
-                const [nextMilestone] = this.statePointMilestones;
-                if (this.statePoints >= nextMilestone) {
+                const [nextMilestone] = this.pointMilestones;
+                if (this.pointsCollected >= nextMilestone) {
                     this.fxMeowHigh.play();
-                    this.statePointMilestones.shift();
+                    this.pointMilestones.shift();
                 }
 
-                if (this.statePoints >= this.params.state.targetPoints) {
+                if (this.pointsCollected >= this.params.targetPoints) {
                     this.win();
                 }
                 break;
             }
             case CollectableKind.Bean: {
                 this.fxWarp.play();
-                this.stateSpeedMod += this.params.state.speedBonus;
+                this.speedBonus += this.params.speedBonus;
                 break;
             }
             case CollectableKind.Life: {
                 this.fxMeowHigh.play();
-                this.stateLifesLeft++;
+                this.lifesLeft++;
                 break;
             }
         }
@@ -335,9 +335,9 @@ export class GameScene extends Scene(SceneKey.Game, {
     }
 
     private handleUiText() {
-        this.textPanacats.setTextArgs(this.statePoints);
-        this.textCaffeine.setTextArgs('`'.repeat(Math.round(this.stateSpeedMod / this.params.state.speedBonus)));
-        this.textLifes.setTextArgs(';'.repeat(this.stateLifesLeft));
+        this.textPanacats.setTextArgs(this.pointsCollected);
+        this.textCaffeine.setTextArgs('`'.repeat(Math.round(this.speedBonus / this.params.speedBonus)));
+        this.textLifes.setTextArgs(';'.repeat(this.lifesLeft));
     }
 
     private lose() {
@@ -361,8 +361,8 @@ export class GameScene extends Scene(SceneKey.Game, {
         this.showMainText("3", () => {
             this.showMainText("2", () => {
                 this.showMainText("1", () => {
-                        this.textMain.setTint(0x88ff44);
-                        this.stateIsRunning = true;
+                    this.textMain.setTint(0x88ff44);
+                    this.isRunning = true;
                     this.showMainText("GO");
                 });
             });
@@ -385,7 +385,7 @@ export class GameScene extends Scene(SceneKey.Game, {
     }
 
     private handleActionKey(isDown: boolean) {
-        this.inputJumping = isDown;
+        this.isJumping = isDown;
     }
 
     // TODO: doesnt, works - pauses own unpause event
@@ -404,9 +404,9 @@ export class GameScene extends Scene(SceneKey.Game, {
         this.scene.start(SceneKey.Over, {
             message,
             finished,
-            points: this.statePoints,
+            points: this.pointsCollected,
             distance: +this.cameras.main.scrollX.toFixed(0),
-            maxSpeedMod: +this.stateSpeedModMax.toFixed(0),
+            maxSpeedMod: +this.speedBonusMax.toFixed(0),
         } as OverSceneParams);
     }
 }
