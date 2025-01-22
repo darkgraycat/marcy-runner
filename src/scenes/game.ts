@@ -107,7 +107,7 @@ export class GameScene extends Scene(SceneKey.Game, {
         this.buildingDecors = this.add.group();
         iterate(totalBuildings, i =>
             this.buildingDecors.add(new BuildingDecor(this, i - 12, 5)
-                .setTint(Phaser.Display.Color.IntegerToColor(level.buildings).darken(20).color)
+                .setTint(Phaser.Display.Color.IntegerToColor(level.buildings).darken(10).color)
                 .setRandomFrame()
             )
         );

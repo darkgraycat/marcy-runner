@@ -9,6 +9,7 @@ import { UiButton, UiText } from "../entities/ui";
 import { Background } from "../entities/background";
 
 export class BootScene extends Scene(SceneKey.Boot, {}) {
+    levelIdx: number;
     backgrounds: Phaser.GameObjects.Group;
 
     preload() {
@@ -74,7 +75,8 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
         if (DEBUG.fastDevmode) return this.startDevmode();
 
         /* #backgrounds */
-        const level = levels[0];
+        this.levelIdx = randomInt(0, levels.length)
+        const level = levels[this.levelIdx];
         this.cameras.main.setBackgroundColor(level.sky);
         this.backgrounds = this.add.group({ runChildUpdate: false });
         for (const [frame, y, color, scrollScale] of level.backgrounds) {
@@ -89,19 +91,19 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
 
         new UiText(this, strings.bootScene.objectives)
             .setTextArgs(GAMEPLAY.targetPoints)
-            .setTint(0xff8822)
+            .setTint(level.sky)
             .setPosition(width / 2, height - 16);
 
         new UiButton(this, strings.bootScene.buttonStart)
             .setPosition(width / 2, height - 64)
             .setOnClick(() => this.startGame())
-            .setTint(0xE6AC0C)
+            .setTint(level.backgrounds[2][3])
             .setSize(100, 16);
 
         new UiButton(this, strings.bootScene.buttonTutorial)
             .setPosition(width / 2, height - 40)
             .setOnClick(() => this.startTutorial())
-            .setTint(0xE6AC0C)
+            .setTint(level.backgrounds[2][3])
             .setSize(100, 16);
 
         /* cheats */
@@ -109,6 +111,7 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
         this.input.keyboard.on('keydown', ({ key }) => {
             combination += key;
             if (key == ' ') combination = '';
+            if (combination.endsWith('level')) return this.startGame({ levelIdx: +combination.split('level')[0] })
             if (combination == 'devmode') return this.startDevmode();
             if (combination == 'cocaine') return this.startGame({ speedBonus: 100, speedBonusMax: 500, jumpVelocity: 250 });
         });
@@ -117,7 +120,7 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
     update(time: number, delta: number): void {
         this.backgrounds.getChildren().forEach((c, index) => {
             const bg = c as Background;
-            bg.tilePositionX += levels[0].backgrounds[index][3];
+            bg.tilePositionX += levels[this.levelIdx].backgrounds[index][3];
         });
     }
 
@@ -139,7 +142,7 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
             speedBonus: override.speedBonus || GAMEPLAY.speedBonusStep,
             speedBonusMax: override.speedBonusMax || GAMEPLAY.speedBonusMax,
             speedBonusTick: GAMEPLAY.speedBonusTick,
-            levelIdx: randomInt(0, levels.length),
+            levelIdx: override.levelIdx ||  randomInt(0, levels.length),
         } as GameSceneParams);
     }
 
@@ -148,6 +151,6 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
     }
 
     private startDevmode() {
-        this.scene.start(SceneKey.Devmode, {});
+        this.scene.start(SceneKey.Devmode, { levelIdx: 4 });
     }
 }
