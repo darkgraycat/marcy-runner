@@ -1,5 +1,5 @@
 export const GAMEPLAY = {
-    targetPoints: 333,
+    targetPoints: 200,
     initialLifes: 3,
     initialMoveVelocity: 100,
     initialJumpVelocity: 200,
@@ -11,8 +11,8 @@ export const GAMEPLAY = {
 export const SETTINGS = {
     volumeMute: false,
     volumeMusic: 0.5,
-    // volumeEffects: 0.3,
-    volumeEffects: 0.0,
+    volumeEffects: 0.1,
+    // volumeEffects: 0.0,
     // userName: "Марсічка",
     userName: "Кицюня Кицик Котічка Кошеня Кицюрівна Кицька Киця".split(' ')[Math.random() * 6 | 0]
 }

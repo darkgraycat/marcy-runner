@@ -56,7 +56,7 @@ export class Building extends TilePhysEntity({
         Building.lastHeight = height;
 
         const [tileWidth] = Building.config.tilesize;
-        const col = (GAME_WIDTH * 2 + this.x) / tileWidth | 0;
+        const col = (GAME_WIDTH * 2 + this.x) / tileWidth | 0; // place at the same point but GAME_WIDTH*2
         this.placeByTile(col, height - 0.5) // to make it appear half
             .setRandomFrame()
             .resizeByTile(1, height)

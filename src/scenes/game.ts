@@ -56,12 +56,6 @@ export class GameScene extends Scene(SceneKey.Game, {
     pointMilestones: number[];
     lifesLeft: number = 3;
 
-    fxJump: Phaser.Sound.NoAudioSound | Phaser.Sound.HTML5AudioSound | Phaser.Sound.WebAudioSound;
-    fxWarp: Phaser.Sound.NoAudioSound | Phaser.Sound.HTML5AudioSound | Phaser.Sound.WebAudioSound;
-    fxMeowLow: Phaser.Sound.NoAudioSound | Phaser.Sound.HTML5AudioSound | Phaser.Sound.WebAudioSound;
-    fxMeowHigh: Phaser.Sound.NoAudioSound | Phaser.Sound.HTML5AudioSound | Phaser.Sound.WebAudioSound;
-    fxCollect: Phaser.Sound.NoAudioSound | Phaser.Sound.HTML5AudioSound | Phaser.Sound.WebAudioSound;
-
     textPanacats: UiText;
     textCaffeine: UiText;
     textLifes: UiText;
@@ -72,13 +66,6 @@ export class GameScene extends Scene(SceneKey.Game, {
         const level = levels[this.params.levelIdx];
         const totalBuildings = Math.round(2 * GAME_WIDTH / Building.config.tilesize[0]);
         const totalCollectables = 12;
-
-        /* #sound */
-        this.fxJump = this.sound.add(AudioKey.Jump, { volume: SETTINGS.volumeEffects * 0.1, detune: -200 });
-        this.fxWarp = this.sound.add(AudioKey.Warp, { volume: SETTINGS.volumeEffects * 0.3, detune: -200 });
-        this.fxMeowLow = this.sound.add(AudioKey.Meow, { volume: SETTINGS.volumeEffects * 0.4, detune: -600 });
-        this.fxMeowHigh = this.sound.add(AudioKey.Meow, { volume: SETTINGS.volumeEffects * 0.4, detune: 400 });
-        this.fxCollect = this.sound.add(AudioKey.Collect, { volume: SETTINGS.volumeEffects * 0.4, detune: 400 });
 
         /* #entities */
         this.sun = new Sun(this, 64, 32, 6);
@@ -151,7 +138,7 @@ export class GameScene extends Scene(SceneKey.Game, {
         /* other */
         this.cameras.main
             .setBackgroundColor(level.sky)
-            .startFollow(this.player, true, 0.2, 0, -96, 0);
+            .startFollow(this.player, true, 0.1, 0, -96, 0);
 
         this.pointMilestones = [
             this.params.targetPoints * 0.25 | 0, // 25%
@@ -190,7 +177,6 @@ export class GameScene extends Scene(SceneKey.Game, {
         if (this.isJumping && !this.isJumpInProgress) {
             this.isJumpInProgress = true;
             this.player.jump(jumpVelocity); // continue jump
-            if (this.player.onGround) this.fxJump.play();
         }
 
         if (this.player.y > GAME_HEIGHT * 2 && this.isRunning) {
@@ -200,6 +186,7 @@ export class GameScene extends Scene(SceneKey.Game, {
 
     private handleLoseLife() {
         this.isRunning = false;
+        this.player.meow(-4);
         if (this.lifesLeft > 1) {
             this.lifesLeft--;
             this.handlePlayerRespawn();
@@ -305,12 +292,11 @@ export class GameScene extends Scene(SceneKey.Game, {
 
         switch (collectable.currentKind) {
             case CollectableKind.Panacat: {
-                this.fxCollect.play();
                 this.pointsCollected++;
 
                 const [nextMilestone] = this.pointMilestones;
                 if (this.pointsCollected >= nextMilestone) {
-                    this.fxMeowHigh.play();
+                    this.player.meow();
                     this.pointMilestones.shift();
                 }
 
@@ -320,12 +306,10 @@ export class GameScene extends Scene(SceneKey.Game, {
                 break;
             }
             case CollectableKind.Bean: {
-                this.fxWarp.play();
                 this.speedBonus += this.params.speedBonus;
                 break;
             }
             case CollectableKind.Life: {
-                this.fxMeowHigh.play();
                 this.lifesLeft++;
                 break;
             }
@@ -341,7 +325,6 @@ export class GameScene extends Scene(SceneKey.Game, {
     }
 
     private lose() {
-        this.fxMeowLow.play();
         return this.startOver(
             "Don't be upset\nYou will succeed next time!",
             false,

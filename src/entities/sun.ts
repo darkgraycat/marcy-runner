@@ -14,7 +14,7 @@ export class Sun extends Phaser.GameObjects.Graphics {
         scene.add.existing(this);
     }
 
-    setColor(color: number | string) {
+    setTint(color: number | string) {
         this.fillStyle(+color, 1);
         this.fillCircle(this.xpos, this.ypos, this.radius);
         return this;

@@ -1,7 +1,7 @@
-import { EntityKey, AnimationKey } from "../shared/keys";
+import { EntityKey, AnimationKey, AudioKey } from "../shared/keys";
 import { PhysEntity } from "../shared/factories";
 import { randomByProbability, randomElement } from "../shared/utils";
-import { SPAWN_RATES } from "../shared/settings";
+import { SETTINGS, SPAWN_RATES } from "../shared/settings";
 
 export enum CollectableKind {
     Panacat,
@@ -9,20 +9,27 @@ export enum CollectableKind {
     Life,
 }
 
-const CollectableConfig = {
+const CollectableConfig: Record<string, {
+    tints: number[],
+    animations: string[],
+    sound: [string, number, number],
+}> = {
     [CollectableKind.Panacat]: {
         tints: [0xff9e70, 0xffdf5f, 0xff8195, 0x7a4841, 0x602c2c],
         animations: [AnimationKey.CollectablePanacatIdle, AnimationKey.CollectablePanacatDie],
+        sound: [AudioKey.Collect, 0.3, 400],
     },
     [CollectableKind.Bean]: {
         tints: [0xbd7856, 0xc5764f, 0x824923],
         animations: [AnimationKey.CollectableBeanIdle, AnimationKey.CollectableBeanDie],
+        sound: [AudioKey.Warp, 0.3, -200],
     },
     [CollectableKind.Life]: {
         tints: [0xff593a],
         animations: [AnimationKey.CollectableLifeIdle, AnimationKey.CollectableLifeDie],
+        sound: [AudioKey.Meow, 0.2, 300],
     },
-}
+};
 
 export class Collectable extends PhysEntity({
     key: EntityKey.Collectables,
@@ -49,6 +56,7 @@ export class Collectable extends PhysEntity({
 
     collect() {
         this.disableBody();
+        this.scene.sound.play(this.sound.key, this.sound.config);
         if (this.animation.die) {
             this.play(this.animation.die);
             setTimeout(() => this.setActive(false).setVisible(false), 200);
@@ -74,6 +82,11 @@ export class Collectable extends PhysEntity({
     get animation() {
         const [idle, die] = CollectableConfig[this.kind].animations;
         return { idle, die };
+    }
+
+    get sound() {
+        const [key, volume, detune] = CollectableConfig[this.kind].sound;
+        return { key, config: { volume: SETTINGS.volumeEffects * volume, detune: detune } };
     }
 
     get randomTint(): number {

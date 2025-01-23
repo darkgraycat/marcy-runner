@@ -15,7 +15,7 @@
         }
 
         canvas {
-            image-rendering: crisp-edges;
+            image-rendering: pixelated;
         }
     </style>
 </head>
@@ -27,7 +27,7 @@
         const content = document.getElementById('content');
         const fullscreen = () => {
             if (content.requestFullscreen) {
-                content.requestFullscreen();
+                // content.requestFullscreen();
             } else if (content.mozRequestFullScreen) { // Firefox
                 content.mozRequestFullScreen();
             } else if (content.webkitRequestFullscreen) { // Chrome, Safari and Opera
