@@ -4,43 +4,47 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script type="text/javascript" src="dist/main.js"></script>
     <link rel="stylesheet" href="style.css">
 	<title>Marcy Runner Game</title>
 </head>
 
 <body>
-    <div id="game-container"></div>
+    <div id="root" container>
+        <h2>Marcy Runner Game</h2>
+        <div id="game"></div>
+        <div id="main" container>
+            The general information about us, this game, story of Marcy.
+            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Tempora, nobis asperiores. Adipisci vitae voluptas expedita quis aperiam dolores doloremque ducimus fugiat quae est! Perferendis, repudiandae? Commodi earum unde sequi optio.
+        </div>
+        <div id="about">
+            Our contacts, links to social, etc.
+        </div>
+    </div>
 
+    <script type="text/javascript" src="dist/main.js"></script>
     <script type="text/javascript">
-        const content = document.getElementById('content');
-        const fullscreen = () => {
-            if (content.requestFullscreen) {
-                // content.requestFullscreen();
-            } else if (content.mozRequestFullScreen) { // Firefox
-                content.mozRequestFullScreen();
-            } else if (content.webkitRequestFullscreen) { // Chrome, Safari and Opera
-                content.webkitRequestFullscreen();
-            } else if (content.msRequestFullscreen) { // IE/Edge
-                content.msRequestFullscreen();
-            }
-        }
-        const handleOrientationChange = () => {
-            if (window.innerHeight < window.innerWidth) {
-                content.classList.add('landscape');
-            } else {
-                content.classList.remove('landscape');
-            }
-        }
+        const gameContainer = document.getElementById('game');
 
-        document.addEventListener('click', fullscreen);
-        document.addEventListener('touchstart', fullscreen);
+        const requestFullScreen = (e) => (e.requestFullScreen || e.mozRequestFullScreen || e.webkitRequestFullscreen || e.msRequestFullscreen); 
+
+        // TODO: make dedicated FS button
+        // gameContainer.addEventListener('click', requestFullScreen(gameContainer));
+        // gameContainer.addEventListener('touchstart', requestFullScreen(gameContainer));
+
+
+        //const handleOrientationChange = () => {
+        //    if (window.innerHeight < window.innerWidth) {
+        //        gameContainer.classList.add('landscape');
+        //    } else {
+        //        gameContainer.classList.remove('landscape');
+        //    }
+        //}
         // window.addEventListener('resize', handleOrientationChange);
         // window.addEventListener('orientationchange', handleOrientationChange);
         // document.addEventListener('fullscreenchange', handleOrientationChange);
 
         // Initial check
-        handleOrientationChange();
+        //handleOrientationChange();
     </script>
 </body>
 

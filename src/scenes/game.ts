@@ -138,7 +138,7 @@ export class GameScene extends Scene(SceneKey.Game, {
         /* other */
         this.cameras.main
             .setBackgroundColor(level.sky)
-            .startFollow(this.player, true, 0.1, 0, -96, 0);
+            .startFollow(this.player, true, 1, 0, -80, 0);
 
         this.pointMilestones = [
             this.params.targetPoints * 0.25 | 0, // 25%
@@ -320,8 +320,8 @@ export class GameScene extends Scene(SceneKey.Game, {
 
     private handleUiText() {
         this.textPanacats.setTextArgs(this.pointsCollected);
-        this.textCaffeine.setTextArgs('`'.repeat(Math.round(this.speedBonus / this.params.speedBonus)));
-        this.textLifes.setTextArgs(';'.repeat(this.lifesLeft));
+        this.textCaffeine.setTextArgs(strings.chars.caffeine.repeat(Math.round(this.speedBonus / this.params.speedBonus)));
+        this.textLifes.setTextArgs(strings.chars.life.repeat(this.lifesLeft));
     }
 
     private lose() {

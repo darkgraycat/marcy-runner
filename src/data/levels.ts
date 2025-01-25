@@ -1,3 +1,10 @@
+export const LevelsDataBgIdxs = {
+    FRAME: 0,
+    Y: 1,
+    COLOR: 2,
+    SCROLL_SCALE: 3,
+};
+
 export type LevelsData = {
     sky: number,
     buildings: number,

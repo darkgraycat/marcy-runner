@@ -62,6 +62,7 @@ export class UiButton extends Phaser.GameObjects.Container {
     }
 
     setTint(tint: number) {
+        console.log("new tint for button", tint);
         this.tint = tint;
         this.borderTint = Phaser.Display.Color.IntegerToColor(tint).darken(10).color;
         this.highlightTint = Phaser.Display.Color.IntegerToColor(tint).lighten(5).color;

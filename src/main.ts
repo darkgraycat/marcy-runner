@@ -7,6 +7,7 @@ import { TutorialScene } from "./scenes/tutorial";
 import {
     GAME_HEIGHT,
     GAME_WIDTH,
+    PARENT_CONTAINER_ID,
 } from './shared/constants';
 import { DEBUG } from "./shared/settings";
 
@@ -15,10 +16,12 @@ export default new Phaser.Game({
     width: GAME_WIDTH,
     height: GAME_HEIGHT,
     pixelArt: true,
+    roundPixels: true,
+    antialias: false,
     scene: [BootScene, GameScene, OverScene, TutorialScene, DevmodeScene],
-    parent: "content",
+    parent: PARENT_CONTAINER_ID,
     scale: {
-        mode: Phaser.Scale.FIT,
+        mode: Phaser.Scale.WIDTH_CONTROLS_HEIGHT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
         width: GAME_WIDTH,
         height: GAME_HEIGHT,
@@ -39,6 +42,5 @@ export default new Phaser.Game({
     powerPreference: "low-power",
     autoMobilePipeline: true,
     autoFocus: true,
-    roundPixels: true,
     autoRound: true,
 });

@@ -4,7 +4,7 @@ import { EntityKey, AnimationKey, SceneKey, UiKey, AudioKey, FontKey } from "../
 import { GameSceneParams } from "./game";
 import { randomInt } from "../shared/utils";
 import strings from "../data/strings";
-import levels from "../data/levels";
+import levels, { LevelsDataBgIdxs } from "../data/levels";
 import { UiButton, UiText } from "../entities/ui";
 import { Background } from "../entities/background";
 
@@ -47,6 +47,7 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
 
     create() {
         super.create();
+        this.scale.setMaxZoom();
 
         [   /* animaton */
             { key: AnimationKey.PlayerIdle, assetKey: EntityKey.Player, frames: [0, 1, 2, 3, 4, 5], frameRate: 8, repeat: -1 },
@@ -97,13 +98,13 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
         new UiButton(this, strings.bootScene.buttonStart)
             .setPosition(width / 2, height - 64)
             .setOnClick(() => this.startGame())
-            .setTint(level.backgrounds[2][3])
+            .setTint(level.backgrounds[2][LevelsDataBgIdxs.COLOR])
             .setSize(100, 16);
 
         new UiButton(this, strings.bootScene.buttonTutorial)
             .setPosition(width / 2, height - 40)
             .setOnClick(() => this.startTutorial())
-            .setTint(level.backgrounds[2][3])
+            .setTint(level.backgrounds[2][LevelsDataBgIdxs.COLOR])
             .setSize(100, 16);
 
         /* cheats */
@@ -120,7 +121,7 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
     update(time: number, delta: number): void {
         this.backgrounds.getChildren().forEach((c, index) => {
             const bg = c as Background;
-            bg.tilePositionX += levels[this.levelIdx].backgrounds[index][3];
+            bg.tilePositionX += levels[this.levelIdx].backgrounds[index][LevelsDataBgIdxs.SCROLL_SCALE];
         });
     }
 
