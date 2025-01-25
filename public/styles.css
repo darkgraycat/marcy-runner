@@ -1,0 +1,16 @@
+:root {
+	--primary-color: #d0d0b0;
+	--primary-bgcolor: #202020;
+}
+
+html,
+body {
+	margin: 0px;
+	padding: 0px;
+	color: var(--primary-color);
+	background-color: var(--primary-bgcolor);
+}
+
+#game-container canvas {
+	image-rendering: pixelated;
+}
