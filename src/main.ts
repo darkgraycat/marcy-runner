@@ -4,7 +4,11 @@ import { GameScene } from "./scenes/game";
 import { OverScene } from "./scenes/over";
 import { TutorialScene } from "./scenes/tutorial";
 
-import { GAME_HEIGHT, GAME_WIDTH } from './shared/constants';
+
+import {
+    GAME_HEIGHT,
+    GAME_WIDTH,
+} from './shared/constants';
 import { DEBUG } from "./shared/settings";
 
 export default new Phaser.Game({
@@ -13,7 +17,7 @@ export default new Phaser.Game({
     height: GAME_HEIGHT,
     pixelArt: true,
     scene: [BootScene, GameScene, OverScene, TutorialScene, DevmodeScene],
-    parent: "game-container",
+    parent: "content",
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
@@ -32,10 +36,8 @@ export default new Phaser.Game({
     },
     powerPreference: "low-power",
     autoMobilePipeline: true,
+    fps: { target: 60 },
     autoFocus: true,
     roundPixels: true,
     autoRound: true,
-    fps: {
-        target: 60
-    },
 });

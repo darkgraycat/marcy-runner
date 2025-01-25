@@ -1,13 +1,13 @@
 {
   "name": "marcy-runner-game",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "start": "npm run serve & npm run watch",
-    "serve": "npx live-server public --port=8080 --watch=public",
-    "watch": "npx esbuild src/main.ts --bundle --outfile=public/main.js --sourcemap=inline --watch",
-    "build": "npx esbuild src/main.ts --bundle --outfile=public/main.js --minify",
+    "serve": "npx live-server --port=8080 --watch=dist,assets",
+    "watch": "npx esbuild src/main.ts --bundle --outdir=dist --sourcemap=inline --watch",
+    "build": "npx esbuild src/main.ts --bundle --minify --outdir=dist",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "darkgraycat",
