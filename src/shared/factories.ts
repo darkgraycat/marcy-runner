@@ -155,7 +155,7 @@ export function TilePhysEntity(config: PhysEntityConfig & { tilesize: Point }) {
 
 
 
-/* Groups */
+/* Groups & Containers */
 type GroupEntityCallback<T extends EntityClass | PhysEntityClass> = (entity: T) => void;
 
 type GroupEntityConfig<T extends EntityClass | PhysEntityClass> = {
@@ -181,42 +181,6 @@ export function GroupEntity<T extends EntityClass | PhysEntityClass>(config: Gro
         }
 
         forEach<K = void>(callback: (child: InstanceType<T>, index?: number) => K) {
-            this.getChildren().forEach((go, i) => {
-                callback(go as any, i)
-            });
-        }
-    }
-}
-
-
-// UNUSED DUE TO ERRORS
-type GroupPhysEntityCallback<T extends PhysEntityClass> = (entity: T) => void;
-
-// UNUSED DUE TO ERRORS
-type GroupPhysEntityConfig<T extends PhysEntityClass> = {
-    class: T;
-    update: boolean;
-    capacity: number;
-    onCreate?: GroupPhysEntityCallback<T>;
-    onRemove?: GroupPhysEntityCallback<T>;
-}
-
-// UNUSED DUE TO ERRORS
-export function GroupPhysEntity<T extends PhysEntityClass>(config: GroupPhysEntityConfig<T>) {
-    return class GroupPhysEntity extends Phaser.Physics.Arcade.Group {
-        static readonly config = config;
-        constructor(scene: Phaser.Scene, children?: Phaser.Physics.Arcade.Sprite[] | Phaser.GameObjects.TileSprite[]) {
-            super(scene.physics.world, scene, children, {
-                classType: config.class,
-                maxSize: config.capacity,
-                runChildUpdate: config.update,
-                createCallback: config.onCreate as any,
-                removeCallback: config.onRemove as any,
-            });
-            scene.add.existing(this);
-        }
-
-        forEach<K = void>(callback: (child: T, index?: number) => K) {
             this.getChildren().forEach((go, i) => {
                 callback(go as any, i)
             });
