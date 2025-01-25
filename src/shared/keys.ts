@@ -1,4 +1,5 @@
 export const SceneKey = {
+    Main: "scene_main",
     Boot: "scene_boot",
     Game: "scene_game2",
     Input: "scene_input",
