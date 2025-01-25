@@ -176,7 +176,7 @@ export class GameScene extends Scene(SceneKey.Game, {
         if (!this.isJumping) {
             if (this.player.body.velocity.y < 0)
                 this.player.body.velocity.y /= 2;
-            if (this.player.onGround)
+            if (this.player.body.blocked.down)
                 this.isJumpInProgress = false;
         }
 

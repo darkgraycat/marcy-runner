@@ -13,7 +13,7 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
     backgrounds: Phaser.GameObjects.Group;
 
     preload() {
-        [   /* audio */
+        [   /* #audio */
             { key: AudioKey.MainTheme, path: "assets/audio/main_theme.mp3" },
             { key: AudioKey.Collect, path: "assets/audio/collect.mp3" },
             { key: AudioKey.Jump, path: "assets/audio/jump.mp3" },
@@ -21,14 +21,14 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
             { key: AudioKey.Meow, path: "assets/audio/meow.mp3" },
         ].forEach(({ key, path }) => this.load.audio(key, path));
 
-        // [   /* image */
+        // [   /* #image */
         //     { key: UiKey.Logo, path: "assets/images/murkit_logo.png" },
         //     { key: UiKey.LogoBig, path: "assets/images/murkit_logo_big.png" },
         //     { key: UiKey.Title, path: "assets/images/title.png" },
         //     { key: UiKey.UiMenu, path: "assets/images/ui_menu.png" },
         // ].forEach(({ key, path }) => this.load.image(key, path));
 
-        [   /* spritesheet */
+        [   /* #spritesheet */
             { key: EntityKey.Player, path: "assets/images/player.png", size: [16, 16] },
             { key: EntityKey.Buildings, path: "assets/images/buildings.png", size: [48, 32] },
             { key: EntityKey.BuildingRoofs, path: "assets/images/building-roofs.png", size: [48, 16] },
@@ -39,7 +39,7 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
             this.load.spritesheet(key, path, { frameWidth, frameHeight })
         );
 
-        [   /* font */
+        [   /* #font */
             { key: FontKey.MKitText, path: "assets/fonts/mkit-text-7x8.png", xml: "assets/fonts/mkit-text-7x8.xml" },
         ].forEach(({ key, path, xml }) => this.load.bitmapFont(key, path, xml));
 
@@ -49,7 +49,7 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
         super.create();
         this.scale.setMaxZoom();
 
-        [   /* animaton */
+        [   /* #animaton */
             { key: AnimationKey.PlayerIdle, assetKey: EntityKey.Player, frames: [0, 1, 2, 3, 4, 5], frameRate: 8, repeat: -1 },
             { key: AnimationKey.PlayerWalk, assetKey: EntityKey.Player, frames: [5, 6, 6, 7], frameRate: 16, repeat: -1 },
             { key: AnimationKey.PlayerJump, assetKey: EntityKey.Player, frames: [4, 4, 6, 6], frameRate: 16, repeat: 0 },
