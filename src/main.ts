@@ -4,7 +4,6 @@ import { GameScene } from "./scenes/game";
 import { OverScene } from "./scenes/over";
 import { TutorialScene } from "./scenes/tutorial";
 
-
 import {
     GAME_HEIGHT,
     GAME_WIDTH,
@@ -34,9 +33,11 @@ export default new Phaser.Game({
     dom: {
         createContainer: true
     },
+    fps: {
+        target: 60
+    },
     powerPreference: "low-power",
     autoMobilePipeline: true,
-    fps: { target: 60 },
     autoFocus: true,
     roundPixels: true,
     autoRound: true,
