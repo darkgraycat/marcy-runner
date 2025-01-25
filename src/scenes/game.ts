@@ -168,15 +168,16 @@ export class GameScene extends Scene(SceneKey.Game, {
             this.player.idle();
         }
 
-        if (this.player.onGround) {
-            if (!this.isJumping) this.isJumpInProgress = false;
-        } else if (!this.isJumping && this.player.body.velocity.y < 0) {
-            this.player.body.velocity.y /= 2; // still in air, but jump key no longer active
-        }
-
         if (this.isJumping && !this.isJumpInProgress) {
             this.isJumpInProgress = true;
-            this.player.jump(jumpVelocity); // continue jump
+            this.player.jump(jumpVelocity);
+        }
+
+        if (!this.isJumping) {
+            if (this.player.body.velocity.y < 0)
+                this.player.body.velocity.y /= 2;
+            if (this.player.onGround)
+                this.isJumpInProgress = false;
         }
 
         if (this.player.y > GAME_HEIGHT * 2 && this.isRunning) {
