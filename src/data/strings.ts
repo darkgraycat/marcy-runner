@@ -15,8 +15,9 @@ export default {
     chars,
 
     bootScene: {
-        title: "Привіт %s!",
-        objectives: `Збери %s панакотиків\n${chars.cat} Та отримай приз!  ${chars.cat}`,
+        welcome: "Привіт %s!",
+        title: `${chars.cat} Котик біжить! ${chars.cat}`,
+        objectives: `Збери %s панакотиків\n${chars.panacat} Та отримай приз!  ${chars.panacat}`,
         buttonStart: "Почати забіг",
         buttonTutorial: "Як грати?",
         hints: "",

@@ -87,8 +87,8 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
         /* #ui */
         const { width, height } = this.scale;
         new UiText(this, strings.bootScene.title)
-            .setTextArgs(SETTINGS.userName)
-            .setPosition(width / 2, 32);
+            .setPosition(width / 2, 32)
+            .setScale(2);
 
         new UiText(this, strings.bootScene.objectives)
             .setTextArgs(GAMEPLAY.targetPoints)
