@@ -27,9 +27,14 @@ export class BuildingDecor extends TileEntity({
 }) {
     kind: BuildingDecorKind;
 
-    constructor(scene: Phaser.Scene, col: number, row: number, kind?: BuildingDecorKind) {
+    constructor(
+        scene: Phaser.Scene,
+        col: number = 0,
+        row: number = 0,
+        kind: BuildingDecorKind = BuildingDecorKind.Aerials,
+    ) {
         super(scene);
-        this.kind = kind || BuildingDecorKind.Aerials;
+        this.kind = kind;
         this.placeByTile(col, row)
             .setOrigin(0, 1)
             .setRandomFrame();

@@ -7,7 +7,7 @@ export class BuildingRoof extends TileEntity({
     size: [48, 16],
     tilesize: [48, 16],
 }) {
-    constructor(scene: Phaser.Scene, col: number, row: number) {
+    constructor(scene: Phaser.Scene, col: number = 0, row: number = 0) {
         super(scene);
         this.placeByTile(col, row)
             .setOrigin(0, 1);

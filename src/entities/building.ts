@@ -1,11 +1,15 @@
 import { GAME_HEIGHT, GAME_WIDTH } from "../shared/constants";
 import { TilePhysEntity } from "../shared/factories";
+import { blockHeightGenerator } from "../shared/generators";
 import { EntityKey, EventKey } from "../shared/keys";
 import { randomInt } from "../shared/utils";
 
-export type BuildingSpawnConfig = {
-
-}
+const generator = blockHeightGenerator({
+    widthsRange: [2, 8],
+    heightsRange: [1, 4],
+    decrement: 1,
+    increment: 2,
+});
 
 export class Building extends TilePhysEntity({
     key: EntityKey.Buildings,
@@ -14,10 +18,7 @@ export class Building extends TilePhysEntity({
     tilesize: [48, 32],
     static: true,
 }) {
-    private static lastWidth: number = 0;
-    private static lastHeight: number = 0;
-
-    constructor(scene: Phaser.Scene, col: number, row: number) {
+    constructor(scene: Phaser.Scene, col: number = 0, row: number = 0) {
         super(scene);
         this.placeByTile(col, row)
             .resizeByTile(1, row)
@@ -41,19 +42,7 @@ export class Building extends TilePhysEntity({
     }
 
     respawn() {
-        const maxBuildingWidth = randomInt(2, 8);
-        if (Building.lastWidth >= maxBuildingWidth)
-            Building.lastWidth = 0;
-        else Building.lastWidth++;
-
-        const height = Building.lastWidth > 0
-            ? randomInt(
-                Math.max(Building.lastHeight - 1, 1),
-                Math.min(Building.lastHeight + 2, 4),
-            )
-            : -1; // empty space
-
-        Building.lastHeight = height;
+        const height = generator.next().value;
 
         const [tileWidth] = Building.config.tilesize;
         const col = (GAME_WIDTH * 2 + this.x) / tileWidth | 0; // place at the same point but GAME_WIDTH*2

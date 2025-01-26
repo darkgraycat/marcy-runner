@@ -1,13 +1,14 @@
 import { randomInt } from "./utils";
 
-export function* blockHeightGenerator(
+export function* blockHeightGenerator(config: {
     widthsRange: [from: number, to: number],
     heightsRange: [from: number, to: number],
-    decrement: number = 1,
-    increment: number = 2,
-): Generator<number> {
-    const [minWidth, maxWidth] = widthsRange;
-    const [minHeight, maxHeight] = heightsRange;
+    decrement: number,
+    increment: number,
+}): Generator<number, number, number> {
+    const [minWidth, maxWidth] = config.widthsRange;
+    const [minHeight, maxHeight] = config.heightsRange;
+    const { decrement, increment } = config;
 
     let lastWidth = 0;
     let lastHeight = -1;
