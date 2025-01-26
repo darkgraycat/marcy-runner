@@ -95,4 +95,15 @@ export default [
             [5, 1.9, 0x1e1a1e, 0.4],
         ],
     },
+    { // 7
+        sky: 0xfec699,
+        buildings: 0xd09a95,
+        backgrounds: [
+            [7, 1.2, 0xfeae84, 0.05],
+            [2, 1.5, 0xfda281, 0.1],
+            [7, 1.6, 0xf18b80, 0.2],
+            [2, 2.1, 0xce7d84, 0.3],
+            [7, 2.2, 0xa7707c, 0.4],
+        ],
+    },
 ] as LevelsData[];
