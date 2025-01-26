@@ -190,7 +190,7 @@ export function GroupEntity<T extends EntityClass | PhysEntityClass>(config: Gro
 
 
 type EntityContainerConfig<T extends EntityClass | PhysEntityClass> = {
-
+    class: T | T[],
 }
 
 export function EntityContainer<T extends EntityClass | PhysEntityClass>(config: EntityContainerConfig<T>) {

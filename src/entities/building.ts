@@ -1,15 +1,21 @@
-import { GAME_HEIGHT, GAME_WIDTH } from "../shared/constants";
-import { TilePhysEntity } from "../shared/factories";
-import { blockHeightGenerator } from "../shared/generators";
+import { GAME_HEIGHT } from "../shared/constants";
+import { TileEntity, TilePhysEntity } from "../shared/factories";
 import { EntityKey, EventKey } from "../shared/keys";
-import { randomInt } from "../shared/utils";
+import { randomBool, randomElement, randomInt } from "../shared/utils";
 
-const generator = blockHeightGenerator({
-    widthsRange: [2, 8],
-    heightsRange: [1, 4],
-    decrement: 1,
-    increment: 2,
-});
+class BuildingRoof extends TileEntity({
+    key: EntityKey.BuildingRoofs,
+    size: [48, 16],
+    origin: [0, 1],
+    tilesize: [48, 32],
+}) { }
+
+class BuildingDecor extends TileEntity({
+    key: EntityKey.BuildingDecors,
+    size: [48, 32],
+    origin: [0, 1],
+    tilesize: [48, 32],
+}) { }
 
 export class Building extends TilePhysEntity({
     key: EntityKey.Buildings,
@@ -18,8 +24,13 @@ export class Building extends TilePhysEntity({
     tilesize: [48, 32],
     static: true,
 }) {
+    private roof: BuildingRoof;
+    private decor: BuildingDecor;
+
     constructor(scene: Phaser.Scene, col: number = 0, row: number = 0) {
         super(scene);
+        this.roof = new BuildingRoof(scene);
+        this.decor = new BuildingDecor(scene);
         this.placeByTile(col, row)
             .resizeByTile(1, row)
             .setOrigin(0);
@@ -29,31 +40,54 @@ export class Building extends TilePhysEntity({
         this.updateBody();
     }
 
+    setTint(tint: number): this {
+        this.roof.setTint(tint);
+        this.decor.setTint(Phaser.Display.Color.IntegerToColor(tint).darken(10).color);
+        return super.setTint(tint);
+    }
+
     placeByTile(col: number, row: number): this {
-        const lastIndex = GAME_HEIGHT / Building.config.tilesize[1]
-        return super.placeByTile(col, lastIndex - row);
+        const height = GAME_HEIGHT / Building.config.tilesize[1] - row;
+        this.roof.placeByTile(col, height);
+        this.decor.placeByTile(col, height);
+        return super.placeByTile(col, height);
+    }
+
+    randomize() {
+        if (randomBool(0.6)) { // place decor
+            this.decor.setVisible(true);
+            if (this.y < GAME_HEIGHT) {
+                this.decor.setFrame(randomElement(this.y <= 48 && randomBool(0.6)
+                    ? [5, 6] // towers
+                    : [2, 3, 4] // aerials
+                ));
+            } else {
+                this.decor.setFrame(randomElement(
+                    [0, 1] // wires
+                ));
+                this.decor.y = GAME_HEIGHT - 16;
+            }
+        } else {
+            this.decor.setVisible(false);
+        }
+        this.roof.setFrame(randomInt(0, 4));
+        return this.setFrame(randomInt(0, 6))
     }
 
     update(): void {
         const [tileWidth] = Building.config.tilesize;
         if (this.x + tileWidth < this.scene.cameras.main.scrollX) {
-            this.respawn();
+            this.setActive(false);
         }
     }
 
-    respawn() {
-        const height = generator.next().value;
-
-        const [tileWidth] = Building.config.tilesize;
-        const col = (GAME_WIDTH * 2 + this.x) / tileWidth | 0; // place at the same point but GAME_WIDTH*2
-        this.placeByTile(col, height - 0.5) // to make it appear half
-            .setRandomFrame()
-            .resizeByTile(1, height)
-            .updateBody();
+    respawn(col: number, row: number) {
         this.scene.events.emit(EventKey.BuildingSpawned, [this.x, this.y]);
-    }
-
-    setRandomFrame() {
-        return this.setFrame(randomInt(0, 6))
+        this.placeByTile(col, row)
+            .resizeByTile(1, row)
+            .setActive(true)
+            .randomize()
+            .updateBody();
     }
 }
+

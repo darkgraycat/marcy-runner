@@ -37,7 +37,7 @@ export class DevmodeScene extends Scene(SceneKey.Devmode, {
         for (let i = 0; i < 2; i++) {
             this.buildings.add(new Building(this, i, 1.5)
                 .setTint(level.buildings)
-                .setRandomFrame()
+                .randomize()
             );
         }
 

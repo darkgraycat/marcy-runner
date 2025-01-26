@@ -6,15 +6,13 @@ import { Player } from "../entities/player";
 import { Sun } from "../entities/sun";
 import { UiText } from "../entities/ui";
 import { Scene } from "../shared/factories";
-import { AudioKey, EventKey, SceneKey } from "../shared/keys";
-import { Point } from "../shared/types";
-import { iterate, randomBool, randomInt } from "../shared/utils";
+import { SceneKey } from "../shared/keys";
+import { iterate, randomInt } from "../shared/utils";
 import { OverSceneParams } from "./over";
-import { DEBUG, SETTINGS } from "../shared/settings";
+import { DEBUG } from "../shared/settings";
 import { GAME_HEIGHT, GAME_WIDTH } from "../shared/constants";
 import { Building } from "../entities/building";
-import { BuildingRoof } from "../entities/building-roof";
-import { BuildingDecor, BuildingDecorKind } from "../entities/building-decor";
+import { blockHeightGenerator } from "../shared/generators";
 
 export type GameSceneParams = {
     moveVelocity: number,
@@ -41,9 +39,9 @@ export class GameScene extends Scene(SceneKey.Game, {
     sun: Sun;
     backgrounds: Phaser.GameObjects.Group;
     buildings: Phaser.GameObjects.Group;
-    buildingRoofs: Phaser.GameObjects.Group;
-    buildingDecors: Phaser.GameObjects.Group;
     collectables: Phaser.GameObjects.Group;
+
+    blockGenerator: Generator<number, number, number>;
 
     isJumping: boolean = false;
     isJumpInProgress: boolean = false;
@@ -79,23 +77,7 @@ export class GameScene extends Scene(SceneKey.Game, {
         iterate(totalBuildings, i =>
             this.buildings.add(new Building(this, i, 1.5)
                 .setTint(level.buildings)
-                .setRandomFrame()
-            )
-        );
-
-        this.buildingRoofs = this.add.group();
-        iterate(totalBuildings, i =>
-            this.buildingRoofs.add(new BuildingRoof(this, i, 5)
-                .setTint(level.buildings)
-                .setRandomFrame()
-            )
-        );
-
-        this.buildingDecors = this.add.group();
-        iterate(totalBuildings, i =>
-            this.buildingDecors.add(new BuildingDecor(this, i - 12, 5)
-                .setTint(Phaser.Display.Color.IntegerToColor(level.buildings).darken(10).color)
-                .setRandomFrame()
+                .randomize()
             )
         );
 
@@ -136,6 +118,13 @@ export class GameScene extends Scene(SceneKey.Game, {
             .setAlpha(0);
 
         /* other */
+        this.blockGenerator = blockHeightGenerator({
+            widthsRange: [2, 8],
+            heightsRange: [1, 4],
+            decrement: 1,
+            increment: 2,
+        });
+
         this.cameras.main
             .setBackgroundColor(level.sky)
             .startFollow(this.player, true, 1, 0, -80, 0);
@@ -147,8 +136,6 @@ export class GameScene extends Scene(SceneKey.Game, {
         ];
         this.lifesLeft = this.params.initialLifes;
 
-        this.events.on(EventKey.BuildingSpawned, (payload: Point) => this.handleBuildingRespawn(payload));
-
         this.handlePlayerRespawn();
     }
 
@@ -156,6 +143,8 @@ export class GameScene extends Scene(SceneKey.Game, {
         this.handlePlayer(delta);
         this.handleSpeedChange();
         this.handleUiText();
+        // TODO: separate from collectables
+        this.handleBuildingRespawn();
     }
 
 
@@ -216,33 +205,17 @@ export class GameScene extends Scene(SceneKey.Game, {
         this.startRunning();
     }
 
-    handleBuildingRespawn(payload: Point) {
-        const [x, y] = payload;
-        // respawn building roofs and decorations
-        {
-            const [tileWidth] = Building.config.tilesize;
-            const findFree = (e: any) => (e.x + tileWidth) < this.cameras.main.scrollX;
+    private handleBuildingRespawn() {
+        const building = this.buildings.getFirstDead() as Building;
+        if (!building) return;
 
-            const decor = this.buildingDecors.getChildren().find(findFree) as BuildingDecor;
-
-            if (y < GAME_HEIGHT) {
-                const roof = this.buildingRoofs.getChildren().find(findFree) as BuildingRoof;
-                if (roof) roof.setPosition(x, y).setRandomFrame();
-
-                if (decor && randomBool(.50)) {
-                    decor.kind = (y < GAME_HEIGHT / 2 && randomBool(.50))
-                        ? BuildingDecorKind.Block
-                        : BuildingDecorKind.Aerials;
-                    decor.setPosition(x, y).setRandomFrame();
-                }
-            } else if (decor && randomBool(.60)) {
-                decor.kind = BuildingDecorKind.Wires;
-                decor.setPosition(x, y - 64).setRandomFrame();
-            }
-        }
+        const [tileWidth] = Building.config.tilesize;
+        const height = this.blockGenerator.next().value;
+        const column = (GAME_WIDTH * 2 + building.x) / tileWidth | 0;
+        building.respawn(column, height - 0.5);
 
         // respawn collectables
-        if (y < GAME_HEIGHT * 0.8) {
+        if (building.y < GAME_HEIGHT * 0.8) {
             const typeToSpawn = Collectable.randomKind;
             const amountToSpawn = typeToSpawn == CollectableKind.Life || typeToSpawn == CollectableKind.Bean
                 ? 1 // life is only spawned as 1
@@ -267,14 +240,13 @@ export class GameScene extends Scene(SceneKey.Game, {
                 }[typeToSpawn] || 0;
 
                 collectablesToRespawn.forEach((c, i) => c.respawn(
-                    x + offsets[i][0],
-                    y + offsets[i][1] - height,
+                    building.x + offsets[i][0],
+                    building.y + offsets[i][1] - height,
                     typeToSpawn,
                 ));
             }
         }
     }
-
 
     private handleSpeedChange() {
         this.speedBonus -= this.params.speedBonusTick;
