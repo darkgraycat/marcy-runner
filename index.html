@@ -2,19 +2,39 @@
 <html>
 
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-	<title>Marcy Runner Game</title>
+    <title>Marcy Runner Game</title>
 </head>
 
 <body>
     <div id="root" container>
         <h2>Marcy Runner Game</h2>
-        <div id="game"></div>
-        <div id="main" container>
-            The general information about us, this game, story of Marcy.
-            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Tempora, nobis asperiores. Adipisci vitae voluptas expedita quis aperiam dolores doloremque ducimus fugiat quae est! Perferendis, repudiandae? Commodi earum unde sequi optio.
+        <div id="main">
+            <div id="game"></div>
+            <div id="overlay"></div>
+        </div>
+        <div id="info" container>
+            <p>
+                The general information about us, this game, story of Marcy.
+            </p>
+            <p>
+                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Tempora, nobis asperiores. Adipisci vitae
+                voluptas expedita quis aperiam dolores doloremque ducimus fugiat quae est! Perferendis, repudiandae?
+                Commodi earum unde sequi optio.
+                Lorem ipsum dolor sit, amet consectetur adipisicing elit. Tenetur incidunt inventore, asperiores saepe
+                sunt harum aspernatur totam, reiciendis ipsam dignissimos dolore repudiandae quaerat soluta eos impedit
+                mollitia, hic quasi repellat!
+            </p>
+            <p>
+                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Excepturi expedita earum sint est aspernatur,
+                laborum corporis quasi? Perspiciatis eum id ipsam iure? Totam maxime tempora commodi ut omnis? Eaque,
+                atque.
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, officiis. Incidunt, blanditiis vitae!
+                Accusamus numquam voluptas doloribus minima nobis, quo ut vitae quisquam, provident veniam, dolorem
+                ducimus voluptatem fuga magni.
+            </p>
         </div>
         <div id="about">
             Our contacts, links to social, etc.
@@ -24,8 +44,12 @@
     <script type="text/javascript" src="dist/main.js"></script>
     <script type="text/javascript">
         const gameContainer = document.getElementById('game');
+        const overlay = document.getElementById('overlay');
+        setTimeout(() => {
+            overlay.classList.add("hidden")
+        }, 200);
 
-        const requestFullScreen = (e) => (e.requestFullScreen || e.mozRequestFullScreen || e.webkitRequestFullscreen || e.msRequestFullscreen); 
+        const requestFullScreen = (e) => (e.requestFullScreen || e.mozRequestFullScreen || e.webkitRequestFullscreen || e.msRequestFullscreen);
 
         // TODO: make dedicated FS button
         // gameContainer.addEventListener('click', requestFullScreen(gameContainer));

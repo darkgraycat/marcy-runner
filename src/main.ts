@@ -21,7 +21,7 @@ export default new Phaser.Game({
     scene: [BootScene, GameScene, OverScene, TutorialScene, DevmodeScene],
     parent: PARENT_CONTAINER_ID,
     scale: {
-        mode: Phaser.Scale.WIDTH_CONTROLS_HEIGHT,
+        mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
         width: GAME_WIDTH,
         height: GAME_HEIGHT,
