@@ -11,7 +11,7 @@ export const GAMEPLAY = {
 export const SETTINGS = {
     volumeMute: false,
     volumeMusic: 0.5,
-    volumeEffects: 0.1,
+    volumeEffects: 0.2,
     // volumeEffects: 0.0,
     // userName: "Марсічка",
     userName: "Кицюня Кицик Котічка Кошеня Кицюрівна Кицька Киця".split(' ')[Math.random() * 6 | 0]

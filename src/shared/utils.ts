@@ -22,13 +22,10 @@ export function randomByProbability(probabilityMap: Record<string, number>): str
     const rand = random(0, totalProbability);
     let cumulativeProbability = 0;
 
-    for (const [key, probability] of Object.entries(probabilityMap)) {
+    return Object.entries(probabilityMap).find(([key, probability]) => {
         cumulativeProbability += probability;
-        if (rand < cumulativeProbability)
-            return key;
-    }
-
-    return Object.keys(probabilityMap)[0];
+        return rand < cumulativeProbability;
+    })[0];
 }
 
 export function iterate<T>(times: number, handler: (idx: number) => T): T[] {
