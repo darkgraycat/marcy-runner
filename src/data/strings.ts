@@ -1,9 +1,3 @@
-// ; - life
-// § - cat
-// ` - caffeine
-// : - panacat
-//
-
 const chars = {
     life: ':',
     cat: '§',
@@ -20,7 +14,11 @@ export default {
         objectives: `Збери %s панакотиків\n${chars.panacat} Та отримай приз!  ${chars.panacat}`,
         buttonStart: "Почати забіг",
         buttonTutorial: "Як грати?",
-        hints: "",
+        hints: [
+            `Панакотик ${chars.panacat}\nЗбери %s для перемоги`,
+            `Кавове зерно ${chars.caffeine}\nПрискорює, але будь обережний`,
+            `Життя ${chars.life}\nДає додаткове життя`,
+        ],
     },
     gameScene: {
         panacatsCollected: `${chars.panacat}%s${chars.panacat}`,

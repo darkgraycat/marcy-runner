@@ -1,4 +1,4 @@
-import levels, { LevelsData } from "../data/levels";
+import levels, { LevelsData, LevelsDataBgIdxs } from "../data/levels";
 import { Background } from "../entities/background";
 import { Building } from "../entities/building";
 import { Scene } from "../shared/factories";
@@ -128,6 +128,13 @@ export class DevmodeScene extends Scene(SceneKey.Devmode, {
                 this.printLevelData();
             });
 
+    }
+
+    update(time: number, delta: number): void {
+        this.backgrounds.getChildren().forEach((c, index) => {
+            const bg = c as Background;
+            bg.tilePositionX += this.levelData.backgrounds[index][LevelsDataBgIdxs.SCROLL_SCALE];
+        });
     }
 
     private printLevelData() {

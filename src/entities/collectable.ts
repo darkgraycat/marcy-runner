@@ -1,4 +1,4 @@
-import { EntityKey, AnimationKey, AudioKey } from "../shared/keys";
+import { SpriteKey, AnimationKey, AudioKey } from "../shared/keys";
 import { PhysEntity } from "../shared/factories";
 import { randomByProbability, randomElement } from "../shared/utils";
 import { SETTINGS, SPAWN_RATES } from "../shared/settings";
@@ -32,7 +32,7 @@ const CollectableConfig: Record<string, {
 };
 
 export class Collectable extends PhysEntity({
-    key: EntityKey.Collectables,
+    key: SpriteKey.Collectables,
     size: [16, 16],
     offset: [0, 0],
     static: true,

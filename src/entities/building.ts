@@ -1,24 +1,24 @@
 import { GAME_HEIGHT } from "../shared/constants";
 import { TileEntity, TilePhysEntity } from "../shared/factories";
-import { EntityKey, EventKey } from "../shared/keys";
+import { SpriteKey, EventKey } from "../shared/keys";
 import { randomBool, randomElement, randomInt } from "../shared/utils";
 
 class BuildingRoof extends TileEntity({
-    key: EntityKey.BuildingRoofs,
+    key: SpriteKey.BuildingRoofs,
     size: [48, 16],
     origin: [0, 1],
     tilesize: [48, 32],
 }) { }
 
 class BuildingDecor extends TileEntity({
-    key: EntityKey.BuildingDecors,
+    key: SpriteKey.BuildingDecors,
     size: [48, 32],
     origin: [0, 1],
     tilesize: [48, 32],
 }) { }
 
 export class Building extends TilePhysEntity({
-    key: EntityKey.Buildings,
+    key: SpriteKey.Buildings,
     size: [48, 32],
     offset: [0, 0],
     tilesize: [48, 32],

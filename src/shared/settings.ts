@@ -2,9 +2,9 @@ export const GAMEPLAY = {
     targetPoints: 333,
     initialLifes: 3,
     initialMoveVelocity: 100,
-    initialJumpVelocity: 200,
+    initialJumpVelocity: 250,
     speedBonusMax: 100,
-    speedBonusStep: 13,
+    speedBonusStep: 20,
     speedBonusTick: 0.05,
 }
 
@@ -20,7 +20,7 @@ export const SETTINGS = {
 export const SPAWN_RATES = {
     COLLECTABLES: {
         panacat: 0.9,
-        bean: 0.5,
+        bean: 0.4,
         life: 0.05,
     },
 }
@@ -28,6 +28,5 @@ export const SPAWN_RATES = {
 export const DEBUG = {
     fastRestart: false,
     fastRespawn: false,
-    fastDevmode: false,
     debugPhysics: false,
 }

@@ -22,6 +22,9 @@ export class UiText extends Phaser.GameObjects.BitmapText {
         return this;
     }
     setText(value: string | string[]): this {
+        this.originalText = Array.isArray(value)
+            ? value.join('\n')
+            : value;
         super.setText(value);
         return this;
     }

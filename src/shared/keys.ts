@@ -1,27 +1,27 @@
 export const SceneKey = {
     Main: "scene_main",
     Boot: "scene_boot",
-    Game: "scene_game2",
+    Game: "scene_game",
     Input: "scene_input",
     Over: "scene_over",
     Tutorial: "scene_tutorial",
     Devmode: "scene_devmode",
 }
 
-export const EntityKey = {
-    Player: "entity_player",
-    Backgrounds: "entity_backgrounds",
-    Buildings: "entity_buildings",
-    BuildingRoofs: "entity_building_roofs",
-    BuildingDecors: "entity_building_decors",
-    Collectables: "asset_collectables",
+export const SpriteKey = {
+    Player: "sprite_player",
+    Backgrounds: "sprite_backgrounds",
+    Buildings: "sprite_buildings",
+    BuildingRoofs: "sprite_building_roofs",
+    BuildingDecors: "sprite_building_decors",
+    Collectables: "sprite_collectables",
 }
 
 export const UiKey = {
-    UiMenu: "asset_uimenu",
-    Title: "asset_title",
-    Logo: "asset_logo",
-    LogoBig: "asset_logo_big",
+    UiMenu: "ui_menu",
+    Title: "ui_title",
+    Logo: "ui_logo",
+    LogoBig: "ui_logo_big",
 }
 
 export const AnimationKey = {

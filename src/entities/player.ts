@@ -1,9 +1,9 @@
-import { EntityKey, AnimationKey, AudioKey } from "../shared/keys";
+import { SpriteKey, AnimationKey, AudioKey } from "../shared/keys";
 import { PhysEntity } from "../shared/factories";
 import { GAMEPLAY, SETTINGS } from "../shared/settings";
 
 export class Player extends PhysEntity({
-    key: EntityKey.Player,
+    key: SpriteKey.Player,
     size: [24, 12],
     offset: [-8, 4],
 }) {

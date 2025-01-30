@@ -1,11 +1,11 @@
-import { EntityKey } from "../shared/keys";
+import { SpriteKey } from "../shared/keys";
 import { Entity, GroupEntity } from "../shared/factories";
 import { GAME_WIDTH } from "../shared/constants";
 
 const frameTintMap = [0x606070, 0x774844, 0x668877, 0xeeddaa];
 
 class ForegroundTile extends Entity({
-    key: EntityKey.Foreground,
+    key: SpriteKey.Foreground,
     size: [48, 32],
     origin: [0, 0],
 }) {

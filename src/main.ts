@@ -1,6 +1,7 @@
 import { BootScene } from "./scenes/boot";
 import { DevmodeScene } from "./scenes/devmode";
 import { GameScene } from "./scenes/game";
+import { MainScene } from "./scenes/main";
 import { OverScene } from "./scenes/over";
 import { TutorialScene } from "./scenes/tutorial";
 
@@ -16,9 +17,7 @@ export default new Phaser.Game({
     width: GAME_WIDTH,
     height: GAME_HEIGHT,
     pixelArt: true,
-    roundPixels: true,
-    antialias: false,
-    scene: [BootScene, GameScene, OverScene, TutorialScene, DevmodeScene],
+    scene: [BootScene, MainScene, GameScene, OverScene, TutorialScene, DevmodeScene],
     parent: PARENT_CONTAINER_ID,
     scale: {
         mode: Phaser.Scale.FIT,
@@ -29,7 +28,7 @@ export default new Phaser.Game({
     physics: {
         default: "arcade",
         arcade: {
-            gravity: { y: 400, x: 0 },
+            gravity: { y: 500, x: 0 },
             debug: DEBUG.debugPhysics,
         }
     },

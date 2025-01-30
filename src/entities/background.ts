@@ -1,9 +1,9 @@
-import { EntityKey } from "../shared/keys";
+import { SpriteKey } from "../shared/keys";
 import { TileEntity } from "../shared/factories";
 import { GAME_HEIGHT, GAME_WIDTH } from "../shared/constants";
 
 export class Background extends TileEntity({
-    key: EntityKey.Backgrounds,
+    key: SpriteKey.Backgrounds,
     size: [GAME_WIDTH, 32],
     origin: [0, 0],
     tilesize: [32, 32],
