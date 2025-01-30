@@ -1,3 +1,5 @@
+import Phaser from "phaser";
+
 import { BootScene } from "./scenes/boot";
 import { DevmodeScene } from "./scenes/devmode";
 import { GameScene } from "./scenes/game";
