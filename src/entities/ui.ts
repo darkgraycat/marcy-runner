@@ -1,5 +1,5 @@
 import { FontKey } from "../shared/keys";
-import { formatString } from "../shared/utils";
+import { formatString, forwardMethods } from "../shared/utils";
 
 export class UiText extends Phaser.GameObjects.BitmapText {
     private originalText: string
@@ -21,8 +21,55 @@ export class UiText extends Phaser.GameObjects.BitmapText {
         this.setText(formatted);
         return this;
     }
-    setOriginalText(value: string): this {
-        this.originalText = value;
+    setOriginalText(text: string): this {
+        this.originalText = text;
+        return this;
+    }
+}
+
+export class UiTextButton extends Phaser.GameObjects.BitmapText {
+    readonly rect: Phaser.GameObjects.Rectangle;
+
+    constructor(scene: Phaser.Scene, text?: string) {
+        super(scene, 0, 0, FontKey.MKitText, text);
+        this.rect = scene.add.rectangle(0, 0, 0, 0, 0x000000)
+            .setScrollFactor(0)
+            .setOrigin(0.5);
+        this.setScrollFactor(0)
+            .setOrigin(0.5);
+        scene.add.existing(this);
+
+        this.updateRectSize();
+
+        this.rect
+            .setInteractive()
+            .setAlpha(0.9)
+            .on(Phaser.Input.Events.POINTER_OUT, () => this.rect.setAlpha(0.9))
+            .on(Phaser.Input.Events.POINTER_OVER, () => this.rect.setAlpha(0.7));
+
+        forwardMethods(this, this.rect, ['setPosition', 'setOrigin', 'setScale']);
+    }
+
+    setOnClick(onClick: (e?: Phaser.Input.Pointer) => void): this {
+        this.rect
+            .removeListener(Phaser.Input.Events.POINTER_DOWN)
+            .setInteractive()
+            .on(Phaser.Input.Events.POINTER_DOWN, onClick)
+        return this;
+    }
+
+    updateRectSize(): this {
+        this.rect?.setSize(this.width + 10, this.height + 8);
+        return this;
+    }
+
+    setRectSize(width: number, height: number): this {
+        this.rect.setSize(width, height);
+        return this;
+    }
+
+    setRectTint(tint: number) {
+        this.rect.fillColor = tint;
         return this;
     }
 }
@@ -62,7 +109,6 @@ export class UiButton extends Phaser.GameObjects.Container {
     }
 
     setTint(tint: number) {
-        console.log("new tint for button", tint);
         this.tint = tint;
         this.borderTint = Phaser.Display.Color.IntegerToColor(tint).darken(10).color;
         this.highlightTint = Phaser.Display.Color.IntegerToColor(tint).lighten(5).color;

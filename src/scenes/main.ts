@@ -1,4 +1,4 @@
-import { UiButton } from "../entities/ui";
+import { UiTextButton } from "../entities/ui";
 import { Scene } from "../shared/factories";
 import { SceneKey } from "../shared/keys";
 
@@ -11,8 +11,8 @@ export class MainScene extends Scene(SceneKey.Main, {
     levelSceneKey: SceneKey.Game,
     levelSceneParams: {},
 } as MainSceneParams) {
-    optionsButton: UiButton;
-    fullScreenButton: UiButton;
+    optionsButton: UiTextButton;
+    fullScreenButton: UiTextButton;
 
     isPaused: boolean = false;
 
@@ -29,16 +29,15 @@ export class MainScene extends Scene(SceneKey.Main, {
 
         const { width, height } = this.scale;
 
-        this.optionsButton = new UiButton(this, "OPT")
-            .setPosition(16, height - 8)
-            .setOnClick(() => this.handleOnClickOptions())
-            .setAlpha(0.5)
-            .setTint(0xff0000);
-        this.fullScreenButton = new UiButton(this, "FS")
-            .setPosition(width - 16, height - 8)
-            .setOnClick(() => console.log('CLICKED FS'))
-            .setAlpha(0.5)
-            .setTint(0xff0000);
+        this.optionsButton = new UiTextButton(this, "OPT")
+            .setOrigin(0, 0.5)
+            .setPosition(0, height - 8)
+            .setOnClick(() => this.handleOnClickOptions());
+
+        this.fullScreenButton = new UiTextButton(this, "FS")
+            .setOrigin(1, 0.5)
+            .setPosition(width, height - 8)
+            .setOnClick(() => console.log('CLICKED FS'));
     }
 
     handleOnClickOptions() {

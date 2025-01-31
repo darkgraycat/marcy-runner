@@ -5,7 +5,7 @@ import { GameSceneParams } from "./game";
 import { randomInt } from "../shared/utils";
 import strings from "../data/strings";
 import levels, { LevelsDataBgIdxs } from "../data/levels";
-import { UiButton, UiText } from "../entities/ui";
+import { UiText, UiTextButton } from "../entities/ui";
 import { Background } from "../entities/background";
 import { MainSceneParams } from "./main";
 
@@ -115,19 +115,17 @@ export class BootScene extends Scene(SceneKey.Boot, {}) {
         //    hintNumber = (hintNumber + 1) % 3;
         //}, 2000);
 
-
-        new UiButton(this, strings.bootScene.buttonStart)
+        new UiTextButton(this, strings.bootScene.buttonStart)
             .setPosition(width / 2, height - 64)
-            .setOnClick(() => this.startGame())
-            .setTint(level.backgrounds[2][LevelsDataBgIdxs.COLOR])
-            .setSize(100, 16);
+            .setRectSize(100, 16)
+            .setRectTint(level.backgrounds[2][LevelsDataBgIdxs.COLOR])
+            .setOnClick(() => this.startGame());
 
-        new UiButton(this, strings.bootScene.buttonTutorial)
+        new UiTextButton(this, strings.bootScene.buttonTutorial)
             .setPosition(width / 2, height - 40)
-            .setOnClick(() => this.startTutorial())
-            .setTint(level.backgrounds[2][LevelsDataBgIdxs.COLOR])
-            .setSize(100, 16);
-
+            .setRectSize(100, 16)
+            .setRectTint(level.backgrounds[2][LevelsDataBgIdxs.COLOR])
+            .setOnClick(() => this.startTutorial());
 
         /* cheats */
         let combination = '';

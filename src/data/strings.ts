@@ -20,15 +20,22 @@ export default {
             `Життя ${chars.life}\nДає додаткове життя`,
         ],
     },
+
     gameScene: {
         panacatsCollected: `${chars.panacat}%s${chars.panacat}`,
         lifesLeft: `${chars.cat} %s`,
         caffeine: "%s",
     },
+
     overScene: {
         results: `Зібрано %s${chars.panacat}\nМаксимальна швидкість%s${chars.caffeine}\nВідстань %s${chars.cat}`,
     },
+
     tutorialScene: {
         intro: "Цей функціонал на стадії розробки.\nВідповідальна особа-\nГоловний Інженер Степан Срака"
     },
+
+    levelNames: [
+        "" // TODO: idea to make it like in Sonic
+    ],
 }

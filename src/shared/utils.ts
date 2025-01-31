@@ -70,3 +70,23 @@ export function formatString(str: string, ...args: (string | number)[]) {
     let index = 0;
     return str.replace(/%s/g, (match) => `${args[index++]}` ?? match);
 }
+
+export function forwardMethods<
+    Source extends object,
+    Receiver extends object,
+    K extends keyof Source & keyof Receiver
+>(source: Source, receiver: Receiver, methods: K[]) {
+    for (const method of methods) {
+        const original = source[method];
+
+        if (typeof original === "function") {
+            (source as any)[method] = function(...args: any[]) {
+                const value = original.apply(source, args);
+                (receiver as any)[method]?.apply(receiver, args);
+                return value;
+            };
+        }
+    }
+}
+
+
