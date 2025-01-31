@@ -43,16 +43,16 @@ export class GameScene extends Scene(SceneKey.Game, {
 
     blockGenerator: Generator<number, number, number>;
 
-    isJumping: boolean = false;
-    isJumpInProgress: boolean = false;
+    isJumping: boolean;
+    isJumpInProgress: boolean;
 
-    isRunning: boolean = false;
-    speedBonus: number = 0;
-    speedBonusMax: number = 0;
+    isRunning: boolean;
+    speedBonus: number;
+    speedBonusMax: number;
 
-    pointsCollected: number = 0;
+    pointsCollected: number;
     pointMilestones: number[];
-    lifesLeft: number = 3;
+    lifesLeft: number;
 
     textPanacats: UiText;
     textCaffeine: UiText;
@@ -61,6 +61,26 @@ export class GameScene extends Scene(SceneKey.Game, {
 
     create() {
         super.create();
+        this.isJumping = false;
+        this.isJumpInProgress = false;
+        this.speedBonus = 0;
+        this.speedBonusMax = 0;
+        this.lifesLeft = this.params.initialLifes;
+
+        this.pointsCollected = 0;
+        this.pointMilestones = [
+            this.params.targetPoints * 0.25 | 0, // 25%
+            this.params.targetPoints * 0.50 | 0, // 50%
+            this.params.targetPoints * 0.75 | 0, // 75%
+        ];
+
+        this.blockGenerator = blockHeightGenerator({
+            widthsRange: [2, 8],
+            heightsRange: [1, 4],
+            decrement: 1,
+            increment: 2,
+        });
+
         const level = levels[this.params.levelIdx];
         const totalBuildings = Math.round(2 * GAME_WIDTH / Building.config.tilesize[0]);
         const totalCollectables = 12;
@@ -118,23 +138,10 @@ export class GameScene extends Scene(SceneKey.Game, {
             .setAlpha(0);
 
         /* other */
-        this.blockGenerator = blockHeightGenerator({
-            widthsRange: [2, 8],
-            heightsRange: [1, 4],
-            decrement: 1,
-            increment: 2,
-        });
-
         this.cameras.main
             .setBackgroundColor(level.sky)
             .startFollow(this.player, true, 1, 0, -80, 0);
 
-        this.pointMilestones = [
-            this.params.targetPoints * 0.25 | 0, // 25%
-            this.params.targetPoints * 0.50 | 0, // 50%
-            this.params.targetPoints * 0.75 | 0, // 75%
-        ];
-        this.lifesLeft = this.params.initialLifes;
 
         this.handlePlayerRespawn();
     }

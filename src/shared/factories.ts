@@ -155,12 +155,15 @@ export function TilePhysEntity(config: PhysEntityConfig & { tilesize: Point }) {
 
 
 /* Groups & Containers */
-type GroupEntityCallback<T extends EntityClass | PhysEntityClass> = (entity: T) => void;
+export type GroupEntityClass =
+    ReturnType<typeof GroupEntity>;
 
-type GroupEntityConfig<T extends EntityClass | PhysEntityClass> = {
+export type GroupEntityCallback<T extends EntityClass | PhysEntityClass> = (entity: T) => void;
+
+export type GroupEntityConfig<T extends EntityClass | PhysEntityClass> = {
     class: T;
-    update: boolean;
-    capacity: number;
+    update?: boolean;
+    capacity?: number;
     onCreate?: GroupEntityCallback<T>;
     onRemove?: GroupEntityCallback<T>;
 }
@@ -171,8 +174,8 @@ export function GroupEntity<T extends EntityClass | PhysEntityClass>(config: Gro
         constructor(scene: Phaser.Scene, children?: Phaser.GameObjects.Sprite[] | Phaser.GameObjects.TileSprite[]) {
             super(scene, children, {
                 classType: config.class,
-                maxSize: config.capacity,
-                runChildUpdate: config.update,
+                maxSize: config.capacity || 100,
+                runChildUpdate: config.update || false,
                 createCallback: config.onCreate as any,
                 removeCallback: config.onRemove as any,
             });
