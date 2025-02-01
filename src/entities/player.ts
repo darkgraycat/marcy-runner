@@ -4,8 +4,8 @@ import { GAMEPLAY, SETTINGS } from "../shared/settings";
 
 export class Player extends PhysEntity({
     key: SpriteKey.Player,
-    size: [24, 12],
-    offset: [-8, 4],
+    size: [20, 12],
+    offset: [-4, 4],
 }) {
     private soundJump: Phaser.Sound.BaseSound;
     private soundMeow: Phaser.Sound.BaseSound;

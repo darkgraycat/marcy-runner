@@ -6,14 +6,16 @@ import levels, { LevelsDataBgIdxs } from "../data/levels";
 import { UiText } from "../entities/ui";
 import strings from "../data/strings";
 
-export type OverSceneParams = {
-    message: string,
-    finished: boolean,
-    points: number,
-    distance: number,
-    maxSpeedMod: number,
-    levelIdx?: number,
-}
+const defaults = {
+    message: "",
+    finished: false,
+    points: 0,
+    distance: 0,
+    maxSpeedMod: 0,
+    levelIdx: 0,
+};
+
+export type OverSceneParams = typeof defaults;
 
 export class OverScene extends Scene(SceneKey.Over, {
     message: "",

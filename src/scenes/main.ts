@@ -1,59 +1,89 @@
+import strings from "../data/strings";
 import { UiTextButton } from "../entities/ui";
 import { Scene } from "../shared/factories";
-import { SceneKey } from "../shared/keys";
+import { EventKey, SceneKey } from "../shared/keys";
+import { DevmodeSceneParams } from "./devmode";
+import { GameSceneParams } from "./game";
+import { OverSceneParams } from "./over";
+import { TitleSceneParams } from "./title";
+import { TutorialSceneParams } from "./tutorial";
 
-export type MainSceneParams = {
-    levelSceneKey: string,
-    levelSceneParams: Record<string, any>,
-}
+const defaults = {
+    initialSceneKey: SceneKey.Title,
+};
 
-export class MainScene extends Scene(SceneKey.Main, {
-    levelSceneKey: SceneKey.Game,
-    levelSceneParams: {},
-} as MainSceneParams) {
-    optionsButton: UiTextButton;
-    fullScreenButton: UiTextButton;
+export type MainSceneParams = typeof defaults;
 
-    isPaused: boolean = false;
+export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
+    private runningSceneKey: string;
 
     create() {
         super.create();
-
-        this.scene.launch(
-            this.params.levelSceneKey,
-            this.params.levelSceneParams,
-        );
         this.scene.bringToTop();
 
-        this.events.on(Phaser.Core.Events.BLUR, this.pauseLevel, this);
+        this.game.events.on(Phaser.Core.Events.BLUR, this.pauseGame, this);
+        this.game.events.on(Phaser.Core.Events.FOCUS, this.unpauseGame, this);
+
+        this.game.events.on(EventKey.TitleStarted, this.onTitleStarted, this);
+        this.game.events.on(EventKey.GameStarted, this.onGameStarted, this);
+        this.game.events.on(EventKey.OverStarted, this.onOverStarted, this);
+        this.game.events.on(EventKey.TutorialStarted, this.onTutorialStarted, this);
+        this.game.events.on(EventKey.DevmodeStarted, this.onDevmodeStarted, this);
 
         const { width, height } = this.scale;
 
-        this.optionsButton = new UiTextButton(this, "OPT")
-            .setOrigin(0, 0.5)
-            .setPosition(0, height - 8)
+        new UiTextButton(this, strings.chars.cat)
+            .setOrigin(0.5, 0.5)
+            .setPosition(9, height - 8)
+            .setRectAlpha(0.1)
             .setOnClick(() => this.handleOnClickOptions());
 
-        this.fullScreenButton = new UiTextButton(this, "FS")
-            .setOrigin(1, 0.5)
-            .setPosition(width, height - 8)
-            .setOnClick(() => console.log('CLICKED FS'));
+        this.game.events.emit(EventKey.TitleStarted, {});
     }
 
-    handleOnClickOptions() {
-        this.isPaused
-            ? this.unpauseLevel()
-            : this.pauseLevel();
+    private pauseGame() {
+        this.scene.pause(this.runningSceneKey);
     }
 
-
-    pauseLevel() {
-        this.isPaused = true;
-        this.scene.pause(this.params.levelSceneKey);
+    private unpauseGame() {
+        this.scene.resume(this.runningSceneKey);
     }
 
-    unpauseLevel() {
-        this.isPaused = false;
-        this.scene.resume(this.params.levelSceneKey);
+    private nextScene<T extends object>(sceneKey: string, sceneParams?: T) {
+        if (this.runningSceneKey)
+            this.scene.stop(this.runningSceneKey);
+        this.scene.launch(sceneKey, sceneParams);
+        this.runningSceneKey = sceneKey;
+    }
+
+    private handleOnClickOptions() {
+        this.scene.isPaused(this.runningSceneKey)
+            ? this.unpauseGame()
+            : this.pauseGame();
+    }
+
+    private onTitleStarted(params: TitleSceneParams) {
+        this.log("main", "title started");
+        this.nextScene(SceneKey.Title, params);
+    }
+
+    private onGameStarted(params: GameSceneParams) {
+        this.log("main", "game started");
+        this.nextScene(SceneKey.Game, params);
+    }
+
+    private onOverStarted(params: OverSceneParams) {
+        this.log("main", "over started");
+        this.nextScene(SceneKey.Over, params);
+    }
+
+    private onTutorialStarted(params: TutorialSceneParams) {
+        this.log("main", "tutorial started");
+        this.nextScene(SceneKey.Tutorial, params);
+    }
+
+    private onDevmodeStarted(params: DevmodeSceneParams) {
+        this.log("main", "devmode started");
+        this.nextScene(SceneKey.Devmode, params);
     }
 }

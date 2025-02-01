@@ -1,5 +1,8 @@
 export const SceneKey = {
+    Preload: "scene_preload",
+    Title: "scene_title",
     Main: "scene_main",
+
     Boot: "scene_boot",
     Game: "scene_game",
     Input: "scene_input",
@@ -54,5 +57,11 @@ export const FontKey = {
 }
 
 export const EventKey = {
-    BuildingSpawned: "event_building_spawned"
+    TitleStarted: "event_title_started",
+    GameStarted: "event_game_started",
+    OverStarted: "event_over_started",
+    TutorialStarted: "event_tutorial_started",
+    DevmodeStarted: "event_devmode_started",
+
+    BuildingSpawned: "event_building_spawned",
 }

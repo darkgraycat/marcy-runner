@@ -3,7 +3,11 @@ import { UiText } from "../entities/ui";
 import { Scene } from "../shared/factories";
 import { SceneKey } from "../shared/keys";
 
-export class TutorialScene extends Scene(SceneKey.Tutorial, {}) {
+const defaults = {};
+
+export type TutorialSceneParams = typeof defaults;
+
+export class TutorialScene extends Scene<TutorialSceneParams>(SceneKey.Tutorial, defaults) {
     create() {
         super.create();
 

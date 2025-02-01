@@ -1,21 +1,27 @@
 import { Point, Size } from "./types";
 
 /* Scenes */
+export type SceneClass =
+    ReturnType<typeof Scene>;
 
-export function Scene<Params>(key: string, defaultParams: Params) {
+export function Scene<Params>(key: string, defaults: Params) {
     return class Scene extends Phaser.Scene {
-        static readonly defaultParams = defaultParams;
+        static readonly defaults = defaults;
         static readonly key = key;
         protected params: Params;
         constructor() {
             super(key);
-            this.params = defaultParams;
+            this.params = defaults;
         }
 
         init(params: Params) {
-            Object
-                .entries(params)
-                .forEach(([param, value]) => this.params[param] = value);
+            //Object
+            //    .entries(params)
+            //    .forEach(([param, value]) => this.params[param] = value);
+            this.params = {
+                ...this.params,
+                ...params,
+            };
             this.log('init', 'invoked', this.params);
         }
 

@@ -9,13 +9,14 @@ const BGIDX_Y = 1;
 const BGIDX_COLOR = 2;
 const BGIDX_SCROLL_SCALE = 3;
 
-export type DevmodeSceneParams = {
-    levelIdx: number,
-}
 
-export class DevmodeScene extends Scene(SceneKey.Devmode, {
+const defaults = {
     levelIdx: 0,
-} as DevmodeSceneParams) {
+};
+
+export type DevmodeSceneParams = typeof defaults;
+
+export class DevmodeScene extends Scene<DevmodeSceneParams>(SceneKey.Devmode, defaults) {
     backgrounds: Phaser.GameObjects.Group;
     buildings: Phaser.GameObjects.Group;
     levelData: LevelsData;

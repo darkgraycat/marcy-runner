@@ -1,25 +1,35 @@
 import Phaser from "phaser";
 
-import { BootScene } from "./scenes/boot";
-import { DevmodeScene } from "./scenes/devmode";
-import { GameScene } from "./scenes/game";
+
+import { PreloadScene } from "./scenes/preload";
 import { MainScene } from "./scenes/main";
+import { TitleScene } from "./scenes/title";
+import { GameScene } from "./scenes/game";
 import { OverScene } from "./scenes/over";
 import { TutorialScene } from "./scenes/tutorial";
+import { DevmodeScene } from "./scenes/devmode";
 
 import {
     GAME_HEIGHT,
     GAME_WIDTH,
     PARENT_CONTAINER_ID,
 } from './shared/constants';
-import { DEBUG } from "./shared/settings";
+import { DEBUG, GAMEPLAY } from "./shared/settings";
 
 export default new Phaser.Game({
     type: Phaser.WEBGL,
     width: GAME_WIDTH,
     height: GAME_HEIGHT,
     pixelArt: true,
-    scene: [BootScene, MainScene, GameScene, OverScene, TutorialScene, DevmodeScene],
+    scene: [
+        PreloadScene,
+        MainScene, 
+        TitleScene,
+        GameScene, 
+        OverScene, 
+        TutorialScene, 
+        DevmodeScene,
+    ],
     parent: PARENT_CONTAINER_ID,
     scale: {
         mode: Phaser.Scale.FIT,
@@ -30,7 +40,7 @@ export default new Phaser.Game({
     physics: {
         default: "arcade",
         arcade: {
-            gravity: { y: 500, x: 0 },
+            gravity: { y: GAMEPLAY.gravity, x: 0 },
             debug: DEBUG.debugPhysics,
         }
     },

@@ -9,32 +9,25 @@ import { Scene } from "../shared/factories";
 import { SceneKey } from "../shared/keys";
 import { iterate, randomInt } from "../shared/utils";
 import { OverSceneParams } from "./over";
-import { DEBUG } from "../shared/settings";
+import { DEBUG, GAMEPLAY } from "../shared/settings";
 import { GAME_HEIGHT, GAME_WIDTH } from "../shared/constants";
 import { Building } from "../entities/building";
 import { blockHeightGenerator } from "../shared/generators";
 
-export type GameSceneParams = {
-    moveVelocity: number,
-    jumpVelocity: number,
-    targetPoints: number,
-    initialLifes: number,
-    speedBonus: number,
-    speedBonusMax: number,
-    speedBonusTick: number,
-    levelIdx: number,
-}
-
-export class GameScene extends Scene(SceneKey.Game, {
-    moveVelocity: 100,
-    jumpVelocity: 200,
-    targetPoints: 100,
-    initialLifes: 3,
-    speedBonus: 25,
-    speedBonusTick: 1,
-    speedBonusMax: 10,
+const defaults = {
+    moveVelocity: GAMEPLAY.initialMoveVelocity,
+    jumpVelocity: GAMEPLAY.initialJumpVelocity,
+    initialLifes: GAMEPLAY.initialLifes,
+    targetPoints: GAMEPLAY.targetPoints,
+    speedBonus: GAMEPLAY.speedBonus,
+    speedBonusMax: GAMEPLAY.speedBonusMax,
+    speedBonusTick: GAMEPLAY.speedBonusTick,
     levelIdx: 0,
-} as GameSceneParams) {
+};
+
+export type GameSceneParams = typeof defaults;
+
+export class GameScene extends Scene<GameSceneParams>(SceneKey.Game, defaults) {
     player: Player;
     sun: Sun;
     backgrounds: Phaser.GameObjects.Group;
@@ -75,7 +68,7 @@ export class GameScene extends Scene(SceneKey.Game, {
         ];
 
         this.blockGenerator = blockHeightGenerator({
-            widthsRange: [2, 8],
+            widthsRange: [3, 9],
             heightsRange: [1, 4],
             decrement: 1,
             increment: 2,

@@ -29,6 +29,7 @@ export class UiText extends Phaser.GameObjects.BitmapText {
 
 export class UiTextButton extends Phaser.GameObjects.BitmapText {
     readonly rect: Phaser.GameObjects.Rectangle;
+    private rectAlpha: number;
 
     constructor(scene: Phaser.Scene, text?: string) {
         super(scene, 0, 0, FontKey.MKitText, text);
@@ -41,11 +42,11 @@ export class UiTextButton extends Phaser.GameObjects.BitmapText {
 
         this.updateRectSize();
 
+        this.setRectAlpha(0.6);
         this.rect
             .setInteractive()
-            .setAlpha(0.9)
-            .on(Phaser.Input.Events.POINTER_OUT, () => this.rect.setAlpha(0.9))
-            .on(Phaser.Input.Events.POINTER_OVER, () => this.rect.setAlpha(0.7));
+            .on(Phaser.Input.Events.POINTER_OUT, () => this.rect.setAlpha(this.rectAlpha))
+            .on(Phaser.Input.Events.POINTER_OVER, () => this.rect.setAlpha(this.rectAlpha + 0.2));
 
         forwardMethods(this, this.rect, ['setPosition', 'setOrigin', 'setScale']);
     }
@@ -70,6 +71,12 @@ export class UiTextButton extends Phaser.GameObjects.BitmapText {
 
     setRectTint(tint: number) {
         this.rect.fillColor = tint;
+        return this;
+    }
+
+    setRectAlpha(alpha: number) {
+        this.rectAlpha = alpha;
+        this.rect.setAlpha(alpha);
         return this;
     }
 }
