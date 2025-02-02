@@ -1,4 +1,4 @@
-export const VERSION = 'v0.80';
+export const VERSION = 'v0.81';
 
 export const PARENT_CONTAINER_ID = "game";
 

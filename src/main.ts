@@ -18,8 +18,6 @@ import { DEBUG, GAMEPLAY } from "./shared/settings";
 
 export default new Phaser.Game({
     type: Phaser.WEBGL,
-    width: GAME_WIDTH,
-    height: GAME_HEIGHT,
     pixelArt: true,
     scene: [
         PreloadScene,
@@ -49,7 +47,7 @@ export default new Phaser.Game({
         createContainer: true
     },
     fps: {
-        target: 60
+        forceSetTimeOut: false,
     },
     autoMobilePipeline: true,
     autoFocus: true,
