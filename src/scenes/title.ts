@@ -1,7 +1,9 @@
+import colors from "../data/colors";
 import levels, { LevelsDataBgIdxs } from "../data/levels";
 import strings from "../data/strings";
 import { Background } from "../entities/background";
 import { UiText, UiRectButton } from "../entities/ui";
+import { VERSION } from "../shared/constants";
 import { Scene } from "../shared/factories";
 import { EventKey, SceneKey } from "../shared/keys";
 import { DEBUG, GAMEPLAY } from "../shared/settings";
@@ -33,6 +35,12 @@ export class TitleScene extends Scene<TitleSceneParams>(SceneKey.Title, defaults
 
         /* #ui */
         const { width, height } = this.scale;
+        new UiText(this, VERSION)
+            .setOrigin(0, 0)
+            .setTint(colors.ui.debug)
+            .setPosition(0, 0);
+            
+
         new UiText(this, strings.bootScene.title)
             .setPosition(width / 2, 32)
             .setScale(2);
