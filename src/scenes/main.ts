@@ -1,6 +1,6 @@
 import strings from "../data/strings";
-import { UiTextButton } from "../entities/ui";
-import { Scene } from "../shared/factories";
+import { UiIconButton  } from "../entities/ui";
+import { Scene  } from "../shared/factories";
 import { EventKey, SceneKey } from "../shared/keys";
 import { DevmodeSceneParams } from "./devmode";
 import { GameSceneParams } from "./game";
@@ -32,13 +32,22 @@ export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
 
         const { width, height } = this.scale;
 
-        new UiTextButton(this, strings.chars.cat)
-            .setOrigin(0.5, 0.5)
+        new UiIconButton(this, strings.chars.options)
             .setPosition(9, height - 8)
-            .setRectAlpha(0.1)
-            .setOnClick(() => this.handleOnClickOptions());
+            .on('pointerup', this.onOptionsClick, this);
+
+        new UiIconButton(this, strings.chars.fullscreen)
+            .setPosition(width - 9, height - 8)
+            .on('pointerup', this.onFullscreenClick, this);
 
         this.game.events.emit(EventKey.TitleStarted, {});
+    }
+
+    private nextScene<T extends object>(sceneKey: string, sceneParams?: T) {
+        if (this.runningSceneKey)
+            this.scene.stop(this.runningSceneKey);
+        this.scene.launch(sceneKey, sceneParams);
+        this.runningSceneKey = sceneKey;
     }
 
     private pauseGame() {
@@ -49,17 +58,16 @@ export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
         this.scene.resume(this.runningSceneKey);
     }
 
-    private nextScene<T extends object>(sceneKey: string, sceneParams?: T) {
-        if (this.runningSceneKey)
-            this.scene.stop(this.runningSceneKey);
-        this.scene.launch(sceneKey, sceneParams);
-        this.runningSceneKey = sceneKey;
-    }
-
-    private handleOnClickOptions() {
+    private onOptionsClick() {
         this.scene.isPaused(this.runningSceneKey)
             ? this.unpauseGame()
             : this.pauseGame();
+    }
+
+    private onFullscreenClick() {
+        this.scale.isFullscreen
+            ? this.scale.stopFullscreen()
+            : this.scale.startFullscreen();
     }
 
     private onTitleStarted(params: TitleSceneParams) {

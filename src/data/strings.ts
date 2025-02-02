@@ -3,6 +3,9 @@ const chars = {
     cat: '§',
     caffeine: '`',
     panacat: ':',
+
+    options: '0',
+    fullscreen: 'x',
 };
 
 export default {
@@ -28,7 +31,9 @@ export default {
     },
 
     overScene: {
-        results: `Зібрано %s${chars.panacat}\nМаксимальна швидкість%s${chars.caffeine}\nВідстань %s${chars.cat}`,
+        results: `Зібрано %s з %s${chars.panacat}\nМаксимальна швидкість%s${chars.caffeine}\nВідстань %s${chars.cat}`,
+        restart: `Бігти знов`,
+        toTitle: `На головну`,
     },
 
     tutorialScene: {

@@ -1,7 +1,7 @@
 import levels, { LevelsDataBgIdxs } from "../data/levels";
 import strings from "../data/strings";
 import { Background } from "../entities/background";
-import { UiText, UiTextButton } from "../entities/ui";
+import { UiText, UiRectButton } from "../entities/ui";
 import { Scene } from "../shared/factories";
 import { EventKey, SceneKey } from "../shared/keys";
 import { DEBUG, GAMEPLAY } from "../shared/settings";
@@ -42,16 +42,16 @@ export class TitleScene extends Scene<TitleSceneParams>(SceneKey.Title, defaults
             .setTint(level.sky)
             .setPosition(width / 2, height - 16);
 
-        new UiTextButton(this, strings.bootScene.buttonStart)
+        new UiRectButton(this, strings.bootScene.buttonStart)
             .setPosition(width / 2, height - 64)
             .setRectSize(100, 16)
-            .setRectTint(level.backgrounds[2][LevelsDataBgIdxs.COLOR])
+            .setRectTint(level.backgrounds[1][LevelsDataBgIdxs.COLOR])
             .setOnClick(() => this.startGame());
 
-        new UiTextButton(this, strings.bootScene.buttonTutorial)
+        new UiRectButton(this, strings.bootScene.buttonTutorial)
             .setPosition(width / 2, height - 40)
             .setRectSize(100, 16)
-            .setRectTint(level.backgrounds[2][LevelsDataBgIdxs.COLOR])
+            .setRectTint(level.backgrounds[1][LevelsDataBgIdxs.COLOR])
             .setOnClick(() => this.startTutorial());
 
         /* cheats */
@@ -73,7 +73,7 @@ export class TitleScene extends Scene<TitleSceneParams>(SceneKey.Title, defaults
     }
 
     private startGame() {
-        this.game.events.emit(EventKey.GameStarted);
+        this.game.events.emit(EventKey.GameStarted, { levelIdx: randomInt(0, levels.length) });
     }
 
     private startTutorial() {

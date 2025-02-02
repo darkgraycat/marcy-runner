@@ -31,6 +31,7 @@ export default new Phaser.Game({
         DevmodeScene,
     ],
     parent: PARENT_CONTAINER_ID,
+    fullscreenTarget: PARENT_CONTAINER_ID,
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,

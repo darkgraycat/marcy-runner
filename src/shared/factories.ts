@@ -210,3 +210,43 @@ export function EntityContainer<T extends EntityClass | PhysEntityClass>(config:
     }
 }
 
+
+
+/* Event names wrappers */
+export type PointerEvent = 'pointerdown' | 'pointerdownoutside' | 'pointermove' | 'pointerout' | 'pointerover' | 'pointerup' | 'pointerupoutside' | 'wheel';
+
+export type EntityEvent = 'gameobjectdown' | 'gameobjectmove' | 'gameobjectout' | 'gameobjectover' | 'gameobjectup';
+
+
+
+/* User Interface */
+export type UiElementConfig = {
+    font: string,
+    origin?: Point,
+    scroll?: number,
+}
+
+export type UiElementEventHandler = (e?: Phaser.Input.Pointer) => void;
+
+export function UiElement(config: UiElementConfig) {
+    return class UiElement extends Phaser.GameObjects.BitmapText {
+        constructor(scene: Phaser.Scene, text?: string) {
+            super(scene, 0, 0, config.font, text);
+            const [x, y] = config.origin || [0.5, 0.5];
+            scene.add
+                .existing(this)
+                .setOrigin(x, y)
+                .setDepth(1)
+                .setScrollFactor(config.scroll || 0);
+        }
+
+        on(event: PointerEvent, handler: UiElementEventHandler, context?: any) {
+            return super.on(event, handler, context);
+        }
+
+        removeListener(event: PointerEvent, handler?: Function, context?: any) {
+            return super.removeListener(event, handler, context);
+        }
+
+    }
+}

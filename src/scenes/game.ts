@@ -6,7 +6,7 @@ import { Player } from "../entities/player";
 import { Sun } from "../entities/sun";
 import { UiText } from "../entities/ui";
 import { Scene } from "../shared/factories";
-import { SceneKey } from "../shared/keys";
+import { EventKey, SceneKey } from "../shared/keys";
 import { iterate, randomInt } from "../shared/utils";
 import { OverSceneParams } from "./over";
 import { DEBUG, GAMEPLAY } from "../shared/settings";
@@ -181,7 +181,7 @@ export class GameScene extends Scene<GameSceneParams>(SceneKey.Game, defaults) {
             this.lifesLeft--;
             this.handlePlayerRespawn();
         } else {
-            this.lose();
+            this.startOver(false);
         }
     }
 
@@ -274,7 +274,7 @@ export class GameScene extends Scene<GameSceneParams>(SceneKey.Game, defaults) {
                 }
 
                 if (this.pointsCollected >= this.params.targetPoints) {
-                    this.win();
+                    this.startOver(true);
                 }
                 break;
             }
@@ -295,20 +295,6 @@ export class GameScene extends Scene<GameSceneParams>(SceneKey.Game, defaults) {
         this.textPanacats.setTextArgs(this.pointsCollected);
         this.textCaffeine.setTextArgs(strings.chars.caffeine.repeat(Math.round(this.speedBonus / this.params.speedBonus)));
         this.textLifes.setTextArgs(strings.chars.life.repeat(this.lifesLeft));
-    }
-
-    private lose() {
-        return this.startOver(
-            "Don't be upset\nYou will succeed next time!",
-            false,
-        );
-    }
-
-    private win() {
-        return this.startOver(
-            "CONGRATULATIONS\nYou collected all panacats!\nWelcome to Murkit to taste 'em!",
-            true,
-        );
     }
 
     // TODO: refactor
@@ -344,25 +330,15 @@ export class GameScene extends Scene<GameSceneParams>(SceneKey.Game, defaults) {
         this.isJumping = isDown;
     }
 
-    // TODO: doesnt, works - pauses own unpause event
-    // create overlay scene with ui and pause options
-    // or even have GameScene - as global overlay
-    private handlePauseKey() {
-        const { key } = this.scene;
-        if (this.scene.isSleeping(key)) {
-            this.scene.wake(key);
-        } else {
-            this.scene.pause(key);
-        }
-    }
-
-    startOver(message: string, finished: boolean) {
-        this.scene.start(SceneKey.Over, {
-            message,
+    startOver(finished: boolean) {
+        const overParams: Partial<OverSceneParams> = {
             finished,
             points: this.pointsCollected,
+            targetPoints: this.params.targetPoints,
             distance: +this.cameras.main.scrollX.toFixed(0),
             maxSpeedMod: +this.speedBonusMax.toFixed(0),
-        } as OverSceneParams);
+            levelIdx: this.params.levelIdx,
+        };
+        this.game.events.emit(EventKey.OverStarted, overParams);
     }
 }

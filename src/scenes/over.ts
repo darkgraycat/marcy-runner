@@ -1,15 +1,16 @@
-import { SceneKey } from "../shared/keys";
+import { EventKey, SceneKey } from "../shared/keys";
 import { Scene } from "../shared/factories";
 import { Background } from "../entities/background";
 import { DEBUG } from "../shared/settings";
 import levels, { LevelsDataBgIdxs } from "../data/levels";
-import { UiText } from "../entities/ui";
+import { UiRectButton, UiText } from "../entities/ui";
 import strings from "../data/strings";
+import { randomInt } from "../shared/utils";
 
 const defaults = {
-    message: "",
     finished: false,
     points: 0,
+    targetPoints: 0,
     distance: 0,
     maxSpeedMod: 0,
     levelIdx: 0,
@@ -17,20 +18,13 @@ const defaults = {
 
 export type OverSceneParams = typeof defaults;
 
-export class OverScene extends Scene(SceneKey.Over, {
-    message: "",
-    finished: false,
-    points: 0,
-    distance: 0,
-    maxSpeedMod: 0,
-    levelIdx: 0,
-} as OverSceneParams) {
+export class OverScene extends Scene<OverSceneParams>(SceneKey.Over, defaults) {
     backgrounds: Phaser.GameObjects.Group;
 
     create() {
         super.create();
 
-        if (DEBUG.fastRestart) return this.restartGame();
+        if (DEBUG.fastRestart) return this.onRestartGame();
 
         /* #backgrounds */
         const level = levels[this.params.levelIdx];
@@ -43,14 +37,20 @@ export class OverScene extends Scene(SceneKey.Over, {
         /* #ui */
         const { width, height } = this.scale;
         new UiText(this, strings.overScene.results)
-            .setTextArgs(this.params.points, this.params.maxSpeedMod, this.params.distance)
+            .setTextArgs(this.params.points, this.params.targetPoints, this.params.maxSpeedMod, this.params.distance)
             .setPosition(width / 2, 32);
 
-        // TODO: replace
-        setTimeout(() => {
-            this.input.keyboard.on('keydown', () => this.restartGame());
-            this.input.on('pointerdown', () => this.restartGame());
-        }, 2000);
+        new UiRectButton(this, strings.overScene.restart)
+            .setPosition(width / 2, height - 40)
+            .setRectSize(60, 16)
+            .setRectTint(level.backgrounds[1][LevelsDataBgIdxs.COLOR])
+            .setOnClick(() => this.onRestartGame());
+
+        new UiRectButton(this, strings.overScene.toTitle)
+            .setPosition(width / 2, height - 16)
+            .setRectSize(60, 16)
+            .setRectTint(level.backgrounds[1][LevelsDataBgIdxs.COLOR])
+            .setOnClick(() => this.onGoTitle());
     }
 
     update(time: number, delta: number): void {
@@ -60,7 +60,11 @@ export class OverScene extends Scene(SceneKey.Over, {
         });
     }
 
-    private restartGame() {
-        this.scene.start(SceneKey.Game);
+    private onRestartGame() {
+        this.game.events.emit(EventKey.GameStarted, { levelIdx: randomInt(0, levels.length) });
+    }
+
+    private onGoTitle() {
+        this.game.events.emit(EventKey.TitleStarted);
     }
 }
