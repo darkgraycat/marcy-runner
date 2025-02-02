@@ -19,6 +19,7 @@ export type MainSceneParams = typeof defaults;
 
 export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
     private runningSceneKey: string;
+    private menuRectangle: Phaser.GameObjects.Rectangle;
     private restartButton: UiRectButton;
     private toTitleButton: UiRectButton;
 
@@ -45,17 +46,22 @@ export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
             .setPosition(width - 9, height - 8)
             .on('pointerup', this.onFullscreenClick, this);
 
+        this.menuRectangle = this.add.rectangle(0, 0, 100, 80, colors.ui.mainBackground)
+            .setScrollFactor(0)
+            .setOrigin(0.5, 0.5)
+            .setPosition(width / 2, height / 2 + 32);
+
         this.restartButton = new UiRectButton(this, strings.mainScene.restart)
             .setPosition(width / 2, height / 2 + 16)
             .setRectSize(60, 16)
-            .setRectTint(colors.ui.mainBackground)
+            .setRectTint(colors.ui.mainForeground)
             .setOnClick(() => this.game.events.emit(EventKey.GameStarted));
 
         this.toTitleButton = new UiRectButton(this, strings.mainScene.toTitle)
             .setPosition(width / 2, height / 2 + 40)
             .setRectSize(60, 16)
-            .setRectTint(colors.ui.mainBackground)
-            .setOnClick(() => this.game.events.emit(EventKey.TitleStarted));
+            .setRectTint(colors.ui.mainForeground)
+            .setOnClick(() => this.game.events.emit(EventKey.TitleStarted, { levelIdx: randomInt(0, levels.length)}));
 
         this.hideMenu();
 
@@ -71,11 +77,13 @@ export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
     }
 
     private hideMenu() {
+        this.menuRectangle.setVisible(false);
         this.restartButton.setVisible(false);
         this.toTitleButton.setVisible(false);
     }
 
     private showMenu() {
+        this.menuRectangle.setVisible(true);
         this.restartButton.setVisible(true);
         this.toTitleButton.setVisible(true);
     }

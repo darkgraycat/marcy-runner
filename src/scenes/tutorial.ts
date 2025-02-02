@@ -11,12 +11,12 @@ export class TutorialScene extends Scene<TutorialSceneParams>(SceneKey.Tutorial,
     create() {
         super.create();
 
-        this.cameras.main.setBackgroundColor(0xffffff);
+        this.cameras.main.setBackgroundColor(0x000000);
         
         const { width, height } = this.scale;
         new UiText(this, strings.tutorialScene.intro)
             .setOrigin(0.5)
-            .setTint(0x000000)
+            .setTint(0xffffff)
             .setPosition(width / 2, height / 2);
     }
 }

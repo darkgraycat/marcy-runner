@@ -26,7 +26,10 @@ export class UiText extends UiElement({ font: FontKey.MKitText }) {
 export class UiIconButton extends UiElement({ font: FontKey.MKitText }) {
     constructor(scene: Phaser.Scene, text?: string) {
         super(scene, text);
-        this.setInteractive()
+        this.setInteractive({ 
+                hitArea: { x: -10, y: -10, width: 20, height: 20 },
+                hitAreaCallback: Phaser.Geom.Rectangle.Contains,
+        })
             .on('pointerover', () => this.setTint(colors.ui.onHover), this)
             .on('pointerout', () => this.setTint(colors.ui.default), this);
     }
