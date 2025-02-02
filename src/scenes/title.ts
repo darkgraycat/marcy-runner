@@ -22,10 +22,12 @@ export class TitleScene extends Scene<TitleSceneParams>(SceneKey.Title, defaults
     create() {
         super.create();
 
-        if (DEBUG.fastRestart) return;
+        if (DEBUG.fastRestart) {
+            this.startGame();
+        };
 
         /* #backgrounds */
-        this.levelIdx = randomInt(0, levels.length)
+        this.levelIdx = randomInt(0, levels.length);
         const level = levels[this.levelIdx];
         this.cameras.main.setBackgroundColor(level.sky);
         this.backgrounds = this.add.group({ runChildUpdate: false });

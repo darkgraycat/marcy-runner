@@ -1,6 +1,7 @@
-export const VERSION = 'v0.81';
+export const VERSION = 'v0.83';
 
 export const PARENT_CONTAINER_ID = "game";
 
-export const GAME_WIDTH = 240;
-export const GAME_HEIGHT = 128;
+// TODO: refactor to use scene.scale instad of constants
+export const GAME_WIDTH = 320;
+export const GAME_HEIGHT = 180;

@@ -47,6 +47,9 @@ export default new Phaser.Game({
         createContainer: true
     },
     fps: {
+        min: 60,
+        target: 120,
+        smoothStep: false,
         forceSetTimeOut: false,
     },
     autoMobilePipeline: true,

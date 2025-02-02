@@ -56,7 +56,7 @@ export class GameScene extends Scene<GameSceneParams>(SceneKey.Game, defaults) {
         super.create();
         this.isJumping = false;
         this.isJumpInProgress = false;
-        this.isRunning = true;
+        this.isRunning = false;
         this.speedBonus = 0;
         this.speedBonusMax = 0;
         this.lifesLeft = this.params.initialLifes;
@@ -114,28 +114,28 @@ export class GameScene extends Scene<GameSceneParams>(SceneKey.Game, defaults) {
         this.physics.add.overlap(this.collectables, this.player, this.handleCollect, null, this);
 
         /* #ui */
+        const { width, height } = this.scale;
         this.textLifes = new UiText(this, strings.gameScene.lifesLeft)
             .setPosition(4, 4)
             .setOrigin(0, 0)
             .setDepth(99);
         this.textPanacats = new UiText(this, strings.gameScene.panacatsCollected)
-            .setPosition(GAME_WIDTH / 2, 4)
+            .setPosition(width / 2, 4)
             .setOrigin(0.5, 0)
             .setDepth(99);
         this.textCaffeine = new UiText(this, strings.gameScene.caffeine)
             .setOrigin(1, 0)
-            .setPosition(GAME_WIDTH - 4, 4);
+            .setPosition(width - 4, 4);
         this.textMain = new UiText(this)
-            .setPosition(GAME_WIDTH / 2, GAME_HEIGHT / 2)
+            .setPosition(width / 2, height / 2)
             .setDepth(99)
             .setScale(4)
             .setAlpha(0);
 
         /* other */
-        this.cameras.main
-            .setBackgroundColor(level.sky)
-            .startFollow(this.player, true, 1, 0, -80, 0);
-
+        this.cameras.main.setBounds(0, 0, Number.MAX_SAFE_INTEGER, height);
+        this.cameras.main.startFollow(this.player, false, 1, 0, -width * 0.3, 0);
+        this.cameras.main.setBackgroundColor(level.sky);
 
         this.handlePlayerRespawn();
     }
@@ -327,7 +327,7 @@ export class GameScene extends Scene<GameSceneParams>(SceneKey.Game, defaults) {
         });
     }
 
-    private onActionDown() { 
+    private onActionDown() {
         this.isJumping = true;
     }
 

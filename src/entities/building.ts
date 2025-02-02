@@ -1,4 +1,3 @@
-import { GAME_HEIGHT } from "../shared/constants";
 import { TileEntity, TilePhysEntity } from "../shared/factories";
 import { SpriteKey, EventKey } from "../shared/keys";
 import { randomBool, randomElement, randomInt } from "../shared/utils";
@@ -33,7 +32,7 @@ export class Building extends TilePhysEntity({
         this.decor = new BuildingDecor(scene);
         this.placeByTile(col, row)
             .resizeByTile(1, row)
-            .setOrigin(0);
+            .setOrigin(0, 0);
         this.body.checkCollision.down = false;
         this.body.checkCollision.left = false;
         this.body.checkCollision.right = false;
@@ -47,7 +46,7 @@ export class Building extends TilePhysEntity({
     }
 
     placeByTile(col: number, row: number): this {
-        const height = GAME_HEIGHT / Building.config.tilesize[1] - row;
+        const height = this.scene.scale.height / Building.config.tilesize[1] - row;
         this.roof.placeByTile(col, height);
         this.decor.placeByTile(col, height);
         return super.placeByTile(col, height);
@@ -56,7 +55,7 @@ export class Building extends TilePhysEntity({
     randomize() {
         if (randomBool(0.6)) { // place decor
             this.decor.setVisible(true);
-            if (this.y < GAME_HEIGHT) {
+            if (this.y < this.scene.scale.height) {
                 this.decor.setFrame(randomElement(this.y <= 48 && randomBool(0.6)
                     ? [5, 6] // towers
                     : [2, 3, 4] // aerials
@@ -65,7 +64,7 @@ export class Building extends TilePhysEntity({
                 this.decor.setFrame(randomElement(
                     [0, 1] // wires
                 ));
-                this.decor.y = GAME_HEIGHT - 16;
+                this.decor.y = this.scene.scale.height - 16;
             }
         } else {
             this.decor.setVisible(false);
