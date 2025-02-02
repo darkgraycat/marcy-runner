@@ -1,11 +1,8 @@
 export const SceneKey = {
     Preload: "scene_preload",
-    Title: "scene_title",
     Main: "scene_main",
-
-    Boot: "scene_boot",
+    Title: "scene_title",
     Game: "scene_game",
-    Input: "scene_input",
     Over: "scene_over",
     Tutorial: "scene_tutorial",
     Devmode: "scene_devmode",

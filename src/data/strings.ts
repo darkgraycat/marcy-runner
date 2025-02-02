@@ -11,7 +11,12 @@ const chars = {
 export default {
     chars,
 
-    bootScene: {
+    mainScene: {
+        restart: `Переграти`,
+        toTitle: `На головну`,
+    },
+
+    titleScene: {
         welcome: "Привіт %s!",
         title: `${chars.cat} Котик біжить! ${chars.cat}`,
         objectives: `Збери %s панакотиків\n${chars.panacat} Та отримай приз!  ${chars.panacat}`,

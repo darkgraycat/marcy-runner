@@ -1,7 +1,10 @@
+import colors from "../data/colors";
+import levels from "../data/levels";
 import strings from "../data/strings";
-import { UiIconButton  } from "../entities/ui";
+import { UiIconButton, UiRectButton  } from "../entities/ui";
 import { Scene  } from "../shared/factories";
 import { EventKey, SceneKey } from "../shared/keys";
+import { randomInt } from "../shared/utils";
 import { DevmodeSceneParams } from "./devmode";
 import { GameSceneParams } from "./game";
 import { OverSceneParams } from "./over";
@@ -16,6 +19,8 @@ export type MainSceneParams = typeof defaults;
 
 export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
     private runningSceneKey: string;
+    private restartButton: UiRectButton;
+    private toTitleButton: UiRectButton;
 
     create() {
         super.create();
@@ -40,7 +45,21 @@ export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
             .setPosition(width - 9, height - 8)
             .on('pointerup', this.onFullscreenClick, this);
 
-        this.game.events.emit(EventKey.TitleStarted, {});
+        this.restartButton = new UiRectButton(this, strings.mainScene.restart)
+            .setPosition(width / 2, height / 2 + 16)
+            .setRectSize(60, 16)
+            .setRectTint(colors.ui.mainBackground)
+            .setOnClick(() => this.game.events.emit(EventKey.GameStarted));
+
+        this.toTitleButton = new UiRectButton(this, strings.mainScene.toTitle)
+            .setPosition(width / 2, height / 2 + 40)
+            .setRectSize(60, 16)
+            .setRectTint(colors.ui.mainBackground)
+            .setOnClick(() => this.game.events.emit(EventKey.TitleStarted));
+
+        this.hideMenu();
+
+        this.game.events.emit(EventKey.TitleStarted, { levelIdx: randomInt(0, levels.length)});
     }
 
     private nextScene<T extends object>(sceneKey: string, sceneParams?: T) {
@@ -48,6 +67,17 @@ export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
             this.scene.stop(this.runningSceneKey);
         this.scene.launch(sceneKey, sceneParams);
         this.runningSceneKey = sceneKey;
+        this.hideMenu();
+    }
+
+    private hideMenu() {
+        this.restartButton.setVisible(false);
+        this.toTitleButton.setVisible(false);
+    }
+
+    private showMenu() {
+        this.restartButton.setVisible(true);
+        this.toTitleButton.setVisible(true);
     }
 
     private pauseGame() {
@@ -59,9 +89,13 @@ export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
     }
 
     private onOptionsClick() {
-        this.scene.isPaused(this.runningSceneKey)
-            ? this.unpauseGame()
-            : this.pauseGame();
+        if (this.scene.isPaused(this.runningSceneKey)) {
+            this.unpauseGame();
+            this.hideMenu();
+        } else {
+            this.pauseGame();
+            this.showMenu();
+        }
     }
 
     private onFullscreenClick() {
@@ -71,27 +105,27 @@ export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
         this.scale.lockOrientation(Phaser.Scale.LANDSCAPE);
     }
 
-    private onTitleStarted(params: TitleSceneParams) {
+    private onTitleStarted(params?: Partial<TitleSceneParams>) {
         this.log("main", "title started");
         this.nextScene(SceneKey.Title, params);
     }
 
-    private onGameStarted(params: GameSceneParams) {
+    private onGameStarted(params?: Partial<GameSceneParams>) {
         this.log("main", "game started");
         this.nextScene(SceneKey.Game, params);
     }
 
-    private onOverStarted(params: OverSceneParams) {
+    private onOverStarted(params?: Partial<OverSceneParams>) {
         this.log("main", "over started");
         this.nextScene(SceneKey.Over, params);
     }
 
-    private onTutorialStarted(params: TutorialSceneParams) {
+    private onTutorialStarted(params?: Partial<TutorialSceneParams>) {
         this.log("main", "tutorial started");
         this.nextScene(SceneKey.Tutorial, params);
     }
 
-    private onDevmodeStarted(params: DevmodeSceneParams) {
+    private onDevmodeStarted(params?: Partial<DevmodeSceneParams>) {
         this.log("main", "devmode started");
         this.nextScene(SceneKey.Devmode, params);
     }

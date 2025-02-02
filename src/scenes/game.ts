@@ -133,6 +133,8 @@ export class GameScene extends Scene<GameSceneParams>(SceneKey.Game, defaults) {
             .setAlpha(0);
 
         /* other */
+        const fadeFromColor = Phaser.Display.Color.IntegerToRGB(level.sky);
+        this.cameras.main.fadeFrom(500, fadeFromColor.r, fadeFromColor.g, fadeFromColor.b);
         this.cameras.main.setBounds(0, 0, Number.MAX_SAFE_INTEGER, height);
         this.cameras.main.startFollow(this.player, false, 1, 0, -width * 0.3, 0);
         this.cameras.main.setBackgroundColor(level.sky);

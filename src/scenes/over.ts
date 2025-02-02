@@ -24,7 +24,9 @@ export class OverScene extends Scene<OverSceneParams>(SceneKey.Over, defaults) {
     create() {
         super.create();
 
-        if (DEBUG.fastRestart) return this.onRestartGame();
+        if (DEBUG.fastRestart) this.restartGame();
+
+        this.cameras.main.fadeFrom(3000, 0, 0, 0);
 
         /* #backgrounds */
         const level = levels[this.params.levelIdx];
@@ -44,13 +46,13 @@ export class OverScene extends Scene<OverSceneParams>(SceneKey.Over, defaults) {
             .setPosition(width / 2, height - 40)
             .setRectSize(60, 16)
             .setRectTint(level.backgrounds[1][LevelsDataBgIdxs.COLOR])
-            .setOnClick(() => this.onRestartGame());
+            .setOnClick(() => this.restartGame());
 
         new UiRectButton(this, strings.overScene.toTitle)
             .setPosition(width / 2, height - 16)
             .setRectSize(60, 16)
             .setRectTint(level.backgrounds[1][LevelsDataBgIdxs.COLOR])
-            .setOnClick(() => this.onGoTitle());
+            .setOnClick(() => this.goToTitle());
     }
 
     update(time: number, delta: number): void {
@@ -60,11 +62,11 @@ export class OverScene extends Scene<OverSceneParams>(SceneKey.Over, defaults) {
         });
     }
 
-    private onRestartGame() {
+    private restartGame() {
         this.game.events.emit(EventKey.GameStarted, { levelIdx: randomInt(0, levels.length) });
     }
 
-    private onGoTitle() {
-        this.game.events.emit(EventKey.TitleStarted);
+    private goToTitle() {
+        this.game.events.emit(EventKey.TitleStarted, { levelIdx: randomInt(0, levels.length)});
     }
 }

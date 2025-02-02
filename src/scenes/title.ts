@@ -11,24 +11,24 @@ import { randomInt } from "../shared/utils";
 import { DevmodeSceneParams } from "./devmode";
 import { GameSceneParams } from "./game";
 
-const defaults = {};
+const defaults = {
+    levelIdx: 0,
+};
 
 export type TitleSceneParams = typeof defaults;
 
 export class TitleScene extends Scene<TitleSceneParams>(SceneKey.Title, defaults) {
-    private levelIdx: number;
     private backgrounds: Phaser.GameObjects.Group;
 
     create() {
         super.create();
 
-        if (DEBUG.fastRestart) {
-            this.startGame();
-        };
+        if (DEBUG.fastRestart) this.startGame();
+
+        this.cameras.main.fadeFrom(2000, 0, 0, 0);
 
         /* #backgrounds */
-        this.levelIdx = randomInt(0, levels.length);
-        const level = levels[this.levelIdx];
+        const level = levels[this.params.levelIdx];
         this.cameras.main.setBackgroundColor(level.sky);
         this.backgrounds = this.add.group({ runChildUpdate: false });
         for (const [frame, y, color, scrollScale] of level.backgrounds) {
@@ -43,22 +43,22 @@ export class TitleScene extends Scene<TitleSceneParams>(SceneKey.Title, defaults
             .setPosition(0, 0);
             
 
-        new UiText(this, strings.bootScene.title)
+        new UiText(this, strings.titleScene.title)
             .setPosition(width / 2, 32)
             .setScale(2);
 
-        new UiText(this, strings.bootScene.objectives)
+        new UiText(this, strings.titleScene.objectives)
             .setTextArgs(GAMEPLAY.targetPoints)
             .setTint(level.sky)
             .setPosition(width / 2, height - 16);
 
-        new UiRectButton(this, strings.bootScene.buttonStart)
+        new UiRectButton(this, strings.titleScene.buttonStart)
             .setPosition(width / 2, height - 64)
             .setRectSize(100, 16)
             .setRectTint(level.backgrounds[1][LevelsDataBgIdxs.COLOR])
             .setOnClick(() => this.startGame());
 
-        new UiRectButton(this, strings.bootScene.buttonTutorial)
+        new UiRectButton(this, strings.titleScene.buttonTutorial)
             .setPosition(width / 2, height - 40)
             .setRectSize(100, 16)
             .setRectTint(level.backgrounds[1][LevelsDataBgIdxs.COLOR])
@@ -78,12 +78,12 @@ export class TitleScene extends Scene<TitleSceneParams>(SceneKey.Title, defaults
     update() {
         this.backgrounds.getChildren().forEach((c, index) => {
             const bg = c as Background;
-            bg.tilePositionX += levels[this.levelIdx].backgrounds[index][LevelsDataBgIdxs.SCROLL_SCALE];
+            bg.tilePositionX += levels[this.params.levelIdx].backgrounds[index][LevelsDataBgIdxs.SCROLL_SCALE];
         });
     }
 
     private startGame() {
-        this.game.events.emit(EventKey.GameStarted, { levelIdx: randomInt(0, levels.length) });
+        this.game.events.emit(EventKey.GameStarted, { levelIdx: this.params.levelIdx });
     }
 
     private startTutorial() {

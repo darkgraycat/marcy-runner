@@ -49,7 +49,7 @@ export class UiRectButton extends UiElement({ font: FontKey.MKitText }) {
 
         this.updateRectSize()
             .setRectAlpha(0.6);
-        forwardMethods(this, this.rect, ['setPosition', 'setOrigin', 'setScale']);
+        forwardMethods(this, this.rect, ['setPosition', 'setOrigin', 'setScale', 'setVisible']);
     }
 
     setOnClick(onClick: (e?: Phaser.Input.Pointer) => void): this {
