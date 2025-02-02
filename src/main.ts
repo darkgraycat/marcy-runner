@@ -51,7 +51,6 @@ export default new Phaser.Game({
     fps: {
         target: 60
     },
-    powerPreference: "low-power",
     autoMobilePipeline: true,
     autoFocus: true,
     autoRound: true,

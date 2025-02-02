@@ -56,6 +56,7 @@ export class GameScene extends Scene<GameSceneParams>(SceneKey.Game, defaults) {
         super.create();
         this.isJumping = false;
         this.isJumpInProgress = false;
+        this.isRunning = true;
         this.speedBonus = 0;
         this.speedBonusMax = 0;
         this.lifesLeft = this.params.initialLifes;
@@ -103,10 +104,10 @@ export class GameScene extends Scene<GameSceneParams>(SceneKey.Game, defaults) {
         this.player = new Player(this).setPosition(48, 64);
 
         /* #controls */
-        this.input.keyboard.on(`keydown-SPACE`, () => this.handleActionKey(true));
-        this.input.keyboard.on(`keyup-SPACE`, () => this.handleActionKey(false));
-        this.input.on('pointerdown', () => this.handleActionKey(true));
-        this.input.on('pointerup', () => this.handleActionKey(false));
+        this.input.keyboard.on('keydown-SPACE', this.onActionDown, this);
+        this.input.keyboard.on('keyup-SPACE', this.onActionUp, this);
+        this.input.on('pointerdown', this.onActionDown, this);
+        this.input.on('pointerup', this.onActionUp, this);
 
         /* #physics */
         this.physics.add.collider(this.buildings, this.player);
@@ -326,8 +327,12 @@ export class GameScene extends Scene<GameSceneParams>(SceneKey.Game, defaults) {
         });
     }
 
-    private handleActionKey(isDown: boolean) {
-        this.isJumping = isDown;
+    private onActionDown() { 
+        this.isJumping = true;
+    }
+
+    private onActionUp() {
+        this.isJumping = false;
     }
 
     startOver(finished: boolean) {

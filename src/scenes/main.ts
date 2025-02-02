@@ -68,6 +68,7 @@ export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
         this.scale.isFullscreen
             ? this.scale.stopFullscreen()
             : this.scale.startFullscreen();
+        this.scale.lockOrientation(Phaser.Scale.LANDSCAPE);
     }
 
     private onTitleStarted(params: TitleSceneParams) {
