@@ -9,7 +9,7 @@ import { EventKey, SceneKey } from "../shared/keys";
 import { DEBUG, GAMEPLAY } from "../shared/settings";
 import { randomInt } from "../shared/utils";
 import { DevmodeSceneParams } from "./devmode";
-import { LevelSceneParams } from "./game";
+import { LevelSceneParams } from "./level";
 
 const defaults = {
     levelIdx: 0,

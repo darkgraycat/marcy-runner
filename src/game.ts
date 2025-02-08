@@ -3,7 +3,7 @@ import Phaser from "phaser";
 import { PreloadScene } from "./scenes/preload";
 import { MainScene } from "./scenes/main";
 import { TitleScene } from "./scenes/title";
-import { LevelScene } from "./scenes/game";
+import { LevelScene } from "./scenes/level";
 import { OverScene } from "./scenes/over";
 import { TutorialScene } from "./scenes/tutorial";
 import { DevmodeScene } from "./scenes/devmode";

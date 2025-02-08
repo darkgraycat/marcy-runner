@@ -6,7 +6,7 @@ import { Scene  } from "../shared/factories";
 import { EventKey, SceneKey } from "../shared/keys";
 import { randomInt } from "../shared/utils";
 import { DevmodeSceneParams } from "./devmode";
-import { LevelSceneParams } from "./game";
+import { LevelSceneParams } from "./level";
 import { OverSceneParams } from "./over";
 import { TitleSceneParams } from "./title";
 import { TutorialSceneParams } from "./tutorial";

@@ -8,6 +8,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <link rel="stylesheet" href="style.css">
+    <script type="text/javascript" src="dist/index.js"></script>
     <title>Marcy Runner Game</title>
 </head>
 
@@ -44,49 +45,6 @@
         </div>
     </div>
 
-    <script type="text/javascript" src="dist/main.js"></script>
-    <script type="text/javascript">
-        const mainDiv = document.getElementById('main');
-        const gameDiv = document.getElementById('game');
-        const overlayDiv = document.getElementById('overlay');
-        setTimeout(() => {
-            overlayDiv.classList.add("hidden")
-        }, 100);
-
-        const requestFullScreen = (e) => (e.requestFullScreen || e.mozRequestFullScreen || e.webkitRequestFullscreen || e.msRequestFullscreen);
-
-        // const handleOrientationChange = (e) => {
-        //     console.log(
-        //         'in ' + (window.innerWidth >= window.innerHeight
-        //             ? 'landscape mode'
-        //             : 'portrait mode'),
-        //         'fullscreen', document.fullscreenElement != null,
-        //     );
-
-        //     if (
-        //         document.fullscreenElement != null &&
-        //         window.innerWidth < window.innerHeight
-        //     ) {
-        //         console.log('ADD CLASS');
-        //         mainDiv.classList.add('force-landscape');
-
-        //     } else {
-        //         console.log('REMOVE CLASS');
-        //         mainDiv.classList.remove('force-landscape');
-        //     }
-        // }
-
-
-        // window.addEventListener('fullscreenchange', handleOrientationChange);
-        // window.addEventListener('resize', handleOrientationChange);
-        // window.addEventListener('orientationchange', handleOrientationChange);
-
-        window.addEventListener('keydown', ({key}) => {
-            // if (key == 'o') handleOrientationChange();
-        })
-
-        // handleOrientationChange();
-    </script>
 </body>
 
 </html>
