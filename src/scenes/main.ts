@@ -6,7 +6,7 @@ import { Scene  } from "../shared/factories";
 import { EventKey, SceneKey } from "../shared/keys";
 import { randomInt } from "../shared/utils";
 import { DevmodeSceneParams } from "./devmode";
-import { GameSceneParams } from "./game";
+import { LevelSceneParams } from "./game";
 import { OverSceneParams } from "./over";
 import { TitleSceneParams } from "./title";
 import { TutorialSceneParams } from "./tutorial";
@@ -31,7 +31,7 @@ export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
         this.game.events.on(Phaser.Core.Events.FOCUS, this.unpauseGame, this);
 
         this.game.events.on(EventKey.TitleStarted, this.onTitleStarted, this);
-        this.game.events.on(EventKey.GameStarted, this.onGameStarted, this);
+        this.game.events.on(EventKey.LevelStarted, this.onLevelStarted, this);
         this.game.events.on(EventKey.OverStarted, this.onOverStarted, this);
         this.game.events.on(EventKey.TutorialStarted, this.onTutorialStarted, this);
         this.game.events.on(EventKey.DevmodeStarted, this.onDevmodeStarted, this);
@@ -56,7 +56,7 @@ export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
             .setPosition(width / 2, height / 2 + 16)
             .setRectSize(60, 16)
             .setRectTint(colors.ui.mainForeground)
-            .setOnClick(() => this.game.events.emit(EventKey.GameStarted));
+            .setOnClick(() => this.game.events.emit(EventKey.LevelStarted));
 
         this.toTitleButton = new UiRectButton(this, strings.mainScene.toTitle)
             .setPosition(width / 2, height / 2 + 40)
@@ -118,9 +118,9 @@ export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
         this.nextScene(SceneKey.Title, params);
     }
 
-    private onGameStarted(params?: Partial<GameSceneParams>) {
-        this.log("main", "game started");
-        this.nextScene(SceneKey.Game, params);
+    private onLevelStarted(params?: Partial<LevelSceneParams>) {
+        this.log("main", "level started");
+        this.nextScene(SceneKey.Level, params);
     }
 
     private onOverStarted(params?: Partial<OverSceneParams>) {

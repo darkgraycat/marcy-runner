@@ -9,7 +9,7 @@ import { EventKey, SceneKey } from "../shared/keys";
 import { DEBUG, GAMEPLAY } from "../shared/settings";
 import { randomInt } from "../shared/utils";
 import { DevmodeSceneParams } from "./devmode";
-import { GameSceneParams } from "./game";
+import { LevelSceneParams } from "./game";
 
 const defaults = {
     levelIdx: 0,
@@ -83,15 +83,15 @@ export class TitleScene extends Scene<TitleSceneParams>(SceneKey.Title, defaults
     }
 
     private startGame() {
-        this.game.events.emit(EventKey.GameStarted, { levelIdx: this.params.levelIdx });
+        this.game.events.emit(EventKey.LevelStarted, { levelIdx: this.params.levelIdx });
     }
 
     private startTutorial() {
         this.game.events.emit(EventKey.TutorialStarted);
     }
 
-    private startGameWithOverrides(params?: Partial<GameSceneParams>) {
-        this.game.events.emit(EventKey.GameStarted, params);
+    private startGameWithOverrides(params?: Partial<LevelSceneParams>) {
+        this.game.events.emit(EventKey.LevelStarted, params);
     }
 
     private startDevmode(params?: Partial<DevmodeSceneParams>) {

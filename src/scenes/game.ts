@@ -24,13 +24,13 @@ const defaults = {
     levelIdx: 0,
 };
 
-class GameController extends Controller({
+class LevelController extends Controller({
     keyJump: 'SPACE'
 }) {}
 
-export type GameSceneParams = typeof defaults;
+export type LevelSceneParams = typeof defaults;
 
-export class GameScene extends Scene<GameSceneParams>(SceneKey.Game, defaults) {
+export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults) {
     player: Player;
     sun: Sun;
     backgrounds: Phaser.GameObjects.Group;
@@ -38,7 +38,7 @@ export class GameScene extends Scene<GameSceneParams>(SceneKey.Game, defaults) {
     collectables: Phaser.GameObjects.Group;
 
     blockGenerator: Generator<number, number, number>;
-    controller: GameController;
+    controller: LevelController;
 
     isJumping: boolean;
     isJumpInProgress: boolean;
@@ -79,7 +79,7 @@ export class GameScene extends Scene<GameSceneParams>(SceneKey.Game, defaults) {
             increment: 2,
         });
 
-        this.controller = new GameController(this);
+        this.controller = new LevelController(this);
 
         const { width, height } = this.scale;
         const level = levels[this.params.levelIdx];
@@ -142,8 +142,7 @@ export class GameScene extends Scene<GameSceneParams>(SceneKey.Game, defaults) {
         const fadeFromColor = Phaser.Display.Color.IntegerToRGB(level.sky);
         this.cameras.main.fadeFrom(500, fadeFromColor.r, fadeFromColor.g, fadeFromColor.b);
         this.cameras.main.setBounds(0, 0, Number.MAX_SAFE_INTEGER, height);
-        // this.cameras.main.startFollow(this.player, false, 1, 0, -width * 0.3, 0);
-        this.cameras.main.startFollow(this.player, false, 1, 0, -width / 2);
+        this.cameras.main.startFollow(this.player, false, 1, 0, -width * 0.3, 0);
         this.cameras.main.setBackgroundColor(level.sky);
 
         console.log({

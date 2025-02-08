@@ -2,7 +2,7 @@ export const SceneKey = {
     Preload: "scene_preload",
     Main: "scene_main",
     Title: "scene_title",
-    Game: "scene_game",
+    Level: "scene_level",
     Over: "scene_over",
     Tutorial: "scene_tutorial",
     Devmode: "scene_devmode",
@@ -55,7 +55,7 @@ export const FontKey = {
 
 export const EventKey = {
     TitleStarted: "event_title_started",
-    GameStarted: "event_game_started",
+    LevelStarted: "event_game_started",
     OverStarted: "event_over_started",
     TutorialStarted: "event_tutorial_started",
     DevmodeStarted: "event_devmode_started",

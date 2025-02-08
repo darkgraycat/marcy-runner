@@ -63,7 +63,7 @@ export class OverScene extends Scene<OverSceneParams>(SceneKey.Over, defaults) {
     }
 
     private restartGame() {
-        this.game.events.emit(EventKey.GameStarted, { levelIdx: randomInt(0, levels.length) });
+        this.game.events.emit(EventKey.LevelStarted, { levelIdx: randomInt(0, levels.length) });
     }
 
     private goToTitle() {
