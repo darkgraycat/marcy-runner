@@ -8,55 +8,64 @@ import { OverScene } from "./scenes/over";
 import { TutorialScene } from "./scenes/tutorial";
 import { DevmodeScene } from "./scenes/devmode";
 
-import {
-    GAME_HEIGHT,
-    GAME_WIDTH,
-    PARENT_CONTAINER_ID,
-} from './shared/constants';
 import { DEBUG, GAMEPLAY } from "./shared/settings";
 
-export default new Phaser.Game({
-    type: Phaser.WEBGL,
-    pixelArt: true,
-    scene: [
-        PreloadScene,
-        MainScene, 
-        TitleScene,
-        LevelScene, 
-        OverScene, 
-        TutorialScene, 
-        DevmodeScene,
-    ],
-    parent: PARENT_CONTAINER_ID,
-    fullscreenTarget: PARENT_CONTAINER_ID,
-    scale: {
-        mode: Phaser.Scale.FIT,
-        // mode: Phaser.Scale.HEIGHT_CONTROLS_WIDTH,
-        autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
-        width: GAME_WIDTH,
-        height: GAME_HEIGHT,
-    },
-    physics: {
-        default: "arcade",
-        arcade: {
-            gravity: { y: GAMEPLAY.gravity, x: 0 },
-            debug: DEBUG.debugPhysics,
+export type GameParams = {
+    parentId: string,
+    gameHeight: number,
+}
+
+export class Game extends Phaser.Game {
+    constructor(params: GameParams) {
+        const scene: Phaser.Types.Scenes.SceneType[] = [
+            PreloadScene,
+            MainScene,
+            TitleScene,
+            LevelScene,
+            OverScene,
+            TutorialScene,
+            DevmodeScene,
+        ];
+
+        const scale: Phaser.Types.Core.ScaleConfig = {
+            mode: Phaser.Scale.HEIGHT_CONTROLS_WIDTH,
+            autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
+            height: params.gameHeight,
         }
-    },
-    dom: {
-        createContainer: true
-    },
-    fps: {
-        min: 60,
-        target: 120,
-        smoothStep: false,
-        forceSetTimeOut: false,
-    },
-    // doesnt work
-    // input: {
-    //     mouse: { preventDefaultWheel: true },
-    // },
-    // autoMobilePipeline: true,
-    // autoFocus: true,
-    // autoRound: true,
-});
+
+        const physics: Phaser.Types.Core.PhysicsConfig = {
+            default: "arcade",
+            arcade: {
+                gravity: { y: GAMEPLAY.gravity, x: 0 },
+                debug: DEBUG.debugPhysics,
+            }
+        }
+
+        const fps: Phaser.Types.Core.FPSConfig = {
+            min: 60,
+            target: 120,
+            smoothStep: false,
+            forceSetTimeOut: false,
+        }
+
+        const dom: Phaser.Types.Core.DOMContainerConfig = {
+            createContainer: true,
+        }
+
+        const input: Phaser.Types.Core.InputConfig = {
+            // doesnt work
+            mouse: { preventDefaultWheel: true },
+        }
+
+        super({
+            type: Phaser.WEBGL,
+            pixelArt: true,
+            parent: params.parentId,
+            fullscreenTarget: params.parentId,
+            scene, scale, input, physics, fps, dom,
+            autoMobilePipeline: true,
+            autoFocus: true,
+            autoRound: true,
+        });
+    }
+}
