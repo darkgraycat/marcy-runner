@@ -1,6 +1,5 @@
 import Phaser from "phaser";
 
-
 import { PreloadScene } from "./scenes/preload";
 import { MainScene } from "./scenes/main";
 import { TitleScene } from "./scenes/title";
@@ -32,7 +31,8 @@ export default new Phaser.Game({
     fullscreenTarget: PARENT_CONTAINER_ID,
     scale: {
         mode: Phaser.Scale.FIT,
-        autoCenter: Phaser.Scale.CENTER_BOTH,
+        // mode: Phaser.Scale.HEIGHT_CONTROLS_WIDTH,
+        autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
         width: GAME_WIDTH,
         height: GAME_HEIGHT,
     },
@@ -52,7 +52,11 @@ export default new Phaser.Game({
         smoothStep: false,
         forceSetTimeOut: false,
     },
-    autoMobilePipeline: true,
-    autoFocus: true,
-    autoRound: true,
+    // doesnt work
+    // input: {
+    //     mouse: { preventDefaultWheel: true },
+    // },
+    // autoMobilePipeline: true,
+    // autoFocus: true,
+    // autoRound: true,
 });

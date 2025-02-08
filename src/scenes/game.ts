@@ -5,12 +5,11 @@ import { Collectable, CollectableKind } from "../entities/collectable";
 import { Player } from "../entities/player";
 import { Sun } from "../entities/sun";
 import { UiText } from "../entities/ui";
-import { Scene } from "../shared/factories";
+import { Controller, Scene } from "../shared/factories";
 import { EventKey, SceneKey } from "../shared/keys";
 import { iterate, randomInt } from "../shared/utils";
 import { OverSceneParams } from "./over";
 import { DEBUG, GAMEPLAY } from "../shared/settings";
-import { GAME_HEIGHT, GAME_WIDTH } from "../shared/constants";
 import { Building } from "../entities/building";
 import { blockHeightGenerator } from "../shared/generators";
 
@@ -25,6 +24,10 @@ const defaults = {
     levelIdx: 0,
 };
 
+class GameController extends Controller({
+    keyJump: 'SPACE'
+}) {}
+
 export type GameSceneParams = typeof defaults;
 
 export class GameScene extends Scene<GameSceneParams>(SceneKey.Game, defaults) {
@@ -35,6 +38,7 @@ export class GameScene extends Scene<GameSceneParams>(SceneKey.Game, defaults) {
     collectables: Phaser.GameObjects.Group;
 
     blockGenerator: Generator<number, number, number>;
+    controller: GameController;
 
     isJumping: boolean;
     isJumpInProgress: boolean;
@@ -75,8 +79,11 @@ export class GameScene extends Scene<GameSceneParams>(SceneKey.Game, defaults) {
             increment: 2,
         });
 
+        this.controller = new GameController(this);
+
+        const { width, height } = this.scale;
         const level = levels[this.params.levelIdx];
-        const totalBuildings = Math.round(2 * GAME_WIDTH / Building.config.tilesize[0]);
+        const totalBuildings = Math.round(2 * width / Building.config.tilesize[0]);
         const totalCollectables = 12;
 
         /* #entities */
@@ -101,7 +108,7 @@ export class GameScene extends Scene<GameSceneParams>(SceneKey.Game, defaults) {
         );
 
         /* #player */
-        this.player = new Player(this).setPosition(48, 64);
+        this.player = new Player(this).setPosition(this.scale.width / 2, 64);
 
         /* #controls */
         this.input.keyboard.on('keydown-SPACE', this.onActionDown, this);
@@ -114,7 +121,6 @@ export class GameScene extends Scene<GameSceneParams>(SceneKey.Game, defaults) {
         this.physics.add.overlap(this.collectables, this.player, this.handleCollect, null, this);
 
         /* #ui */
-        const { width, height } = this.scale;
         this.textLifes = new UiText(this, strings.gameScene.lifesLeft)
             .setPosition(4, 4)
             .setOrigin(0, 0)
@@ -136,8 +142,13 @@ export class GameScene extends Scene<GameSceneParams>(SceneKey.Game, defaults) {
         const fadeFromColor = Phaser.Display.Color.IntegerToRGB(level.sky);
         this.cameras.main.fadeFrom(500, fadeFromColor.r, fadeFromColor.g, fadeFromColor.b);
         this.cameras.main.setBounds(0, 0, Number.MAX_SAFE_INTEGER, height);
-        this.cameras.main.startFollow(this.player, false, 1, 0, -width * 0.3, 0);
+        // this.cameras.main.startFollow(this.player, false, 1, 0, -width * 0.3, 0);
+        this.cameras.main.startFollow(this.player, false, 1, 0, -width / 2);
         this.cameras.main.setBackgroundColor(level.sky);
+
+        console.log({
+            w: this.scale.width
+        })
 
         this.handlePlayerRespawn();
     }
@@ -172,7 +183,7 @@ export class GameScene extends Scene<GameSceneParams>(SceneKey.Game, defaults) {
                 this.isJumpInProgress = false;
         }
 
-        if (this.player.y > GAME_HEIGHT * 2 && this.isRunning) {
+        if (this.player.y > this.scale.height * 2 && this.isRunning) {
             this.handleLoseLife();
         }
     }
@@ -191,7 +202,7 @@ export class GameScene extends Scene<GameSceneParams>(SceneKey.Game, defaults) {
     private handlePlayerRespawn() {
         const entries = this.buildings.getChildren() as Building[];
         const safeBuilding = entries
-            .filter((b) => b.x > this.player.x && b.y < GAME_HEIGHT)
+            .filter((b) => b.x > this.player.x && b.y < this.scale.height)
             .sort((a, b) => a.x - b.x)[0];
         if (safeBuilding) {
             this.player.x = safeBuilding.x + 16;
@@ -214,11 +225,11 @@ export class GameScene extends Scene<GameSceneParams>(SceneKey.Game, defaults) {
 
         const [tileWidth] = Building.config.tilesize;
         const height = this.blockGenerator.next().value;
-        const column = (GAME_WIDTH * 2 + building.x) / tileWidth | 0;
+        const column = (this.scale.width * 2 + building.x) / tileWidth | 0;
         building.respawn(column, height - 0.5);
 
         // respawn collectables
-        if (building.y < GAME_HEIGHT * 0.8) {
+        if (building.y < this.scale.height * 0.8) {
             const typeToSpawn = Collectable.randomKind;
             const amountToSpawn = typeToSpawn == CollectableKind.Life || typeToSpawn == CollectableKind.Bean
                 ? 1 // life is only spawned as 1

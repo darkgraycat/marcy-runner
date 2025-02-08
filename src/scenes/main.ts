@@ -46,6 +46,7 @@ export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
             .setPosition(width - 9, height - 8)
             .on('pointerup', this.onFullscreenClick, this);
 
+
         this.menuRectangle = this.add.rectangle(0, 0, 100, 80, colors.ui.mainBackground)
             .setScrollFactor(0)
             .setOrigin(0.5, 0.5)
@@ -110,7 +111,6 @@ export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
         this.scale.isFullscreen
             ? this.scale.stopFullscreen()
             : this.scale.startFullscreen();
-        this.scale.lockOrientation(Phaser.Scale.LANDSCAPE);
     }
 
     private onTitleStarted(params?: Partial<TitleSceneParams>) {

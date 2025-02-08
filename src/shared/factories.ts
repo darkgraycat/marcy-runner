@@ -1,4 +1,4 @@
-import { Point, Size } from "./types";
+import { FieldsToInstance, Point, Size } from "./types";
 
 /* Scenes */
 export type SceneClass =
@@ -187,7 +187,6 @@ export function GroupEntity<T extends EntityClass | PhysEntityClass>(config: Gro
             });
             scene.add.existing(this);
         }
-
         forEach<K = void>(callback: (child: InstanceType<T>, index?: number) => K) {
             this.getChildren().forEach((go, i) => {
                 callback(go as any, i)
@@ -203,6 +202,7 @@ type EntityContainerConfig<T extends EntityClass | PhysEntityClass> = {
 
 export function EntityContainer<T extends EntityClass | PhysEntityClass>(config: EntityContainerConfig<T>) {
     return class EntityContainer extends Phaser.GameObjects.Container {
+        static readonly config = config;
         constructor(scene: Phaser.Scene, children?: (Phaser.GameObjects.Sprite | Phaser.Physics.Arcade.Sprite)[]) {
             super(scene, 0, 0, children);
             scene.add.existing(this);
@@ -230,6 +230,7 @@ export type UiElementEventHandler = (e?: Phaser.Input.Pointer) => void;
 
 export function UiElement(config: UiElementConfig) {
     return class UiElement extends Phaser.GameObjects.BitmapText {
+        static readonly config = config;
         constructor(scene: Phaser.Scene, text?: string) {
             super(scene, 0, 0, config.font, text);
             const [x, y] = config.origin || [0.5, 0.5];
@@ -239,14 +240,42 @@ export function UiElement(config: UiElementConfig) {
                 .setDepth(1)
                 .setScrollFactor(config.scroll || 0);
         }
-
         on(event: PointerEvent, handler: UiElementEventHandler, context?: any) {
             return super.on(event, handler, context);
         }
-
         removeListener(event: PointerEvent, handler?: Function, context?: any) {
             return super.removeListener(event, handler, context);
         }
 
     }
 }
+
+/* User Input */
+// export type ControllerConfig<T> = {
+//     keys: { [K in keyof T]: T[K] };
+// }
+
+// export function Controller<T extends object>(config: ControllerConfig<T>) {
+//     return class Controller extends Phaser.Input.InputPlugin {
+//         static readonly config = config;
+// 
+//         constructor(scene: Phaser.Scene) {
+//             super(scene);
+//             Object.assign(this, config);
+//         }
+//     } as { new(): FieldsToInstance<T> & { config: T } };
+// }
+
+export function Controller<T extends object>(config: T) {
+  return class Controller extends Phaser.Input.InputPlugin {
+    static readonly config = config;
+    constructor(scene: Phaser.Scene) {
+      super(scene);
+      Object.assign(this, config);
+    }
+  } as {
+    new(scene: Phaser.Scene): FieldsToInstance<T> & Phaser.Input.InputPlugin;
+    config: T;
+  };
+}
+
