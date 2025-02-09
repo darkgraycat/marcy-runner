@@ -2,8 +2,10 @@ name: Build
 
 on:
   push:
-    tags:
-      - '*'
+    branches:
+      - main
+        #    tags:
+        #      - '*'
 
 jobs:
   # Build job
@@ -20,10 +22,9 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - name: Upload pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: github-pages
           path: ./public
           if-no-files-found: error
           retention-days: 1
@@ -32,7 +33,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       pages: write
       id-token: write
     environment:
