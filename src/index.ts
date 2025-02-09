@@ -20,6 +20,8 @@ window.onload = async function() {
         gravity: GAMEPLAY.gravity,
         debug: DEBUG.debugPhysics,
     });
+    game.scale.lockOrientation('landscape');
+
 
     // const handleOrientationChange = (e) => {
     //     console.log(

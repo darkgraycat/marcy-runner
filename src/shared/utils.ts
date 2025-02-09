@@ -59,7 +59,7 @@ export function colorToRgb(hex: number) {
         (hex >> 16) & 0xff,
         (hex >> 8) & 0xff,
         (hex >> 0) & 0xff,
-    ]
+    ];
 }
 
 export function colorToHex([r, g, b]: number[]) {
