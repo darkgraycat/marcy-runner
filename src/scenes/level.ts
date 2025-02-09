@@ -73,10 +73,10 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
         ];
 
         this.blockGenerator = blockHeightGenerator({
-            widthsRange: [3, 9],
-            heightsRange: [1, 4],
+            widthsRange: [2, 8],
+            heightsRange: [1, 5],
             decrement: 1,
-            increment: 2,
+            increment: 3,
         });
 
         this.controller = new LevelController(this);
@@ -85,7 +85,7 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
         const level = levels[this.params.levelIdx];
         const totalBuildings = Math.round(2 * width / Building.config.tilesize[0]);
         console.log({ totalBuildings })
-        const totalCollectables = 12;
+        const totalCollectables = totalBuildings;
 
         /* #entities */
         this.sun = new Sun(this, width * 0.45, height * 0.25, 6);
@@ -97,7 +97,7 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
 
         this.buildings = this.add.group({ runChildUpdate: true });
         iterate(totalBuildings, i =>
-            this.buildings.add(new Building(this, i - totalBuildings / 2, 1.5)
+            this.buildings.add(new Building(this, i - totalBuildings / 2 | 0, 1.5)
                 .setTint(level.buildings)
                 .randomize()
             )
@@ -119,6 +119,7 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
 
         /* #physics */
         this.physics.add.collider(this.buildings, this.player);
+        this.physics.add.collider(this.buildings.getChildren().flatMap(b => (b as Building).bodies), this.player);
         this.physics.add.overlap(this.collectables, this.player, this.handleCollect, null, this);
 
         /* #ui */
@@ -183,7 +184,7 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
                 this.isJumpInProgress = false;
         }
 
-        if (this.player.y > this.scale.height * 2 && this.isRunning) {
+        if (this.player.y > this.scale.height && this.isRunning) {
             this.handleLoseLife();
         }
     }
@@ -193,7 +194,8 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
         this.player.meow(-4);
         if (this.lifesLeft > 1) {
             this.lifesLeft--;
-            this.handlePlayerRespawn();
+            this.player.disableBody().stop();
+            this.time.delayedCall(2000, this.handlePlayerRespawn, null, this);
         } else {
             this.startOver(false);
         }
@@ -216,6 +218,7 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
         this.isJumping = false;
         this.isJumpInProgress = false;
 
+        this.player.enableBody();
         this.startRunning();
     }
 

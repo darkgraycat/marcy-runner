@@ -1,6 +1,6 @@
 import { TileEntity, TilePhysEntity } from "../shared/factories";
 import { SpriteKey, EventKey } from "../shared/keys";
-import { randomBool, randomElement, randomInt } from "../shared/utils";
+import { iterate, randomBool, randomElement, randomInt } from "../shared/utils";
 
 class BuildingRoof extends TileEntity({
     key: SpriteKey.BuildingRoofs,
@@ -16,15 +16,31 @@ class BuildingDecor extends TileEntity({
     tilesize: [48, 32],
 }) { }
 
+class InternalBody extends TilePhysEntity({
+    key: "",
+    size: [48, 32],
+    tilesize: [48, 32],
+    static: true,
+}) {
+    constructor(scene: Phaser.Scene) {
+        super(scene);
+        this.body.checkCollision.down = false;
+        this.body.checkCollision.left = false;
+        this.body.checkCollision.right = false;
+        this.setOrigin(0, 0)
+            .setAlpha(0);
+    }
+}
+
 export class Building extends TilePhysEntity({
     key: SpriteKey.Buildings,
     size: [48, 32],
-    offset: [0, 0],
     tilesize: [48, 32],
     static: true,
 }) {
     private roof: BuildingRoof;
     private decor: BuildingDecor;
+    readonly bodies: InternalBody[];
 
     constructor(scene: Phaser.Scene, col: number = 0, row: number = 0) {
         super(scene);
@@ -36,23 +52,22 @@ export class Building extends TilePhysEntity({
         this.body.checkCollision.down = false;
         this.body.checkCollision.left = false;
         this.body.checkCollision.right = false;
+
+        this.bodies = iterate(5, () => new InternalBody(scene));
+
         this.updateBody();
     }
 
-    setTint(tint: number): this {
-        this.roof.setTint(tint);
-        this.decor.setTint(Phaser.Display.Color.IntegerToColor(tint).darken(10).color);
-        return super.setTint(tint);
+    respawn(col: number, row: number): void {
+        this.scene.events.emit(EventKey.BuildingSpawned, [this.x, this.y]);
+        this.placeByTile(col, row)
+            .resizeByTile(1, row)
+            .setActive(true)
+            .randomize()
+            .updateBody();
     }
 
-    placeByTile(col: number, row: number): this {
-        const height = this.scene.scale.height / Building.config.tilesize[1] - row;
-        this.roof.placeByTile(col, height);
-        this.decor.placeByTile(col, height);
-        return super.placeByTile(col, height);
-    }
-
-    randomize() {
+    randomize(): this {
         if (randomBool(0.6)) { // place decor
             this.decor.setVisible(true);
             if (this.y < this.scene.scale.height) {
@@ -73,6 +88,23 @@ export class Building extends TilePhysEntity({
         return this.setFrame(randomInt(0, 6))
     }
 
+    getInternalBodies(): InternalBody[] {
+        return this.bodies;
+    }
+
+    setTint(tint: number): this {
+        this.roof.setTint(tint);
+        this.decor.setTint(Phaser.Display.Color.IntegerToColor(tint).darken(10).color);
+        return super.setTint(tint);
+    }
+
+    placeByTile(col: number, row: number): this {
+        const height = this.scene.scale.height / Building.config.tilesize[1] - row;
+        this.roof.placeByTile(col, height);
+        this.decor.placeByTile(col, height);
+        return super.placeByTile(col, height);
+    }
+
     update(): void {
         const [tileWidth] = Building.config.tilesize;
         if (this.x + tileWidth < this.scene.cameras.main.scrollX) {
@@ -80,13 +112,12 @@ export class Building extends TilePhysEntity({
         }
     }
 
-    respawn(col: number, row: number) {
-        this.scene.events.emit(EventKey.BuildingSpawned, [this.x, this.y]);
-        this.placeByTile(col, row)
-            .resizeByTile(1, row)
-            .setActive(true)
-            .randomize()
-            .updateBody();
+    updateBody(): this {
+        this.bodies.forEach((body, i) => body
+            .setPosition(this.x, this.y + i * Building.config.tilesize[1])
+            .updateBody(),
+        );
+        return super.updateBody();
     }
 }
 

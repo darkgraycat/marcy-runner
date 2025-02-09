@@ -16,7 +16,7 @@ export function* blockHeightGenerator(config: {
     while (true) {
         const limitWidth = randomInt(minWidth, maxWidth);
 
-        if (lastWidth < limitWidth) {
+        if (lastWidth <= limitWidth) {
             lastWidth++;
             lastHeight = randomInt(
                 Math.max(lastHeight - decrement, minHeight),
