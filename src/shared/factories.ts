@@ -231,6 +231,8 @@ export type UiElementEventHandler = (e?: Phaser.Input.Pointer) => void;
 export function UiElement(config: UiElementConfig) {
     return class UiElement extends Phaser.GameObjects.BitmapText {
         static readonly config = config;
+        private relativeScaleXY: Point;
+        private relativeOffsetXY: Point;
         constructor(scene: Phaser.Scene, text?: string) {
             super(scene, 0, 0, config.font, text);
             const [x, y] = config.origin || [0.5, 0.5];
@@ -246,14 +248,21 @@ export function UiElement(config: UiElementConfig) {
         removeListener(event: PointerEvent, handler?: Function, context?: any) {
             return super.removeListener(event, handler, context);
         }
-        setRelativePosition(x: number, y: number = x) {
+        setRelativePosition(x: number, y = x, ox = 0, oy = 0) {
             const { parentSize, gameSize } = this.scene.scale;
 
             const offsetRatio = (parentSize.width * gameSize.height) / (2 * parentSize.height);
             const relativeX = (gameSize.width / 2) + offsetRatio * (2 * x - 1);
             const relativeY = gameSize.height * y;
 
-            return super.setPosition(relativeX, relativeY);
+            this.relativeScaleXY = [x, y];
+            this.relativeOffsetXY = [ox, oy];
+            return super.setPosition(relativeX + ox, relativeY + oy);
+        }
+        updateRelativePosition() {
+            const [x, y] = this.relativeScaleXY;
+            const [ox, oy] = this.relativeOffsetXY;
+            return this.setRelativePosition(x, y, ox, oy);
         }
 
     }

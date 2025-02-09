@@ -1,7 +1,7 @@
 import colors from "../data/colors";
 import levels from "../data/levels";
 import strings from "../data/strings";
-import { UiIconButton, UiRectButton  } from "../entities/ui";
+import { UiIconButton, UiRectButton, UiText  } from "../entities/ui";
 import { Scene  } from "../shared/factories";
 import { EventKey, SceneKey } from "../shared/keys";
 import { randomInt } from "../shared/utils";
@@ -22,6 +22,11 @@ export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
     private menuRectangle: Phaser.GameObjects.Rectangle;
     private restartButton: UiRectButton;
     private toTitleButton: UiRectButton;
+    private optionsButton: UiIconButton;
+    private fullscreenButton: UiIconButton;
+
+    // TODO: cleanup
+    // private textDebug: UiText;
 
     create() {
         super.create();
@@ -36,14 +41,16 @@ export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
         this.game.events.on(EventKey.TutorialStarted, this.onTutorialStarted, this);
         this.game.events.on(EventKey.DevmodeStarted, this.onDevmodeStarted, this);
 
+        this.scale.on('resize', this.onResize, this);
+
         const { width, height } = this.scale;
 
-        new UiIconButton(this, strings.chars.options)
-            .setPosition(9, height - 8)
+        this.optionsButton = new UiIconButton(this, strings.chars.options)
+            .setRelativePosition(0.0, 1.0, 8, -8)
             .on('pointerup', this.onOptionsClick, this);
 
-        new UiIconButton(this, strings.chars.fullscreen)
-            .setPosition(width - 9, height - 8)
+        this.fullscreenButton = new UiIconButton(this, strings.chars.fullscreen)
+            .setRelativePosition(1.0, 1.0, -8, -8)
             .on('pointerup', this.onFullscreenClick, this);
 
 
@@ -67,7 +74,32 @@ export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
         this.hideMenu();
 
         this.game.events.emit(EventKey.TitleStarted, { levelIdx: randomInt(0, levels.length)});
+
+        // DEBUG
+        // this.textDebug = new UiText(this)
+        //     .setPosition(width / 2, height / 2)
+        //     .setScrollFactor(0)
+        //     .setTint(0xff0000)
+        //     .setText("DEBUG");
+
+        // this.input.on('pointerup', (e) => {
+        //     console.log(e.x, e.y);
+        // }, this);
     }
+
+    // update() {
+    //     const { width, height, baseSize, gameSize, parentSize, displaySize } = this.scale;
+    //     const mainCamera = this.cameras.main.worldView;
+    //     const text = ''
+    //         + `\nbaseSize ${baseSize.width} ${baseSize.height}`
+    //         + `\ngameSize ${gameSize.width} ${gameSize.height}`
+    //         + `\nparentSize ${parentSize.width} ${parentSize.height}`
+    //         + `\ndisplaySize ${displaySize.width} ${displaySize.height}`
+    //         + `\nmainCamera ${mainCamera.width} ${mainCamera.height}`
+
+    //     this.textDebug.setText(text);
+    //     
+    // }
 
     private nextScene<T extends object>(sceneKey: string, sceneParams?: T) {
         if (this.runningSceneKey)
@@ -136,5 +168,10 @@ export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
     private onDevmodeStarted(params?: Partial<DevmodeSceneParams>) {
         this.log("main", "devmode started");
         this.nextScene(SceneKey.Devmode, params);
+    }
+
+    private onResize() {
+        this.optionsButton.updateRelativePosition();
+        this.fullscreenButton.updateRelativePosition();
     }
 }

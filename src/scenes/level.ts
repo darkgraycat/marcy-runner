@@ -31,30 +31,30 @@ class LevelController extends Controller({
 export type LevelSceneParams = typeof defaults;
 
 export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults) {
-    player: Player;
-    sun: Sun;
-    backgrounds: Phaser.GameObjects.Group;
-    buildings: Phaser.GameObjects.Group;
-    collectables: Phaser.GameObjects.Group;
+    private player: Player;
+    private sun: Sun;
+    private backgrounds: Phaser.GameObjects.Group;
+    private buildings: Phaser.GameObjects.Group;
+    private collectables: Phaser.GameObjects.Group;
 
-    blockGenerator: Generator<number, number, number>;
-    controller: LevelController;
+    private blockGenerator: Generator<number, number, number>;
+    private controller: LevelController;
 
-    isJumping: boolean;
-    isJumpInProgress: boolean;
+    private isJumping: boolean;
+    private isJumpInProgress: boolean;
 
-    isRunning: boolean;
-    speedBonus: number;
-    speedBonusMax: number;
+    private isRunning: boolean;
+    private speedBonus: number;
+    private speedBonusMax: number;
 
-    pointsCollected: number;
-    pointMilestones: number[];
-    lifesLeft: number;
+    private pointsCollected: number;
+    private pointMilestones: number[];
+    private lifesLeft: number;
 
-    textPanacats: UiText;
-    textCaffeine: UiText;
-    textLifes: UiText;
-    textMain: UiText;
+    private textPanacats: UiText;
+    private textCaffeine: UiText;
+    private textLifes: UiText;
+    private textMain: UiText;
 
     create() {
         super.create();
@@ -142,17 +142,16 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
         const fadeFromColor = Phaser.Display.Color.IntegerToRGB(level.sky);
         this.cameras.main.fadeFrom(500, fadeFromColor.r, fadeFromColor.g, fadeFromColor.b);
         this.cameras.main.setBounds(0, 0, Number.MAX_SAFE_INTEGER, height);
-        this.cameras.main.startFollow(this.player, false, 1, 0, -width * 0.3, 0);
+        // TODO: cleanup
+        // this.cameras.main.startFollow(this.player, false, 1, 0, -width * 0.3, 0);
+        this.cameras.main.startFollow(this.player, false, 1, 0, -320 * 0.3, 0);
         this.cameras.main.setBackgroundColor(level.sky);
 
-        console.log({
-            w: this.scale.width
-        })
 
         this.handlePlayerRespawn();
     }
 
-    update(time: number, delta: number): void {
+    update(time: number, delta: number) {
         this.handlePlayer(delta);
         this.handleSpeedChange();
         this.handleUiText();

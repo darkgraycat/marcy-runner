@@ -8,11 +8,11 @@ import { OverScene } from "./scenes/over";
 import { TutorialScene } from "./scenes/tutorial";
 import { DevmodeScene } from "./scenes/devmode";
 
-import { DEBUG, GAMEPLAY } from "./shared/settings";
-
 export type GameParams = {
     parentId: string,
-    gameHeight: number,
+    verticalSize: number,
+    gravity: number,
+    debug: boolean,
 }
 
 export class Game extends Phaser.Game {
@@ -28,16 +28,17 @@ export class Game extends Phaser.Game {
         ];
 
         const scale: Phaser.Types.Core.ScaleConfig = {
+            autoCenter: Phaser.Scale.CENTER_BOTH,
             mode: Phaser.Scale.HEIGHT_CONTROLS_WIDTH,
-            autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
-            height: params.gameHeight,
+            height: params.verticalSize,
+            width: "100%",
         }
 
         const physics: Phaser.Types.Core.PhysicsConfig = {
             default: "arcade",
             arcade: {
-                gravity: { y: GAMEPLAY.gravity, x: 0 },
-                debug: DEBUG.debugPhysics,
+                gravity: { y: params.gravity, x: 0 },
+                debug: params.debug,
             }
         }
 
