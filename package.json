@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "npm run serve & npm run watch",
-    "serve": "npx live-server --port=8080 --watch=dist,assets,index.html,style.css",
-    "watch": "npx esbuild src/index.ts --bundle --outdir=dist --sourcemap=inline --watch",
-    "build": "npx esbuild src/index.ts --bundle --minify --outdir=dist",
+    "serve": "npx live-server public --port=8080 --watch",
+    "watch": "npx esbuild src/index.ts --bundle --outdir=public --sourcemap=inline --watch",
+    "build": "npx esbuild src/index.ts --bundle --minify --outdir=public",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "darkgraycat",

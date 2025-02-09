@@ -32,6 +32,7 @@ export class Game extends Phaser.Game {
             mode: Phaser.Scale.HEIGHT_CONTROLS_WIDTH,
             height: params.verticalSize,
             width: "100%",
+            resizeInterval: 2000,
         }
 
         const physics: Phaser.Types.Core.PhysicsConfig = {

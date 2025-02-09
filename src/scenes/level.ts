@@ -349,6 +349,7 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
     }
 
     private onScreenResized() {
+        if (!this.scene.isActive(this.scene.key)) return;
         this.textLifes.updateRelativePosition();
         this.textMain.updateRelativePosition();
         this.textPanacats.updateRelativePosition();
