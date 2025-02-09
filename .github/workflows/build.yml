@@ -25,6 +25,8 @@ jobs:
         with:
           name: github-pages
           path: ./public
+          if-no-files-found: error
+          retention-days: 1
 
   # Deployment job
   deploy:
@@ -46,7 +48,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: github-pages
-          path: ./public
+          path: ./_site
       - name: List files
         run: ls -la ./public
 
