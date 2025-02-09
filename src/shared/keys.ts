@@ -61,4 +61,5 @@ export const EventKey = {
     DevmodeStarted: "event_devmode_started",
 
     BuildingSpawned: "event_building_spawned",
+    ScreenResized: "event_screen_resized",
 }

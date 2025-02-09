@@ -84,10 +84,11 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
         const { width, height } = this.scale;
         const level = levels[this.params.levelIdx];
         const totalBuildings = Math.round(2 * width / Building.config.tilesize[0]);
+        console.log({ totalBuildings })
         const totalCollectables = 12;
 
         /* #entities */
-        this.sun = new Sun(this, 64, 32, 6);
+        this.sun = new Sun(this, width * 0.45, height * 0.25, 6);
 
         this.backgrounds = this.add.group({ runChildUpdate: true });
         for (const [frame, y, color, scrollScale] of level.backgrounds) {
@@ -96,7 +97,7 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
 
         this.buildings = this.add.group({ runChildUpdate: true });
         iterate(totalBuildings, i =>
-            this.buildings.add(new Building(this, i, 1.5)
+            this.buildings.add(new Building(this, i - totalBuildings / 2, 1.5)
                 .setTint(level.buildings)
                 .randomize()
             )
@@ -104,7 +105,7 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
 
         this.collectables = this.add.group({ runChildUpdate: true });
         iterate(totalCollectables, i =>
-            this.collectables.add(new Collectable(this, 32 * i, 400))
+            this.collectables.add(new Collectable(this, -width, 0))
         );
 
         /* #player */
@@ -122,18 +123,18 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
 
         /* #ui */
         this.textLifes = new UiText(this, strings.gameScene.lifesLeft)
-            .setPosition(4, 4)
+            .setRelativePosition(0.0, 0.0, 4, 4)
             .setOrigin(0, 0)
             .setDepth(99);
         this.textPanacats = new UiText(this, strings.gameScene.panacatsCollected)
-            .setPosition(width / 2, 4)
+            .setRelativePosition(0.5, 0.0, 0, 4)
             .setOrigin(0.5, 0)
             .setDepth(99);
         this.textCaffeine = new UiText(this, strings.gameScene.caffeine)
+            .setRelativePosition(1.0, 0.0, -4, 4)
             .setOrigin(1, 0)
-            .setPosition(width - 4, 4);
         this.textMain = new UiText(this)
-            .setPosition(width / 2, height / 2)
+            .setRelativePosition(0.5, 0.5)
             .setDepth(99)
             .setScale(4)
             .setAlpha(0);
@@ -147,6 +148,7 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
         this.cameras.main.startFollow(this.player, false, 1, 0, -320 * 0.3, 0);
         this.cameras.main.setBackgroundColor(level.sky);
 
+        this.game.events.on(EventKey.ScreenResized, this.onScreenResized, this);
 
         this.handlePlayerRespawn();
     }
@@ -344,6 +346,13 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
 
     private onActionUp() {
         this.isJumping = false;
+    }
+
+    private onScreenResized() {
+        this.textLifes.updateRelativePosition();
+        this.textMain.updateRelativePosition();
+        this.textPanacats.updateRelativePosition();
+        this.textCaffeine.updateRelativePosition();
     }
 
     startOver(finished: boolean) {

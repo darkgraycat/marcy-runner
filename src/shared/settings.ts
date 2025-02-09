@@ -2,11 +2,11 @@ export const GAMEPLAY = {
     targetPoints: 100,
     initialLifes: 3,
     initialMoveVelocity: 100,
-    initialJumpVelocity: 250,
+    initialJumpVelocity: 200,
     speedBonus: 20,
     speedBonusMax: 100,
     speedBonusTick: 0.05,
-    gravity: 600,
+    gravity: 400,
 }
 
 export const SETTINGS = {
@@ -27,7 +27,7 @@ export const SPAWN_RATES = {
 }
 
 export const DEBUG = {
-    fastRestart: false,
+    fastRestart: true,
     fastRespawn: false,
     debugPhysics: false,
 }

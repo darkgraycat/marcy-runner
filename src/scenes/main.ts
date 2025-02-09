@@ -40,8 +40,9 @@ export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
         this.game.events.on(EventKey.OverStarted, this.onOverStarted, this);
         this.game.events.on(EventKey.TutorialStarted, this.onTutorialStarted, this);
         this.game.events.on(EventKey.DevmodeStarted, this.onDevmodeStarted, this);
+        this.game.events.on(EventKey.ScreenResized, this.onScreenResized, this);
 
-        this.scale.on('resize', this.onResize, this);
+        this.scale.on('resize', () => this.game.events.emit(EventKey.ScreenResized), this);
 
         const { width, height } = this.scale;
 
@@ -170,7 +171,8 @@ export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
         this.nextScene(SceneKey.Devmode, params);
     }
 
-    private onResize() {
+    private onScreenResized() {
+        this.log("main", "resize requested");
         this.optionsButton.updateRelativePosition();
         this.fullscreenButton.updateRelativePosition();
     }

@@ -43,9 +43,9 @@ export class PreloadScene extends Scene<PreloadSceneParams>(SceneKey.Preload, de
         /* #animaton */
         [   
             { key: AnimationKey.PlayerIdle, assetKey: SpriteKey.Player, frames: [0, 1, 2, 3, 4, 5], frameRate: 8, repeat: -1 },
-            { key: AnimationKey.PlayerWalk, assetKey: SpriteKey.Player, frames: [5, 6, 6, 7], frameRate: 16, repeat: -1 },
-            { key: AnimationKey.PlayerJump, assetKey: SpriteKey.Player, frames: [4, 4, 6, 6], frameRate: 16, repeat: 0 },
-            { key: AnimationKey.PlayerRun, assetKey: SpriteKey.Player, frames: [8, 9, 9, 10], frameRate: 20, repeat: -1 },
+            { key: AnimationKey.PlayerWalk, assetKey: SpriteKey.Player, frames: [5, 6, 6, 7], frameRate: 10, repeat: -1 },
+            { key: AnimationKey.PlayerJump, assetKey: SpriteKey.Player, frames: [4, 4, 6, 6], frameRate: 20, repeat: 0 },
+            { key: AnimationKey.PlayerRun, assetKey: SpriteKey.Player, frames: [8, 9, 9, 10], frameRate: 15, repeat: -1 },
 
             { key: AnimationKey.CollectablePanacatIdle, assetKey: SpriteKey.Collectables, frames: [0, 1], frameRate: 8, repeat: -1 },
             { key: AnimationKey.CollectablePanacatDie, assetKey: SpriteKey.Collectables, frames: [2, 3], frameRate: 16, repeat: 0 },
