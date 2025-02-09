@@ -246,6 +246,15 @@ export function UiElement(config: UiElementConfig) {
         removeListener(event: PointerEvent, handler?: Function, context?: any) {
             return super.removeListener(event, handler, context);
         }
+        setRelativePosition(x: number, y: number = x) {
+            const { parentSize, gameSize } = this.scene.scale;
+
+            const offsetRatio = (parentSize.width * gameSize.height) / (2 * parentSize.height);
+            const relativeX = (gameSize.width / 2) + offsetRatio * (2 * x - 1);
+            const relativeY = gameSize.height * y;
+
+            return super.setPosition(relativeX, relativeY);
+        }
 
     }
 }
@@ -267,15 +276,15 @@ export function UiElement(config: UiElementConfig) {
 // }
 
 export function Controller<T extends object>(config: T) {
-  return class Controller extends Phaser.Input.InputPlugin {
-    static readonly config = config;
-    constructor(scene: Phaser.Scene) {
-      super(scene);
-      Object.assign(this, config);
-    }
-  } as {
-    new(scene: Phaser.Scene): FieldsToInstance<T> & Phaser.Input.InputPlugin;
-    config: T;
-  };
+    return class Controller extends Phaser.Input.InputPlugin {
+        static readonly config = config;
+        constructor(scene: Phaser.Scene) {
+            super(scene);
+            Object.assign(this, config);
+        }
+    } as {
+        new(scene: Phaser.Scene): FieldsToInstance<T> & Phaser.Input.InputPlugin;
+        config: T;
+    };
 }
 
