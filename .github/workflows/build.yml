@@ -50,7 +50,7 @@ jobs:
           name: github-pages
           path: ./_site
       - name: List files
-        run: ls -la ./public
+        run: ls -la ./_site
 
       - name: Deploy to GitHub Pages
         id: deployment
