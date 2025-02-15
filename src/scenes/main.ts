@@ -145,6 +145,8 @@ export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
             document.exitFullscreen();
         } {
             document.getElementById('main').requestFullscreen();
+            // @ts-ignore
+            screen.orientation.lock('landscape').catch();
         }
         // this.scale.isFullscreen
         //     ? this.scale.stopFullscreen()

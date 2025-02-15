@@ -73,18 +73,18 @@ window.onload = async function() {
     //     }, 100);
     // });
 
-    function handleOrientationChange() {
-        // @ts-ignore
-        if (screen.orientation && screen.orientation.lock) {
-            // @ts-ignore
-            screen.orientation.lock("landscape").catch((err: any) => {
-                console.warn("Orientation lock failed:", err);
-            });
-        }
+    // function handleOrientationChange() {
+    //     // @ts-ignore
+    //     if (screen.orientation && screen.orientation.lock) {
+    //         // @ts-ignore
+    //         screen.orientation.lock("landscape").catch((err: any) => {
+    //             console.warn("Orientation lock failed:", err);
+    //         });
+    //     }
 
-    }
+    // }
 
-    window.addEventListener('fullscreenchange', handleOrientationChange);
+    // window.addEventListener('fullscreenchange', handleOrientationChange);
     // window.addEventListener('resize', handleOrientationChange);
     // window.addEventListener('orientationchange', handleOrientationChange);
 }
