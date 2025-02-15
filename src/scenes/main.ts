@@ -146,9 +146,9 @@ export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
         // } {
         //     document.getElementById('main').requestFullscreen();
         // }
-        // this.scale.isFullscreen
-        //     ? this.scale.stopFullscreen()
-        //     : this.scale.startFullscreen();
+        this.scale.isFullscreen
+            ? this.scale.stopFullscreen()
+            : this.scale.startFullscreen();
     }
 
     private onTitleStarted(params?: Partial<TitleSceneParams>) {
