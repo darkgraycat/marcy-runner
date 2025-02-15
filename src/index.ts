@@ -1,4 +1,5 @@
 import { Game } from "./game";
+import { EventKey } from "./shared/keys";
 import { DEBUG, GAMEPLAY } from "./shared/settings";
 import { sleep } from "./shared/utils";
 
@@ -19,6 +20,16 @@ window.onload = async function() {
         verticalSize: VERTICAL_SIZE,
         gravity: GAMEPLAY.gravity,
         debug: DEBUG.debugPhysics,
+    });
+
+    addEventListener(EventKey.FullScreenToggled, () => {
+        if (document.fullscreenElement) {
+            document.exitFullscreen();
+        } else {
+            gameDiv.requestFullscreen();
+            // @ts-ignore
+            screen.orientation.lock('landscape');
+        }
     });
 
 

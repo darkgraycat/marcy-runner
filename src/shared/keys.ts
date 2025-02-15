@@ -62,4 +62,5 @@ export const EventKey = {
 
     BuildingSpawned: "event_building_spawned",
     ScreenResized: "event_screen_resized",
+    FullScreenToggled: "event_fullscreen_toggled",
 }

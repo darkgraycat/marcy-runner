@@ -141,14 +141,15 @@ export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
     }
 
     private onFullscreenClick() {
+        this.game.events.emit(EventKey.FullScreenToggled);
         // if (document.fullscreenElement) {
-        if (this.scale.isFullscreen) {
-            document.exitFullscreen();
-        } {
-            document.getElementById('main').requestFullscreen();
-            // @ts-ignore
-            screen.orientation.lock('landscape').catch();
-        }
+        // if (this.scale.isFullscreen) {
+        //     document.exitFullscreen();
+        // } else {
+        //     document.getElementById('main').requestFullscreen();
+        //     // @ts-ignore
+        //     screen.orientation.lock('landscape').catch();
+        // }
         // this.scale.isFullscreen
         //     ? this.scale.stopFullscreen()
         //     : this.scale.startFullscreen();
