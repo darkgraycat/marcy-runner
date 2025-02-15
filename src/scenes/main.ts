@@ -143,14 +143,14 @@ export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
     private onFullscreenClick() {
         // if (document.fullscreenElement != null) {
         if (this.scale.isFullscreen) {
-            document.exitFullscreen();
-            // this.scale.stopFullscreen();
+            // document.exitFullscreen();
+            this.scale.stopFullscreen();
         } {
-            document.getElementById('main').requestFullscreen();
-            // this.scale.startFullscreen();
-            this.scale.lockOrientation('landscape');
+            // document.getElementById('main').requestFullscreen();
+            this.scale.startFullscreen();
+            // this.scale.lockOrientation('landscape');
             // @ts-ignore
-            // screen.orientation.lock('landscape').catch();
+            screen.orientation.lock('landscape').catch();
         }
         // this.scale.isFullscreen
         //     ? this.scale.stopFullscreen()
