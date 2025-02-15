@@ -143,7 +143,6 @@ export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
     private onFullscreenClick() {
         this.game.events.emit(EventKey.FullScreenToggled);
         this.scale.updateScale();
-        this.game.events.emit(EventKey.ScreenResized);
     }
 
     private onTitleStarted(params?: Partial<TitleSceneParams>) {
