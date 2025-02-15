@@ -53,7 +53,7 @@ window.onload = async function() {
 
     window.addEventListener("resize", () => {
         setTimeout(() => {
-            game.scale.updateScale();
+            // game.scale.updateScale();
             // game.scale.updateBounds();
             // game.scale.updateCenter();
             // game.scale.updateOrientation();
