@@ -2,8 +2,10 @@ name: Build
 
 on:
   push:
-    tags:
-      - '*'
+    branch:
+      - 'main'
+    #tags:
+    #  - '*'
 
 jobs:
   # Build job

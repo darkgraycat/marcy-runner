@@ -20,7 +20,6 @@ window.onload = async function() {
         gravity: GAMEPLAY.gravity,
         debug: DEBUG.debugPhysics,
     });
-    game.scale.lockOrientation('landscape');
 
 
     // const handleOrientationChange = (e) => {
@@ -54,28 +53,51 @@ window.onload = async function() {
 
     window.addEventListener('keydown', ({ key }) => {
         // if (key == 'o') handleOrientationChange();
-        if (key == 'r') {
+        if (key == 'p') {
+            const { gameSize, displaySize, baseSize, parentSize } = game.scale;
             console.table({
-                gameSize: [game.scale.gameSize.width, game.scale.gameSize.height],
-                displaySize: [game.scale.displaySize.width, game.scale.displaySize.height],
-                baseSize: [game.scale.baseSize.width, game.scale.baseSize.height],
-                parentSize: [game.scale.parentSize.width, game.scale.parentSize.height],
+                gameSize: [gameSize.width, gameSize.height],
+                displaySize: [displaySize.width, displaySize.height],
+                baseSize: [baseSize.width, baseSize.height],
+                parentSize: [parentSize.width, parentSize.height],
             })
-            console.log('refreshing size................');
-
-            // const gameWidth = 320;
-            // const gameHeight = 180;
-
-            // // Resize the game canvas to match the screen width and fixed height
-            // this.scale.resize(window.innerWidth, gameHeight);
-
-            // // Recalculate the scale factor for dynamic width
-            // const scaleFactor = window.innerWidth / gameWidth;
-
-            // // Update the camera's viewport (adjust to new size and keep it centered)
-            // this.cameras.main.setViewport(0, 0, gameWidth * scaleFactor, gameHeight);
+        }
+        if (key == 'r') {
+            gameDiv.classList.toggle('force-landscape');
         }
     });
 
+    window.addEventListener("resize", () => {
+        setTimeout(() => {
+            game.scale.resize(window.innerWidth, window.innerHeight);
+        }, 100);
+    });
+
+    function toggleFullscreen() {
+        const elem = mainDiv;
+
+        if (!document.fullscreenElement) {
+            elem.requestFullscreen().then(() => {
+                lockLandscape();
+            }).catch(err => {
+                console.error("Fullscreen error:", err);
+            });
+        } else {
+            document.exitFullscreen();
+        }
+    }
+
+    function lockLandscape() {
+        // @ts-ignore
+        if (screen.orientation && screen.orientation.lock) {
+            // @ts-ignore
+            screen.orientation.lock("landscape").catch((err: any) => {
+                console.warn("Orientation lock failed:", err);
+            });
+        }
+    }
+
+    // Attach to a fullscreen button
+    document.getElementById("fullscreen-btn").addEventListener("click", toggleFullscreen);
 }
 

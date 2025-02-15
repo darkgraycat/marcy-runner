@@ -28,11 +28,13 @@ export class Game extends Phaser.Game {
         ];
 
         const scale: Phaser.Types.Core.ScaleConfig = {
-            autoCenter: Phaser.Scale.CENTER_BOTH,
+            autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
             mode: Phaser.Scale.HEIGHT_CONTROLS_WIDTH,
+            // mode: Phaser.Scale.RESIZE,
+            // autoCenter: Phaser.Scale.CENTER_BOTH,
             height: params.verticalSize,
             width: "100%",
-            resizeInterval: 2000,
+            resizeInterval: 1000,
         }
 
         const physics: Phaser.Types.Core.PhysicsConfig = {
