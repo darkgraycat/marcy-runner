@@ -67,27 +67,13 @@ window.onload = async function() {
         }
     });
 
-    window.addEventListener("resize", () => {
-        setTimeout(() => {
-            game.scale.resize(window.innerWidth, window.innerHeight);
-        }, 100);
-    });
+    // window.addEventListener("resize", () => {
+    //     setTimeout(() => {
+    //         game.scale.resize(window.innerWidth, window.innerHeight);
+    //     }, 100);
+    // });
 
-    function toggleFullscreen() {
-        const elem = mainDiv;
-
-        if (!document.fullscreenElement) {
-            elem.requestFullscreen().then(() => {
-                lockLandscape();
-            }).catch(err => {
-                console.error("Fullscreen error:", err);
-            });
-        } else {
-            document.exitFullscreen();
-        }
-    }
-
-    function lockLandscape() {
+    function handleOrientationChange() {
         // @ts-ignore
         if (screen.orientation && screen.orientation.lock) {
             // @ts-ignore
@@ -95,9 +81,11 @@ window.onload = async function() {
                 console.warn("Orientation lock failed:", err);
             });
         }
+
     }
 
-    // Attach to a fullscreen button
-    document.getElementById("fullscreen-btn").addEventListener("click", toggleFullscreen);
+    window.addEventListener('fullscreenchange', handleOrientationChange);
+    window.addEventListener('resize', handleOrientationChange);
+    window.addEventListener('orientationchange', handleOrientationChange);
 }
 

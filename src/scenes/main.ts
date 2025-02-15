@@ -141,11 +141,11 @@ export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
     }
 
     private onFullscreenClick() {
-        if (document.fullscreenElement != null) {
-            document.exitFullscreen();
-        } {
-            document.getElementById('main').requestFullscreen();
-        }
+        // if (document.fullscreenElement != null) {
+        //     document.exitFullscreen();
+        // } {
+        //     document.getElementById('main').requestFullscreen();
+        // }
         // this.scale.isFullscreen
         //     ? this.scale.stopFullscreen()
         //     : this.scale.startFullscreen();
