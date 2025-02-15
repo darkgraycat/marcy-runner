@@ -29,50 +29,5 @@ window.onload = async function() {
             screen.orientation.lock('landscape');
         }
     });
-
-
-
-
-    // DEBUG
-
-    // window.addEventListener('keydown', ({ key }) => {
-    //     // if (key == 'o') handleOrientationChange();
-    //     if (key == 'p') {
-    //         const { gameSize, displaySize, baseSize, parentSize } = game.scale;
-    //         console.table({
-    //             gameSize: [gameSize.width, gameSize.height],
-    //             displaySize: [displaySize.width, displaySize.height],
-    //             baseSize: [baseSize.width, baseSize.height],
-    //             parentSize: [parentSize.width, parentSize.height],
-    //         })
-    //     }
-    //     if (key == 'r') {
-    //         gameDiv.classList.toggle('force-landscape');
-    //     }
-    // });
-
-    // window.addEventListener("resize", () => {
-    //     setTimeout(() => {
-    //         // game.scale.updateScale();
-    //         // game.scale.updateBounds();
-    //         // game.scale.updateCenter();
-    //         // game.scale.updateOrientation();
-    //     }, 500);
-    // });
-
-    // function handleOrientationChange() {
-    //     // @ts-ignore
-    //     if (screen.orientation && screen.orientation.lock) {
-    //         // @ts-ignore
-    //         screen.orientation.lock("landscape").catch((err: any) => {
-    //             console.warn("Orientation lock failed:", err);
-    //         });
-    //     }
-
-    // }
-
-    // window.addEventListener('fullscreenchange', handleOrientationChange);
-    // window.addEventListener('resize', handleOrientationChange);
-    // window.addEventListener('orientationchange', handleOrientationChange);
 }
 

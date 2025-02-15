@@ -31,7 +31,7 @@ export class Game extends Phaser.Game {
             autoCenter: Phaser.Scale.CENTER_BOTH,
             mode: Phaser.Scale.HEIGHT_CONTROLS_WIDTH,
             height: params.verticalSize,
-            // resizeInterval: 1000,
+            width: "100%",
         }
 
         const physics: Phaser.Types.Core.PhysicsConfig = {
