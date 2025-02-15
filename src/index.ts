@@ -85,7 +85,7 @@ window.onload = async function() {
     }
 
     window.addEventListener('fullscreenchange', handleOrientationChange);
-    window.addEventListener('resize', handleOrientationChange);
-    window.addEventListener('orientationchange', handleOrientationChange);
+    // window.addEventListener('resize', handleOrientationChange);
+    // window.addEventListener('orientationchange', handleOrientationChange);
 }
 
