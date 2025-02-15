@@ -29,5 +29,11 @@ window.onload = async function() {
             screen.orientation.lock('landscape');
         }
     });
+
+    window.addEventListener('resize', () => {
+        setTimeout(() => {
+            game.scale.updateScale();
+        }, 500)
+    })
 }
 
