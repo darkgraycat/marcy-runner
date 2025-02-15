@@ -35,7 +35,7 @@ export class Game extends Phaser.Game {
             // width: 320,
             // height: 180,
             height: params.verticalSize,
-            width: "100%",
+            // width: "100%",
             resizeInterval: 1000,
         }
 
