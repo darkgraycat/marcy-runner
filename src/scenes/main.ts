@@ -142,7 +142,6 @@ export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
 
     private onFullscreenClick() {
         this.game.events.emit(EventKey.FullScreenToggled);
-        this.time.delayedCall(500, this.scale.updateScale);
     }
 
     private onTitleStarted(params?: Partial<TitleSceneParams>) {
@@ -172,7 +171,10 @@ export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
 
     private onScreenResized() {
         this.log("main", "resize requested");
-        this.optionsButton.updateRelativePosition();
-        this.fullscreenButton.updateRelativePosition();
+        this.time.delayedCall(500, () => {
+            this.scale.updateScale();
+            this.optionsButton.updateRelativePosition();
+            this.fullscreenButton.updateRelativePosition();
+        });
     }
 }
