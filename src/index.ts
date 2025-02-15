@@ -74,7 +74,7 @@ window.onload = async function() {
             game.scale.updateBounds();
             game.scale.updateCenter();
             game.scale.updateOrientation();
-        }, 100);
+        }, 500);
     });
 
     // function handleOrientationChange() {
