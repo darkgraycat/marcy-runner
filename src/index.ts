@@ -3,12 +3,21 @@ import { EventKey } from "./shared/keys";
 import { DEBUG, GAMEPLAY } from "./shared/settings";
 import { sleep } from "./shared/utils";
 
+const { log } = console;
+
 const VERTICAL_SIZE = 180;
 
 window.onload = async function() {
     const mainDiv = document.getElementById("main") as HTMLDivElement;
     const gameDiv = document.getElementById("game") as HTMLDivElement;
+    const debugDiv = document.getElementById("debug") as HTMLDivElement;
     const overlayDiv = document.getElementById("overlay") as HTMLDivElement;
+
+    // use monkey-patching to debug
+    console.log = (...args: any[]) => {
+        log(...args);
+        debugDiv.textContent += args + '\n';
+    }
 
     await sleep(100);
     overlayDiv.classList.add("hidden");
