@@ -75,32 +75,7 @@ export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
         this.hideMenu();
 
         this.game.events.emit(EventKey.TitleStarted, { levelIdx: randomInt(0, levels.length) });
-
-        // DEBUG
-        // this.textDebug = new UiText(this)
-        //     .setPosition(width / 2, height / 2)
-        //     .setScrollFactor(0)
-        //     .setTint(0xff0000)
-        //     .setText("DEBUG");
-
-        // this.input.on('pointerup', (e) => {
-        //     console.log(e.x, e.y);
-        // }, this);
     }
-
-    // update() {
-    //     const { width, height, baseSize, gameSize, parentSize, displaySize } = this.scale;
-    //     const mainCamera = this.cameras.main.worldView;
-    //     const text = ''
-    //         + `\nbaseSize ${baseSize.width} ${baseSize.height}`
-    //         + `\ngameSize ${gameSize.width} ${gameSize.height}`
-    //         + `\nparentSize ${parentSize.width} ${parentSize.height}`
-    //         + `\ndisplaySize ${displaySize.width} ${displaySize.height}`
-    //         + `\nmainCamera ${mainCamera.width} ${mainCamera.height}`
-
-    //     this.textDebug.setText(text);
-    //     
-    // }
 
     private nextScene<T extends object>(sceneKey: string, sceneParams?: T) {
         if (this.runningSceneKey)
@@ -173,9 +148,9 @@ export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
     }
 
     private onScreenResized() {
-        // this.log("event", "resize requested");
         this.time.delayedCall(500, () => {
             this.scale.updateScale();
+            this.scale.updateCenter();
             this.optionsButton.updateRelativePosition();
             this.fullscreenButton.updateRelativePosition();
         });
