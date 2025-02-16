@@ -212,17 +212,14 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
             this.player.idle();
         }
 
-        // if (this.isJumping && !this.isJumpInProgress) {
-        //     this.isJumpInProgress = true;
-        //     this.player.jump(jumpVelocity);
-        // }
-
-        if (this.isJumping) {
-            this.isJumpInProgress = true;
+        if (this.isJumping && !this.isJumpInProgress) {
+            if (this.player.body.blocked.down)
+                this.isJumpInProgress = true;
             this.player.jump(jumpVelocity);
         }
 
         if (!this.isJumping) {
+            this.isJumpInProgress = false;
             if (this.player.body.velocity.y < 0)
                 this.player.body.velocity.y /= 2;
             if (this.player.body.blocked.down)
