@@ -115,6 +115,8 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
             )
         );
 
+        this.log("total buildings", totalBuildings);
+
         this.log("create", "process 6");
 
         this.collectables = this.add.group({ runChildUpdate: true });

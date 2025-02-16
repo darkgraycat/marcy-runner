@@ -29,7 +29,7 @@ export function Scene<Params>(key: string, defaults: Params) {
             this.log('create', 'invoked');
         }
 
-        protected log(context: string, message: string, ...rest: any[]) {
+        protected log(context: string, message: string | number, ...rest: any[]) {
             console.log(`${(performance.now() / 1000).toFixed(2).padStart(8, ' ')} [${this.constructor.name}: ${context}] ${message}`, ...rest);
             return this;
         }

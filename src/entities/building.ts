@@ -44,7 +44,7 @@ export class Building extends TilePhysEntity({
 
     constructor(scene: Phaser.Scene, col: number = 0, row: number = 0) {
         super(scene);
-        console.log(`Building ${col}${row} start - ` + (performance.now() / 1000).toFixed(2))
+        console.log(`Building ${col}${row} start -------- ` + (performance.now() / 1000).toFixed(2))
         this.roof = new BuildingRoof(scene);
         console.log(`Building ${col}${row} roof - ` + (performance.now() / 1000).toFixed(2))
         this.decor = new BuildingDecor(scene);
