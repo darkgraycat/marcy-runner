@@ -67,12 +67,16 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
         this.speedBonusMax = 0;
         this.lifesLeft = this.params.initialLifes;
 
+        this.log("create", "process 1");
+
         this.pointsCollected = 0;
         this.pointMilestones = [
             this.params.targetPoints * 0.25 | 0, // 25%
             this.params.targetPoints * 0.50 | 0, // 50%
             this.params.targetPoints * 0.75 | 0, // 75%
         ];
+
+        this.log("create", "process 2");
 
         this.blockGenerator = blockHeightGenerator({
             widthsRange: [2, 8],
@@ -83,11 +87,15 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
 
         this.controller = new LevelController(this);
 
+        this.log("create", "process 3");
+
         const { width, height } = this.scale;
         const level = levels[this.params.levelIdx];
         const totalBuildings = Math.round(2 * width / Building.config.tilesize[0]);
         console.log({ totalBuildings })
         const totalCollectables = totalBuildings;
+
+        this.log("create", "process 4");
 
         /* #entities */
         this.sun = new Sun(this, width * 0.45, height * 0.25, 6);
@@ -97,6 +105,8 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
             this.backgrounds.add(new Background(this, frame, y, scrollScale).setTint(color))
         }
 
+        this.log("create", "process 5");
+
         this.buildings = this.add.group({ runChildUpdate: true });
         iterate(totalBuildings, i =>
             this.buildings.add(new Building(this, i - totalBuildings / 2 | 0, 1.5)
@@ -105,13 +115,19 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
             )
         );
 
+        this.log("create", "process 6");
+
         this.collectables = this.add.group({ runChildUpdate: true });
         iterate(totalCollectables, i =>
             this.collectables.add(new Collectable(this, -width, 0))
         );
 
+        this.log("create", "process 7");
+
         /* #player */
         this.player = new Player(this).setPosition(this.scale.width / 2, 64);
+
+        this.log("create", "process 8");
 
         /* #controls */
         this.input.keyboard.on('keydown-SPACE', this.onActionDown, this);
@@ -119,10 +135,14 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
         this.input.on('pointerdown', this.onActionDown, this);
         this.input.on('pointerup', this.onActionUp, this);
 
+        this.log("create", "process 9");
+
         /* #physics */
         this.physics.add.collider(this.buildings, this.player);
         this.physics.add.collider(this.buildings.getChildren().flatMap(b => (b as Building).bodies), this.player);
         this.physics.add.overlap(this.collectables, this.player, this.handleCollect, null, this);
+
+        this.log("create", "process 10");
 
         /* #ui */
         this.textLifes = new UiText(this, strings.gameScene.lifesLeft)
@@ -142,18 +162,28 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
             .setScale(4)
             .setAlpha(0);
 
+        this.log("create", "process 11");
+
         /* other */
         const fadeFromColor = Phaser.Display.Color.IntegerToRGB(level.sky);
         this.cameras.main.fadeFrom(500, fadeFromColor.r, fadeFromColor.g, fadeFromColor.b);
         this.cameras.main.setBounds(0, 0, Number.MAX_SAFE_INTEGER, height);
+
+        this.log("create", "process 12");
         // TODO: cleanup
         // this.cameras.main.startFollow(this.player, false, 1, 0, -width * 0.3, 0);
         this.cameras.main.startFollow(this.player, false, 1, 0, -320 * 0.3, 0);
         this.cameras.main.setBackgroundColor(level.sky);
 
+        this.log("create", "process 13");
+
         this.game.events.on(EventKey.ScreenResized, this.onScreenResized, this);
 
+        this.log("create", "process 14");
+
         this.handlePlayerRespawn();
+
+        this.log("create", "process 15");
 
         this.log("create", "end");
     }
