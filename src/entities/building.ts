@@ -59,13 +59,14 @@ export class Building extends TilePhysEntity({
         console.log(`Building ${col}${row} setup 2 - ` + (performance.now() / 1000).toFixed(2))
 
         // this.bodies = iterate(5, () => new InternalBody(scene));
-        // this.bodies = [];
-        // setTimeout(() => {
-        //     iterate(4, () => {
-        //         this.bodies.push(new InternalBody(scene));
-        //     });
-        //     this.updateBody();
-        // }, 0);
+        this.bodies = [];
+        scene.time.delayedCall(0, () => {
+            iterate(4, () => {
+                this.bodies.push(new InternalBody(scene));
+            });
+            this.updateBody();
+
+        }, null, this);
 
         console.log(`Building ${col}${row} add bodies - ` + (performance.now() / 1000).toFixed(2))
 
@@ -105,6 +106,7 @@ export class Building extends TilePhysEntity({
     }
 
     getInternalBodies(): InternalBody[] {
+        console.log("getting internal", this.bodies.length);
         return this.bodies;
     }
 
@@ -129,10 +131,10 @@ export class Building extends TilePhysEntity({
     }
 
     updateBody(): this {
-        // this.bodies.forEach((body, i) => body
-        //     .setPosition(this.x, this.y + i * Building.config.tilesize[1])
-        //     .updateBody(),
-        // );
+        this.bodies.forEach((body, i) => body
+            .setPosition(this.x, this.y + i * Building.config.tilesize[1])
+            .updateBody(),
+        );
         return super.updateBody();
     }
 }

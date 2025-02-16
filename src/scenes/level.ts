@@ -142,9 +142,11 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
         this.log("create", "process 9");
 
         /* #physics */
-        this.physics.add.collider(this.buildings, this.player);
-        this.physics.add.collider(this.buildings.getChildren().flatMap(b => (b as Building).getInternalBodies()), this.player);
-        this.physics.add.overlap(this.collectables, this.player, this.handleCollect, null, this);
+        this.time.delayedCall(1, () => {
+            this.physics.add.collider(this.buildings, this.player);
+            this.physics.add.collider(this.buildings.getChildren().flatMap(b => (b as Building).getInternalBodies()), this.player);
+            this.physics.add.overlap(this.collectables, this.player, this.handleCollect, null, this);
+        }, null, this);
 
         this.log("create", "process 10");
 
@@ -210,7 +212,12 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
             this.player.idle();
         }
 
-        if (this.isJumping && !this.isJumpInProgress) {
+        // if (this.isJumping && !this.isJumpInProgress) {
+        //     this.isJumpInProgress = true;
+        //     this.player.jump(jumpVelocity);
+        // }
+
+        if (this.isJumping) {
             this.isJumpInProgress = true;
             this.player.jump(jumpVelocity);
         }

@@ -15,7 +15,7 @@ window.onload = async function() {
 
     // use monkey-patching to debug
     console.log = (...args: any[]) => {
-        log(...args);
+        // log(...args);
         debugDiv.textContent += args + '\n';
         debugDiv.scrollTop = debugDiv.scrollHeight;
     }
