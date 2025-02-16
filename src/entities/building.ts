@@ -40,7 +40,7 @@ export class Building extends TilePhysEntity({
 }) {
     private roof: BuildingRoof;
     private decor: BuildingDecor;
-    readonly bodies: InternalBody[];
+    private bodies: InternalBody[];
 
     constructor(scene: Phaser.Scene, col: number = 0, row: number = 0) {
         super(scene);
@@ -58,7 +58,11 @@ export class Building extends TilePhysEntity({
         this.body.checkCollision.right = false;
         console.log(`Building ${col}${row} setup 2 - ` + (performance.now() / 1000).toFixed(2))
 
-        this.bodies = iterate(5, () => new InternalBody(scene));
+        // this.bodies = iterate(5, () => new InternalBody(scene));
+        setTimeout(() => {
+            this.bodies = iterate(5, () => new InternalBody(scene));
+        }, 0);
+
         console.log(`Building ${col}${row} add bodies - ` + (performance.now() / 1000).toFixed(2))
 
         this.updateBody();
