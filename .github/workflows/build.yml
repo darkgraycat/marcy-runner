@@ -28,6 +28,16 @@ jobs:
           path: ./public
           if-no-files-found: error
           retention-days: 1
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - name: Delete deployment
+        uses: strumwolf/delete-deployment-environment@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          environment: github-pages
+          onlyRemoveDeployments: true
 
   # Deployment job
   deploy:
@@ -39,12 +49,13 @@ jobs:
     environment:
       name: github-pages
       url: ${{steps.deployment.outputs.page_url}}
-    needs: build
+    needs:
+      - build
+      - cleanup
     steps:
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
-
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
