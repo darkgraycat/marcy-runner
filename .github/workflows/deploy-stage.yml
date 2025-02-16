@@ -45,8 +45,9 @@ jobs:
         uses: actions/configure-pages@v5
       - name: Move contents to stage directory
         run: |
-          mkdir -p ./public/stage
-          mv ./public/* ./public/stage/
+          mv ./public ./temp
+          mkdir ./public
+          mv ./temp ./public/stage
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
