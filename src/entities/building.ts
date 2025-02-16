@@ -106,7 +106,6 @@ export class Building extends TilePhysEntity({
     }
 
     getInternalBodies(): InternalBody[] {
-        console.log("getting internal", this.bodies.length);
         return this.bodies;
     }
 
