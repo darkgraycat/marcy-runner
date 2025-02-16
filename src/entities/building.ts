@@ -44,18 +44,25 @@ export class Building extends TilePhysEntity({
 
     constructor(scene: Phaser.Scene, col: number = 0, row: number = 0) {
         super(scene);
+        console.log(`Building ${col}${row} start - ` + (performance.now() / 1000).toFixed(2))
         this.roof = new BuildingRoof(scene);
+        console.log(`Building ${col}${row} roof - ` + (performance.now() / 1000).toFixed(2))
         this.decor = new BuildingDecor(scene);
+        console.log(`Building ${col}${row} decor - ` + (performance.now() / 1000).toFixed(2))
         this.placeByTile(col, row)
             .resizeByTile(1, row)
             .setOrigin(0, 0);
+        console.log(`Building ${col}${row} setup - ` + (performance.now() / 1000).toFixed(2))
         this.body.checkCollision.down = false;
         this.body.checkCollision.left = false;
         this.body.checkCollision.right = false;
+        console.log(`Building ${col}${row} setup 2 - ` + (performance.now() / 1000).toFixed(2))
 
         this.bodies = iterate(5, () => new InternalBody(scene));
+        console.log(`Building ${col}${row} add bodies - ` + (performance.now() / 1000).toFixed(2))
 
         this.updateBody();
+        console.log(`Building ${col}${row} end - ` + (performance.now() / 1000).toFixed(2))
     }
 
     respawn(col: number, row: number): void {
