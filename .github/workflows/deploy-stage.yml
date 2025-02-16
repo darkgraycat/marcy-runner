@@ -36,13 +36,17 @@ jobs:
       id-token: write
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}-stage
+      url: ${{ steps.deployment.outputs.page_url }}stage/
     needs:
       - build
     steps:
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
+      - name: Move contents to stage directory
+        run: |
+          mkdir -p ./public/stage
+          mv ./public/* ./public/stage/
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
