@@ -13,16 +13,6 @@ body {
     box-sizing: border-box;
 }
 
-.force-landscape {
-    transform-origin: center;
-    transform: translate(-50%, -50%) rotate(90deg);
-    position: fixed;
-    width: 100vh;
-    height: 100vw;
-    top: 50%;
-    left: 50%;
-}
-
 [container] {
     display: flex;
     flex-direction: column;
@@ -32,7 +22,9 @@ body {
 
 #root {
     width: 100%;
+    /*
     padding: 2rem;
+    */
     gap: 40px;
 }
 
@@ -49,7 +41,7 @@ body {
 }
 
 #overlay {
-    position: absolute;
+    position: relative;
     top: 0;
     left: 0;
     width: 100%;
