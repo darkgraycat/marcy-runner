@@ -91,9 +91,9 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
 
         const { width, height } = this.scale;
         const level = levels[this.params.levelIdx];
-        const totalBuildings = Math.round(2 * width / Building.config.tilesize[0]);
+        const totalBuildings = Math.ceil(width / Building.config.tilesize[0]);
         console.log({ totalBuildings })
-        const totalCollectables = totalBuildings;
+        const totalCollectables = totalBuildings * 2;
 
         this.log("create", "process 4");
 
@@ -109,7 +109,7 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
 
         this.buildings = this.add.group({ runChildUpdate: true });
         iterate(totalBuildings, i =>
-            this.buildings.add(new Building(this, i - totalBuildings / 2 | 0, 1.5)
+            this.buildings.add(new Building(this, i | 0, 1.5)
                 .setTint(level.buildings)
                 .randomize()
             )
@@ -266,7 +266,7 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
 
         const [tileWidth] = Building.config.tilesize;
         const height = this.blockGenerator.next().value;
-        const column = (this.scale.width * 2 + building.x) / tileWidth | 0;
+        const column = (this.scale.width + building.x) / tileWidth | 0;
         building.respawn(column, height - 0.5);
 
         // respawn collectables
