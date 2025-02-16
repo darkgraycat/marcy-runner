@@ -7,6 +7,7 @@ export const GAMEPLAY = {
     speedBonusMax: 100,
     speedBonusTick: 0.03,
     enemyDroneVelocity: 50,
+    enemyDroneTotal: 3,
     gravity: 500,
 }
 

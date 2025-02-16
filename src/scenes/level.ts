@@ -108,14 +108,14 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
         const totalCollectables = totalBuildings * 2;
         this.collectables = this.add.group({ runChildUpdate: true });
         iterate(totalCollectables, () =>
-            this.collectables.add(new Collectable(this).respawn(-width, 0))
+            this.collectables.add(new Collectable(this).setPosition(-width, 0))
         );
 
         /* #enemies */
-        const totalDrones = 5; // TODO: use as difficulty level adjustment
+        const totalDrones = GAMEPLAY.enemyDroneTotal;
         this.enemyDrones = this.add.group({ runChildUpdate: true });
         iterate(totalDrones, i =>
-            this.enemyDrones.add(new EnemyDrone(this).respawn(-width, 0))
+            this.enemyDrones.add(new EnemyDrone(this).setPosition(-width, 0))
         );
 
         /* #player */
@@ -212,7 +212,7 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
         this.player.meow(-4);
         if (this.lifesLeft > 1) {
             this.lifesLeft--;
-            this.player.disableBody().stop();
+            this.player.setActive(false).disableBody().stop();
             this.time.delayedCall(2000, this.handlePlayerRespawn, null, this);
         } else {
             this.startOver(false);
@@ -236,10 +236,10 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
         this.isJumping = false;
         this.isJumpInProgress = false;
 
-        this.player.enableBody();
-        // this.enemyDrones
-        //     .getChildren()
-        //     .forEach(ed => (ed as EnemyDrone).setVisible(false).die());
+        this.player.setActive(true).enableBody();
+        this.enemyDrones
+            .getChildren()
+            .forEach(ed => (ed as EnemyDrone).setVisible(false).die());
         this.startRunning();
     }
 
@@ -290,8 +290,7 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
             const enemyDrone = this.enemyDrones.getFirstDead() as EnemyDrone;
             if (enemyDrone) {
                 // TODO: implement drone generator
-                enemyDrone.respawn(building.x, randomInt(32, this.scale.height - 32));
-                // enemyDrone.respawn(building.x, randomInt(16, building.y - 32));
+                enemyDrone.respawn(building.x, randomInt(16, this.scale.height  * 0.75));
             }
         }
     }
@@ -346,12 +345,9 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
     }
 
     private handleUiText() {
-        const bd = this.player.body.blocked.down ? 'B' : '_';
-        const td = this.player.body.touching.down ? 'T' : '_';
-        this.textLifes.setTextArgs(`${bd} ${td}`);
-        // this.textPanacats.setTextArgs(this.pointsCollected);
-        // this.textCaffeine.setTextArgs(strings.chars.caffeine.repeat(Math.round(this.speedBonus / this.params.speedBonus)));
-        // this.textLifes.setTextArgs(strings.chars.life.repeat(this.lifesLeft));
+        this.textPanacats.setTextArgs(this.pointsCollected);
+        this.textCaffeine.setTextArgs(strings.chars.caffeine.repeat(Math.round(this.speedBonus / this.params.speedBonus)));
+        this.textLifes.setTextArgs(strings.chars.life.repeat(this.lifesLeft));
     }
 
     // TODO: refactor

@@ -6,7 +6,7 @@ import { randomInt } from "../shared/utils";
 export class EnemyDrone extends PhysEntity({
     key: SpriteKey.EnemyDrone,
     size: [28, 16],
-    offset: [2, 0],
+    offset: [2, 4],
 }) {
     constructor(scene: Phaser.Scene) {
         super(scene);
@@ -33,13 +33,14 @@ export class EnemyDrone extends PhysEntity({
     }
 
     respawn(x: number, y: number) {
+        const speed = randomInt(GAMEPLAY.enemyDroneVelocity / 2, GAMEPLAY.enemyDroneVelocity);
         return this
             .setActive(true)
             .setVisible(true)
-            .setPosition(x, y)
             .enableBody()
             .updateBody()
-            .setVelocity(-randomInt(GAMEPLAY.enemyDroneVelocity / 2, GAMEPLAY.enemyDroneVelocity), 0)
+            .setVelocity(-speed, 0)
+            .setPosition(x, y)
             .anims.play(AnimationKey.EnemyDroneFly);
     }
 }
