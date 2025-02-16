@@ -2,11 +2,11 @@ export const GAMEPLAY = {
     targetPoints: 100,
     initialLifes: 3,
     initialMoveVelocity: 100,
-    initialJumpVelocity: 250,
+    initialJumpVelocity: 200,
     speedBonus: 25,
     speedBonusMax: 100,
     speedBonusTick: 0.03,
-    gravity: 800,
+    gravity: 600,
 }
 
 export const SETTINGS = {
