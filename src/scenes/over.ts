@@ -24,7 +24,7 @@ export class OverScene extends Scene<OverSceneParams>(SceneKey.Over, defaults) {
     create() {
         super.create();
 
-        if (DEBUG.fastRestart) this.restartGame();
+        if (DEBUG.skipTitle) this.restartGame();
 
         this.cameras.main.fadeFrom(3000, 0, 0, 0);
 

@@ -10,6 +10,7 @@ export const SceneKey = {
 
 export const SpriteKey = {
     Player: "sprite_player",
+    EnemyDrone: "sprite_enemy_drone",
     Backgrounds: "sprite_backgrounds",
     Buildings: "sprite_buildings",
     BuildingRoofs: "sprite_building_roofs",
@@ -30,6 +31,9 @@ export const AnimationKey = {
     PlayerJump: "anim_player_jump",
     PlayerBlink: "anim_player_blink",
     PlayerRun: "anim_player_run",
+
+    EnemyDroneFly: "anim_enemy_drone_fly",
+    EnemyDroneDie: "anim_enemy_drone_die",
 
     CollectablePanacatIdle: "anim_coll_panacat_idle",
     CollectablePanacatDie: "anim_coll_panacat_die",

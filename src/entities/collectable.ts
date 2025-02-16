@@ -9,6 +9,7 @@ export enum CollectableKind {
     Life,
 }
 
+// TODO: move to /data
 const CollectableConfig: Record<string, {
     tints: number[],
     animations: string[],
@@ -39,12 +40,11 @@ export class Collectable extends PhysEntity({
 }) {
     static readonly probabilityMap = SPAWN_RATES.COLLECTABLES;
 
-    kind: CollectableKind;
+    private kind: CollectableKind;
 
-    constructor(scene: Phaser.Scene, x: number, y: number, kind?: CollectableKind) {
+    constructor(scene: Phaser.Scene, kind?: CollectableKind) {
         super(scene);
         this.kind = kind || CollectableKind.Panacat;
-        this.setPosition(x, y);
         this.updateBody();
     }
 
@@ -58,17 +58,21 @@ export class Collectable extends PhysEntity({
         this.disableBody();
         this.scene.sound.play(this.sound.key, this.sound.config);
         if (this.animation.die) {
-            this.play(this.animation.die);
-            setTimeout(() => this.setActive(false).setVisible(false), 200);
+            this.anims.play(this.animation.die);
+            this.scene.time.delayedCall(200, () => {
+                this.setActive(false).setVisible(false);
+            });
         } else {
             this.setActive(false).setVisible(false);
         }
-        return this;
     }
 
-    respawn(x: number, y: number, kind: CollectableKind) {
-        this.kind = kind;
-        return this.setActive(true).setVisible(true).enableBody()
+    respawn(x: number, y: number, kind?: CollectableKind) {
+        this.kind = kind || CollectableKind.Panacat;
+        return this
+            .setActive(true)
+            .setVisible(true)
+            .enableBody()
             .setPosition(x, y)
             .updateBody()
             .setTint(this.randomTint)

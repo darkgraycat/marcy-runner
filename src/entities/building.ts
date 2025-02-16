@@ -1,6 +1,6 @@
-import { GroupEntityClass, TileEntity, TilePhysEntity } from "../shared/factories";
+import { TileEntity, TilePhysEntity } from "../shared/factories";
 import { SpriteKey, EventKey } from "../shared/keys";
-import { iterate, randomBool, randomElement, randomInt } from "../shared/utils";
+import { randomBool, randomElement, randomInt } from "../shared/utils";
 
 class BuildingRoof extends TileEntity({
     key: SpriteKey.BuildingRoofs,
@@ -40,24 +40,18 @@ export class Building extends TilePhysEntity({
 }) {
     private roof: BuildingRoof;
     private decor: BuildingDecor;
-    private bodies: InternalBody[];
     private internalBodies: Phaser.GameObjects.Group;
 
     constructor(scene: Phaser.Scene, col: number = 0, row: number = 0) {
         super(scene);
-        console.log(`Building ${col}${row} start -------- ` + (performance.now() / 1000).toFixed(2))
         this.roof = new BuildingRoof(scene);
-        console.log(`Building ${col}${row} roof - ` + (performance.now() / 1000).toFixed(2))
         this.decor = new BuildingDecor(scene);
-        console.log(`Building ${col}${row} decor - ` + (performance.now() / 1000).toFixed(2))
         this.placeByTile(col, row)
             .resizeByTile(1, row)
             .setOrigin(0, 0);
-        console.log(`Building ${col}${row} setup - ` + (performance.now() / 1000).toFixed(2))
         this.body.checkCollision.down = false;
         this.body.checkCollision.left = false;
         this.body.checkCollision.right = false;
-        console.log(`Building ${col}${row} setup 2 - ` + (performance.now() / 1000).toFixed(2))
 
         this.internalBodies = scene.add.group([
             new InternalBody(scene),
@@ -66,21 +60,7 @@ export class Building extends TilePhysEntity({
             new InternalBody(scene),
         ]);
 
-        // this.bodies = iterate(5, () => new InternalBody(scene));
-        // this.bodies = [];
-        // scene.time.delayedCall(0, () => {
-        //     iterate(4, () => {
-        //         this.bodies.push(new InternalBody(scene));
-        //     });
-        //     this.updateBody();
-
-        // }, null, this);
-
-        console.log(`Building ${col}${row} add bodies - ` + (performance.now() / 1000).toFixed(2))
-
         this.updateBody();
-
-        console.log(`Building ${col}${row} end - ` + (performance.now() / 1000).toFixed(2))
     }
 
     respawn(col: number, row: number): void {
@@ -142,13 +122,6 @@ export class Building extends TilePhysEntity({
         this.internalBodies.setXY(this.x, this.y);
         this.internalBodies.incY(0, Building.config.tilesize[1]);
         this.internalBodies.getChildren().forEach(ib => (ib as InternalBody).updateBody());
-        // console.log(this.x, this.y);
-        // @ts-ignore
-        // console.log(this.internalBodies.getChildren().map(go => `${go.x} - ${go.y}`));
-        // this.bodies.forEach((body, i) => body
-        //     .setPosition(this.x, this.y + i * Building.config.tilesize[1])
-        //     .updateBody(),
-        // );
         return super.updateBody();
     }
 }

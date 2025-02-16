@@ -22,6 +22,7 @@ export class PreloadScene extends Scene<PreloadSceneParams>(SceneKey.Preload, de
         /* #spritesheet */
         [
             { key: SpriteKey.Player, path: "assets/images/player.png", size: [16, 16] },
+            { key: SpriteKey.EnemyDrone, path: "assets/images/enemy-drone.png", size: [32, 16] },
             { key: SpriteKey.Buildings, path: "assets/images/buildings.png", size: [48, 32] },
             { key: SpriteKey.BuildingRoofs, path: "assets/images/building-roofs.png", size: [48, 16] },
             { key: SpriteKey.BuildingDecors, path: "assets/images/building-decors.png", size: [48, 32] },
@@ -49,6 +50,9 @@ export class PreloadScene extends Scene<PreloadSceneParams>(SceneKey.Preload, de
             { key: AnimationKey.PlayerWalk, assetKey: SpriteKey.Player, frames: [5, 6, 6, 7], frameRate: 10, repeat: -1 },
             { key: AnimationKey.PlayerJump, assetKey: SpriteKey.Player, frames: [4, 4, 6, 6], frameRate: 20, repeat: 0 },
             { key: AnimationKey.PlayerRun, assetKey: SpriteKey.Player, frames: [8, 9, 9, 10], frameRate: 15, repeat: -1 },
+
+            { key: AnimationKey.EnemyDroneFly, assetKey: SpriteKey.EnemyDrone, frames: [0, 1, 2, 3], frameRate: 16, repeat: -1 },
+            { key: AnimationKey.EnemyDroneDie, assetKey: SpriteKey.EnemyDrone, frames: [4, 5, 6], frameRate: 8, repeat: 0 },
 
             { key: AnimationKey.CollectablePanacatIdle, assetKey: SpriteKey.Collectables, frames: [0, 1], frameRate: 8, repeat: -1 },
             { key: AnimationKey.CollectablePanacatDie, assetKey: SpriteKey.Collectables, frames: [2, 3], frameRate: 16, repeat: 0 },

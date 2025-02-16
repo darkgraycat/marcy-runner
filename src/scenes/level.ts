@@ -12,6 +12,7 @@ import { OverSceneParams } from "./over";
 import { DEBUG, GAMEPLAY } from "../shared/settings";
 import { Building } from "../entities/building";
 import { blockHeightGenerator } from "../shared/generators";
+import { EnemyDrone } from "../entities/enemydrone";
 
 const defaults = {
     moveVelocity: GAMEPLAY.initialMoveVelocity,
@@ -26,13 +27,15 @@ const defaults = {
 
 class LevelController extends Controller({
     keyJump: 'SPACE'
-}) {}
+}) { }
 
 export type LevelSceneParams = typeof defaults;
 
 export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults) {
     private player: Player;
     private sun: Sun;
+
+    private enemyDrones: Phaser.GameObjects.Group;
     private backgrounds: Phaser.GameObjects.Group;
     private buildings: Phaser.GameObjects.Group;
     private collectables: Phaser.GameObjects.Group;
@@ -57,8 +60,6 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
     private textMain: UiText;
 
     create() {
-        this.log("create", "start");
-
         super.create();
         this.isJumping = false;
         this.isJumpInProgress = false;
@@ -67,16 +68,12 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
         this.speedBonusMax = 0;
         this.lifesLeft = this.params.initialLifes;
 
-        this.log("create", "process 1");
-
         this.pointsCollected = 0;
         this.pointMilestones = [
             this.params.targetPoints * 0.25 | 0, // 25%
             this.params.targetPoints * 0.50 | 0, // 50%
             this.params.targetPoints * 0.75 | 0, // 75%
         ];
-
-        this.log("create", "process 2");
 
         this.blockGenerator = blockHeightGenerator({
             widthsRange: [2, 8],
@@ -87,15 +84,9 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
 
         this.controller = new LevelController(this);
 
-        this.log("create", "process 3");
-
         const { width, height } = this.scale;
         const level = levels[this.params.levelIdx];
-        const totalBuildings = Math.ceil(width / Building.config.tilesize[0]);
-        console.log({ totalBuildings })
-        const totalCollectables = totalBuildings * 2;
 
-        this.log("create", "process 4");
 
         /* #entities */
         this.sun = new Sun(this, width * 0.45, height * 0.25, 6);
@@ -105,8 +96,7 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
             this.backgrounds.add(new Background(this, frame, y, scrollScale).setTint(color))
         }
 
-        this.log("create", "process 5");
-
+        const totalBuildings = Math.ceil(width / Building.config.tilesize[0]);
         this.buildings = this.add.group({ runChildUpdate: true });
         iterate(totalBuildings, i =>
             this.buildings.add(new Building(this, i | 0, 1.5)
@@ -115,23 +105,22 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
             )
         );
 
-        this.log("total buildings", totalBuildings);
-        this.log("total buildings", `NUMBER: ${totalBuildings}`);
-        console.log("TOTAL BUILDINGS IS", totalBuildings);
-
-        this.log("create", "process 6");
-
+        const totalCollectables = totalBuildings * 2;
         this.collectables = this.add.group({ runChildUpdate: true });
-        iterate(totalCollectables, i =>
-            this.collectables.add(new Collectable(this, -width, 0))
+        iterate(totalCollectables, () =>
+            this.collectables.add(new Collectable(this).respawn(-width, 0))
         );
 
-        this.log("create", "process 7");
+        /* #enemies */
+        const totalDrones = 5; // TODO: use as difficulty level adjustment
+        this.enemyDrones = this.add.group({ runChildUpdate: true });
+        iterate(totalDrones, i =>
+            this.enemyDrones.add(new EnemyDrone(this).respawn(-width, 0))
+        );
 
         /* #player */
-        this.player = new Player(this).setPosition(this.scale.width / 2, 64);
-
-        this.log("create", "process 8");
+        this.player = new Player(this)
+            .setPosition(this.scale.width / 2, 64);
 
         /* #controls */
         this.input.keyboard.on('keydown-SPACE', this.onActionDown, this);
@@ -139,16 +128,14 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
         this.input.on('pointerdown', this.onActionDown, this);
         this.input.on('pointerup', this.onActionUp, this);
 
-        this.log("create", "process 9");
-
         /* #physics */
         this.time.delayedCall(0, () => {
             this.physics.add.collider(this.buildings, this.player);
+            this.physics.add.collider(this.enemyDrones, this.player);
             this.physics.add.collider(this.buildings.getChildren().flatMap(b => (b as Building).getInternalBodies()), this.player);
             this.physics.add.overlap(this.collectables, this.player, this.handleCollect, null, this);
+            this.physics.add.overlap(this.enemyDrones, this.player, this.handleEnemyDroneHurt, null, this);
         }, null, this);
-
-        this.log("create", "process 10");
 
         /* #ui */
         this.textLifes = new UiText(this, strings.gameScene.lifesLeft)
@@ -168,30 +155,19 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
             .setScale(4)
             .setAlpha(0);
 
-        this.log("create", "process 11");
-
         /* other */
         const fadeFromColor = Phaser.Display.Color.IntegerToRGB(level.sky);
         this.cameras.main.fadeFrom(500, fadeFromColor.r, fadeFromColor.g, fadeFromColor.b);
         this.cameras.main.setBounds(0, 0, Number.MAX_SAFE_INTEGER, height);
 
-        this.log("create", "process 12");
         // TODO: cleanup
         // this.cameras.main.startFollow(this.player, false, 1, 0, -width * 0.3, 0);
         this.cameras.main.startFollow(this.player, false, 1, 0, -320 * 0.3, 0);
         this.cameras.main.setBackgroundColor(level.sky);
 
-        this.log("create", "process 13");
-
         this.game.events.on(EventKey.ScreenResized, this.onScreenResized, this);
 
-        this.log("create", "process 14");
-
         this.handlePlayerRespawn();
-
-        this.log("create", "process 15");
-
-        this.log("create", "end");
     }
 
     update(time: number, delta: number) {
@@ -213,7 +189,7 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
         }
 
         if (this.isJumping && !this.isJumpInProgress) {
-            if (this.player.body.blocked.down)
+            if (this.player.isLanded)
                 this.isJumpInProgress = true;
             this.player.jump(jumpVelocity);
         }
@@ -222,7 +198,7 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
             this.isJumpInProgress = false;
             if (this.player.body.velocity.y < 0)
                 this.player.body.velocity.y /= 2;
-            if (this.player.body.blocked.down)
+            if (this.player.isLanded)
                 this.isJumpInProgress = false;
         }
 
@@ -252,15 +228,18 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
             this.player.x = safeBuilding.x + 16;
             this.player.y = safeBuilding.y - 16;
         } else {
-            console.warn("no safe building for spawn");
+            this.log("respawn", "no safe building");
             this.player.y = 0;
         }
-        console.log("respawned at", { x: this.player.x, y: this.player.y });
+        this.log("respawn", `x: ${this.player.x}, y: ${this.player.y}`)
         this.speedBonus = 0;
         this.isJumping = false;
         this.isJumpInProgress = false;
 
         this.player.enableBody();
+        // this.enemyDrones
+        //     .getChildren()
+        //     .forEach(ed => (ed as EnemyDrone).setVisible(false).die());
         this.startRunning();
     }
 
@@ -280,29 +259,39 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
                 ? 1 // life is only spawned as 1
                 : randomInt(1, 4); // 1, 2, or 3
 
-            const collectablesToRespawn = this.collectables
+            const collectables = this.collectables
                 .getChildren()
                 .filter(c => !c.active)
                 .slice(0, amountToSpawn) as Collectable[];
 
-            if (collectablesToRespawn.length) {
+            if (collectables.length) {
                 // TODO: move logic into Collectable class, and define spawn based on type
                 const offsets = {
                     1: [[24, -8]],
                     2: [[16, -8], [32, -8]],
                     3: [[16, -8], [32, -8], [24, -16]],
-                }[collectablesToRespawn.length];
+                }[collectables.length];
 
                 const height = {
                     [CollectableKind.Bean]: 16,
                     [CollectableKind.Life]: 32,
                 }[typeToSpawn] || 0;
 
-                collectablesToRespawn.forEach((c, i) => c.respawn(
+                collectables.forEach((c, i) => c.respawn(
                     building.x + offsets[i][0],
                     building.y + offsets[i][1] - height,
                     typeToSpawn,
                 ));
+            }
+        }
+
+        // respawn enemy drones
+        if (building.y < this.scale.height * 0.9) {
+            const enemyDrone = this.enemyDrones.getFirstDead() as EnemyDrone;
+            if (enemyDrone) {
+                // TODO: implement drone generator
+                enemyDrone.respawn(building.x, randomInt(32, this.scale.height - 32));
+                // enemyDrone.respawn(building.x, randomInt(16, building.y - 32));
             }
         }
     }
@@ -350,10 +339,19 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
         collectable.collect();
     }
 
+    private handleEnemyDroneHurt(obj: any) {
+        const enemyDrone = obj as EnemyDrone;
+        enemyDrone.die();
+        this.handleLoseLife();
+    }
+
     private handleUiText() {
-        this.textPanacats.setTextArgs(this.pointsCollected);
-        this.textCaffeine.setTextArgs(strings.chars.caffeine.repeat(Math.round(this.speedBonus / this.params.speedBonus)));
-        this.textLifes.setTextArgs(strings.chars.life.repeat(this.lifesLeft));
+        const bd = this.player.body.blocked.down ? 'B' : '_';
+        const td = this.player.body.touching.down ? 'T' : '_';
+        this.textLifes.setTextArgs(`${bd} ${td}`);
+        // this.textPanacats.setTextArgs(this.pointsCollected);
+        // this.textCaffeine.setTextArgs(strings.chars.caffeine.repeat(Math.round(this.speedBonus / this.params.speedBonus)));
+        // this.textLifes.setTextArgs(strings.chars.life.repeat(this.lifesLeft));
     }
 
     // TODO: refactor

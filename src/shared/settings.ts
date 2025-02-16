@@ -6,7 +6,8 @@ export const GAMEPLAY = {
     speedBonus: 25,
     speedBonusMax: 100,
     speedBonusTick: 0.03,
-    gravity: 600,
+    enemyDroneVelocity: 50,
+    gravity: 500,
 }
 
 export const SETTINGS = {
@@ -27,7 +28,7 @@ export const SPAWN_RATES = {
 }
 
 export const DEBUG = {
-    fastRestart: false,
+    skipTitle: false,
     fastRespawn: false,
     debugPhysics: false,
     useDebugLogs: false,

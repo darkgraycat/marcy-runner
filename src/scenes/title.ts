@@ -25,7 +25,7 @@ export class TitleScene extends Scene<TitleSceneParams>(SceneKey.Title, defaults
 
         super.create();
 
-        if (DEBUG.fastRestart) this.startGame();
+        if (DEBUG.skipTitle) this.startGame();
 
         this.cameras.main.fadeFrom(2000, 0, 0, 0);
 

@@ -1,6 +1,28 @@
 import { FieldsToInstance, Point, Size } from "./types";
 
-/* Scenes */
+
+/* #Builders */
+export type SpriteConfig = {
+    key: string,
+    size: Size,
+    tilesize?: Size,
+    body?: boolean,
+    static?: boolean,
+}
+
+export function makeSprite(scene: Phaser.Scene, config: SpriteConfig) {
+    const sprite = config.tilesize
+        ? scene.add.tileSprite(0, 0, ...config.tilesize, config.key)
+        : scene.add.sprite(0, 0, config.key);
+    if (config.body) {
+        scene.physics.add.existing(sprite, config.static)
+    }
+    sprite.setSize(...config.size);
+    return sprite;
+}
+
+
+/* #Scenes */
 export type SceneClass =
     ReturnType<typeof Scene>;
 
@@ -37,8 +59,7 @@ export function Scene<Params>(key: string, defaults: Params) {
 }
 
 
-
-/* Entities */
+/* #Entities */
 export type EntityClass =
     ReturnType<typeof Entity> |
     ReturnType<typeof TileEntity>;
@@ -54,12 +75,10 @@ export function Entity(config: EntityConfig) {
         static readonly config = config;
         constructor(scene: Phaser.Scene) {
             super(scene, 0, 0, config.key);
-            const [w, h] = config.size;
-            const [x, y] = config.origin || [0, 0];
             scene.add
                 .existing(this)
-                .setSize(w, h)
-                .setOrigin(x, y);
+                .setSize(...config.size)
+                .setOrigin(...config.origin || [0, 0]);
         }
     }
 }
@@ -69,12 +88,10 @@ export function TileEntity(config: EntityConfig & { tilesize: Point }) {
         static readonly config = config;
         constructor(scene: Phaser.Scene) {
             super(scene, 0, 0, 0, 0, config.key);
-            const [w, h] = config.size;
-            const [x, y] = config.origin || [0, 0];
             scene.add
                 .existing(this)
-                .setSize(w, h)
-                .setOrigin(x, y);
+                .setSize(...config.size)
+                .setOrigin(...config.origin || [0, 0]);
         }
         resizeByTile(cols: number, rows: number) {
             return this.setSize(
@@ -92,9 +109,7 @@ export function TileEntity(config: EntityConfig & { tilesize: Point }) {
 }
 
 
-
-/* Phys Entities */
-
+/* #PhysEntities */
 export type PhysEntityClass =
     ReturnType<typeof PhysEntity> |
     ReturnType<typeof TilePhysEntity>;
@@ -112,12 +127,12 @@ export function PhysEntity(config: PhysEntityConfig) {
         public body: Phaser.Physics.Arcade.Body | Phaser.Physics.Arcade.StaticBody
         constructor(scene: Phaser.Scene) {
             super(scene, 0, 0, config.key);
-            const [w, h] = config.size;
-            const [x, y] = config.offset || [0, 0];
             scene.physics.add
                 .existing(scene.add.existing(this), config.static)
-                .setSize(w, h)
-                .setOffset(x, y);
+                .setSize(...config.size)
+            this.body
+                .setSize(...config.size)
+                .setOffset(...config.offset || [0, 0]);
         }
         updateBody() {
             this.body.updateFromGameObject();
@@ -132,12 +147,12 @@ export function TilePhysEntity(config: PhysEntityConfig & { tilesize: Point }) {
         public body: Phaser.Physics.Arcade.Body | Phaser.Physics.Arcade.StaticBody
         constructor(scene: Phaser.Scene) {
             super(scene, 0, 0, 0, 0, config.key);
-            const [w, h] = config.size;
-            const [x, y] = config.offset || [0, 0];
             scene.physics.add
                 .existing(scene.add.existing(this), config.static)
-                .setSize(w, h);
-            this.body.setOffset(x, y);
+                .setSize(...config.size);
+            this.body
+                .setSize(...config.size)
+                .setOffset(...config.offset || [0, 0]);
         }
         updateBody() {
             this.body.updateFromGameObject();
@@ -159,8 +174,7 @@ export function TilePhysEntity(config: PhysEntityConfig & { tilesize: Point }) {
 }
 
 
-
-/* Groups & Containers */
+/* #Other */
 export type GroupEntityClass =
     ReturnType<typeof GroupEntity>;
 
@@ -196,12 +210,12 @@ export function GroupEntity<T extends EntityClass | PhysEntityClass>(config: Gro
 }
 
 
-type EntityContainerConfig<T extends EntityClass | PhysEntityClass> = {
+type ContainerEntityConfig<T extends EntityClass | PhysEntityClass> = {
     class: T | T[],
 }
 
-export function EntityContainer<T extends EntityClass | PhysEntityClass>(config: EntityContainerConfig<T>) {
-    return class EntityContainer extends Phaser.GameObjects.Container {
+export function ContainerEntity<T extends EntityClass | PhysEntityClass>(config: ContainerEntityConfig<T>) {
+    return class ContainerEntity extends Phaser.GameObjects.Container {
         static readonly config = config;
         constructor(scene: Phaser.Scene, children?: (Phaser.GameObjects.Sprite | Phaser.Physics.Arcade.Sprite)[]) {
             super(scene, 0, 0, children);
@@ -211,15 +225,11 @@ export function EntityContainer<T extends EntityClass | PhysEntityClass>(config:
 }
 
 
-
-/* Event names wrappers */
+/* #UserInterface */
 export type PointerEvent = 'pointerdown' | 'pointerdownoutside' | 'pointermove' | 'pointerout' | 'pointerover' | 'pointerup' | 'pointerupoutside' | 'wheel';
 
 export type EntityEvent = 'gameobjectdown' | 'gameobjectmove' | 'gameobjectout' | 'gameobjectover' | 'gameobjectup';
 
-
-
-/* User Interface */
 export type UiElementConfig = {
     font: string,
     origin?: Point,
@@ -235,11 +245,10 @@ export function UiElement(config: UiElementConfig) {
         private relativeOffsetXY: Point;
         constructor(scene: Phaser.Scene, text?: string) {
             super(scene, 0, 0, config.font, text);
-            const [x, y] = config.origin || [0.5, 0.5];
             scene.add
                 .existing(this)
-                .setOrigin(x, y)
                 .setDepth(1)
+                .setOrigin(...config.origin || [0.5])
                 .setScrollFactor(config.scroll || 0);
         }
         on(event: PointerEvent, handler: UiElementEventHandler, context?: any) {
@@ -268,7 +277,8 @@ export function UiElement(config: UiElementConfig) {
     }
 }
 
-/* User Input */
+
+/* #UserInput */
 // export type ControllerConfig<T> = {
 //     keys: { [K in keyof T]: T[K] };
 // }

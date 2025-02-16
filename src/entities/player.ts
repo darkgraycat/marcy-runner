@@ -19,7 +19,7 @@ export class Player extends PhysEntity({
     move(velocity: number) {
         this.flipX = velocity < 0;
         this.body.velocity.x = velocity;
-        if (this.body.blocked.down) {
+        if (this.isLanded) {
             this.anims.play(velocity > GAMEPLAY.initialMoveVelocity
                 ? AnimationKey.PlayerRun
                 : AnimationKey.PlayerWalk, true)
@@ -28,13 +28,13 @@ export class Player extends PhysEntity({
 
     idle() {
         this.body.velocity.x = 0;
-        if (this.body.blocked.down) {
+        if (this.isLanded) {
             this.play(AnimationKey.PlayerIdle, true)
         }
     }
 
     jump(velocity: number) {
-        if (this.body.blocked.down) {
+        if (this.isLanded) {
             this.body.velocity.y = -velocity;
             this.anims.play(AnimationKey.PlayerJump, true)
             this.soundJump.play({ detune: -400 });
@@ -43,5 +43,9 @@ export class Player extends PhysEntity({
 
     meow(level: number = 0) {
         this.soundMeow.play({ detune: level * 100 });
+    }
+
+    get isLanded() {
+        return this.body.blocked.down || this.body.touching.down;
     }
 }
