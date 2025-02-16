@@ -149,8 +149,9 @@ export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
 
     private onScreenResized() {
         this.time.delayedCall(500, () => {
-            this.scale.updateScale();
+            this.scale.updateBounds();
             this.scale.updateCenter();
+            this.scale.updateScale();
             this.optionsButton.updateRelativePosition();
             this.fullscreenButton.updateRelativePosition();
         });
