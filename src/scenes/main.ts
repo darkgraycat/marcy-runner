@@ -1,8 +1,8 @@
 import colors from "../data/colors";
 import levels from "../data/levels";
 import strings from "../data/strings";
-import { UiIconButton, UiRectButton, UiText  } from "../entities/ui";
-import { Scene  } from "../shared/factories";
+import { UiIconButton, UiRectButton, UiText } from "../entities/ui";
+import { Scene } from "../shared/factories";
 import { EventKey, SceneKey } from "../shared/keys";
 import { randomInt } from "../shared/utils";
 import { DevmodeSceneParams } from "./devmode";
@@ -70,11 +70,11 @@ export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
             .setPosition(width / 2, height / 2 + 40)
             .setRectSize(60, 16)
             .setRectTint(colors.ui.mainForeground)
-            .setOnClick(() => this.game.events.emit(EventKey.TitleStarted, { levelIdx: randomInt(0, levels.length)}));
+            .setOnClick(() => this.game.events.emit(EventKey.TitleStarted, { levelIdx: randomInt(0, levels.length) }));
 
         this.hideMenu();
 
-        this.game.events.emit(EventKey.TitleStarted, { levelIdx: randomInt(0, levels.length)});
+        this.game.events.emit(EventKey.TitleStarted, { levelIdx: randomInt(0, levels.length) });
 
         // DEBUG
         // this.textDebug = new UiText(this)
@@ -123,10 +123,12 @@ export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
     }
 
     private pauseGame() {
+        this.log("pause", "ON");
         this.scene.pause(this.runningSceneKey);
     }
 
     private unpauseGame() {
+        this.log("pause", "OFF");
         this.scene.resume(this.runningSceneKey);
     }
 
@@ -141,36 +143,37 @@ export class MainScene extends Scene<MainSceneParams>(SceneKey.Main, defaults) {
     }
 
     private onFullscreenClick() {
+        this.log("event", "fullscreen click");
         this.game.events.emit(EventKey.FullScreenToggled);
     }
 
     private onTitleStarted(params?: Partial<TitleSceneParams>) {
-        this.log("main", "title started");
+        this.log("event", "title started");
         this.nextScene(SceneKey.Title, params);
     }
 
     private onLevelStarted(params?: Partial<LevelSceneParams>) {
-        this.log("main", "level started");
+        this.log("event", "level started");
         this.nextScene(SceneKey.Level, params);
     }
 
     private onOverStarted(params?: Partial<OverSceneParams>) {
-        this.log("main", "over started");
+        this.log("event", "over started");
         this.nextScene(SceneKey.Over, params);
     }
 
     private onTutorialStarted(params?: Partial<TutorialSceneParams>) {
-        this.log("main", "tutorial started");
+        this.log("event", "tutorial started");
         this.nextScene(SceneKey.Tutorial, params);
     }
 
     private onDevmodeStarted(params?: Partial<DevmodeSceneParams>) {
-        this.log("main", "devmode started");
+        this.log("event", "devmode started");
         this.nextScene(SceneKey.Devmode, params);
     }
 
     private onScreenResized() {
-        this.log("main", "resize requested");
+        // this.log("event", "resize requested");
         this.time.delayedCall(500, () => {
             this.scale.updateScale();
             this.optionsButton.updateRelativePosition();

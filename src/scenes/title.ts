@@ -21,6 +21,8 @@ export class TitleScene extends Scene<TitleSceneParams>(SceneKey.Title, defaults
     private backgrounds: Phaser.GameObjects.Group;
 
     create() {
+        this.log("create", "start");
+
         super.create();
 
         if (DEBUG.fastRestart) this.startGame();
@@ -73,6 +75,8 @@ export class TitleScene extends Scene<TitleSceneParams>(SceneKey.Title, defaults
             if (combination.endsWith('devmode')) return this.startDevmode({ levelIdx: +combination.split('devmode')[0] });
             if (combination == 'cocaine') return this.startGameWithOverrides({ speedBonus: 100, speedBonusMax: 500, jumpVelocity: 250 });
         });
+
+        this.log("create", "end");
     }
 
     update() {
@@ -83,6 +87,7 @@ export class TitleScene extends Scene<TitleSceneParams>(SceneKey.Title, defaults
     }
 
     private startGame() {
+        this.log("startGame", "clicked");
         this.game.events.emit(EventKey.LevelStarted, { levelIdx: this.params.levelIdx });
     }
 

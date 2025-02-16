@@ -57,6 +57,8 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
     private textMain: UiText;
 
     create() {
+        this.log("create", "start");
+
         super.create();
         this.isJumping = false;
         this.isJumpInProgress = false;
@@ -152,6 +154,8 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
         this.game.events.on(EventKey.ScreenResized, this.onScreenResized, this);
 
         this.handlePlayerRespawn();
+
+        this.log("create", "end");
     }
 
     update(time: number, delta: number) {

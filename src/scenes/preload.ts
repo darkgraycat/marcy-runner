@@ -7,6 +7,7 @@ export type PreloadSceneParams = typeof defaults;
 
 export class PreloadScene extends Scene<PreloadSceneParams>(SceneKey.Preload, defaults) {
     preload() {
+        this.log("preload", "start");
         /* #audio */
         [
             { key: AudioKey.MainTheme, path: "assets/audio/main_theme.mp3" },
@@ -35,10 +36,12 @@ export class PreloadScene extends Scene<PreloadSceneParams>(SceneKey.Preload, de
             { key: FontKey.MKitText, path: "assets/fonts/mkit-text-7x8.png", xml: "assets/fonts/mkit-text-7x8.xml" },
         ].forEach(({ key, path, xml }) => this.load.bitmapFont(key, path, xml));
 
+        this.log("preload", "end");
     }
 
     create() {
         super.create();
+        this.log("create", "start");
 
         /* #animaton */
         [   
@@ -66,5 +69,7 @@ export class PreloadScene extends Scene<PreloadSceneParams>(SceneKey.Preload, de
 
         this.scene.stop();
         this.scene.start(SceneKey.Main);
+
+        this.log("create", "end");
     }
 }
