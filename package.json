@@ -7,7 +7,7 @@
     "start": "npm run serve & npm run watch",
     "serve": "npx live-server public --port=8080 --watch",
     "watch": "npx esbuild src/index.ts --bundle --outdir=public --sourcemap=inline --watch",
-    "build": "npx esbuild src/index.ts --bundle --minify --outdir=public",
+    "build": "npx esbuild src/index.ts --bundle --minify --keep-names --outdir=public",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "darkgraycat",
