@@ -142,7 +142,7 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
         this.log("create", "process 9");
 
         /* #physics */
-        this.time.delayedCall(1, () => {
+        this.time.delayedCall(0, () => {
             this.physics.add.collider(this.buildings, this.player);
             this.physics.add.collider(this.buildings.getChildren().flatMap(b => (b as Building).getInternalBodies()), this.player);
             this.physics.add.overlap(this.collectables, this.player, this.handleCollect, null, this);

@@ -1,4 +1,4 @@
-import { TileEntity, TilePhysEntity } from "../shared/factories";
+import { GroupEntityClass, TileEntity, TilePhysEntity } from "../shared/factories";
 import { SpriteKey, EventKey } from "../shared/keys";
 import { iterate, randomBool, randomElement, randomInt } from "../shared/utils";
 
@@ -28,7 +28,7 @@ class InternalBody extends TilePhysEntity({
         this.body.checkCollision.left = false;
         this.body.checkCollision.right = false;
         this.setOrigin(0, 0)
-            .setAlpha(0);
+            .setAlpha(0.0);
     }
 }
 
@@ -41,6 +41,7 @@ export class Building extends TilePhysEntity({
     private roof: BuildingRoof;
     private decor: BuildingDecor;
     private bodies: InternalBody[];
+    private internalBodies: Phaser.GameObjects.Group;
 
     constructor(scene: Phaser.Scene, col: number = 0, row: number = 0) {
         super(scene);
@@ -58,15 +59,22 @@ export class Building extends TilePhysEntity({
         this.body.checkCollision.right = false;
         console.log(`Building ${col}${row} setup 2 - ` + (performance.now() / 1000).toFixed(2))
 
-        // this.bodies = iterate(5, () => new InternalBody(scene));
-        this.bodies = [];
-        scene.time.delayedCall(0, () => {
-            iterate(4, () => {
-                this.bodies.push(new InternalBody(scene));
-            });
-            this.updateBody();
+        this.internalBodies = scene.add.group([
+            new InternalBody(scene),
+            new InternalBody(scene),
+            new InternalBody(scene),
+            new InternalBody(scene),
+        ]);
 
-        }, null, this);
+        // this.bodies = iterate(5, () => new InternalBody(scene));
+        // this.bodies = [];
+        // scene.time.delayedCall(0, () => {
+        //     iterate(4, () => {
+        //         this.bodies.push(new InternalBody(scene));
+        //     });
+        //     this.updateBody();
+
+        // }, null, this);
 
         console.log(`Building ${col}${row} add bodies - ` + (performance.now() / 1000).toFixed(2))
 
@@ -106,7 +114,8 @@ export class Building extends TilePhysEntity({
     }
 
     getInternalBodies(): InternalBody[] {
-        return this.bodies;
+        // return this.bodies;
+        return this.internalBodies.getChildren() as InternalBody[];
     }
 
     setTint(tint: number): this {
@@ -130,10 +139,16 @@ export class Building extends TilePhysEntity({
     }
 
     updateBody(): this {
-        this.bodies.forEach((body, i) => body
-            .setPosition(this.x, this.y + i * Building.config.tilesize[1])
-            .updateBody(),
-        );
+        this.internalBodies.setXY(this.x, this.y);
+        this.internalBodies.incY(0, Building.config.tilesize[1]);
+        this.internalBodies.getChildren().forEach(ib => (ib as InternalBody).updateBody());
+        // console.log(this.x, this.y);
+        // @ts-ignore
+        // console.log(this.internalBodies.getChildren().map(go => `${go.x} - ${go.y}`));
+        // this.bodies.forEach((body, i) => body
+        //     .setPosition(this.x, this.y + i * Building.config.tilesize[1])
+        //     .updateBody(),
+        // );
         return super.updateBody();
     }
 }

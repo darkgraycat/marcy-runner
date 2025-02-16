@@ -13,12 +13,16 @@ window.onload = async function() {
     const debugDiv = document.getElementById("debug") as HTMLTextAreaElement;
     const overlayDiv = document.getElementById("overlay") as HTMLDivElement;
 
-    // use monkey-patching to debug
-    console.log = (...args: any[]) => {
-        log(...args);
-        debugDiv.textContent += args + '\n';
-        debugDiv.scrollTop = debugDiv.scrollHeight;
+    if (DEBUG.useDebugLogs) {
+        console.log = (...args: any[]) => {
+            log(...args);
+            debugDiv.textContent += args + '\n';
+            debugDiv.scrollTop = debugDiv.scrollHeight;
+        }
+    } else {
+        debugDiv.classList.add("hidden");
     }
+
 
     await sleep(100);
     overlayDiv.classList.add("hidden");

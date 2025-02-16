@@ -1,5 +1,5 @@
 export const GAMEPLAY = {
-    targetPoints: 100,
+    targetPoints: 200,
     initialLifes: 3,
     initialMoveVelocity: 100,
     initialJumpVelocity: 200,
@@ -30,4 +30,5 @@ export const DEBUG = {
     fastRestart: false,
     fastRespawn: false,
     debugPhysics: false,
+    useDebugLogs: false,
 }
