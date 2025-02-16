@@ -4,8 +4,6 @@ on:
   push:
     tags:
       - '*'
-    #branch:
-    #  - 'main'
 
 jobs:
   # Build job
@@ -28,6 +26,8 @@ jobs:
           path: ./public
           if-no-files-found: error
           retention-days: 1
+
+  # Cleanup job
   cleanup:
     runs-on: ubuntu-latest
     permissions: write-all
