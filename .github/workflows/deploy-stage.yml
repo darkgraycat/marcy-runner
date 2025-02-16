@@ -39,7 +39,6 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}-stage
     needs:
       - build
-      - cleanup
     steps:
       - name: Setup Pages
         id: pages
