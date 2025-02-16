@@ -116,6 +116,8 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
         );
 
         this.log("total buildings", totalBuildings);
+        this.log("total buildings", `NUMBER: ${totalBuildings}`);
+        console.log("TOTAL BUILDINGS IS", totalBuildings);
 
         this.log("create", "process 6");
 
