@@ -4,12 +4,16 @@ import strings from "../data/strings";
 import { Background } from "../entities/background";
 import { UiText, UiRectButton } from "../entities/ui";
 import { VERSION } from "../shared/constants";
-import { Scene } from "../shared/factories";
+import { GroupEntity, Scene } from "../shared/factories";
 import { EventKey, SceneKey } from "../shared/keys";
 import { DEBUG, GAMEPLAY } from "../shared/settings";
-import { randomInt } from "../shared/utils";
 import { DevmodeSceneParams } from "./devmode";
 import { LevelSceneParams } from "./level";
+
+class BackgroundsGroup extends GroupEntity({
+    class: Background,
+    capacity: 10,
+}) {}
 
 const defaults = {
     levelIdx: 0,
@@ -18,7 +22,7 @@ const defaults = {
 export type TitleSceneParams = typeof defaults;
 
 export class TitleScene extends Scene<TitleSceneParams>(SceneKey.Title, defaults) {
-    private backgrounds: Phaser.GameObjects.Group;
+    private backgrounds: BackgroundsGroup;
 
     create() {
         this.log("create", "start");
@@ -32,10 +36,11 @@ export class TitleScene extends Scene<TitleSceneParams>(SceneKey.Title, defaults
         /* #backgrounds */
         const level = levels[this.params.levelIdx];
         this.cameras.main.setBackgroundColor(level.sky);
-        this.backgrounds = this.add.group({ runChildUpdate: false });
-        for (const [frame, y, color, scrollScale] of level.backgrounds) {
-            this.backgrounds.add(new Background(this, frame, y, scrollScale).setTint(color))
-        }
+
+        this.backgrounds = new BackgroundsGroup(this).fillBy(
+            level.backgrounds,
+            (_, [frame, y, color, scrollScale]) => new Background(this, frame, y, scrollScale).setTint(color),
+        )
 
         /* #ui */
         const { width, height } = this.scale;
@@ -80,8 +85,7 @@ export class TitleScene extends Scene<TitleSceneParams>(SceneKey.Title, defaults
     }
 
     update() {
-        this.backgrounds.getChildren().forEach((c, index) => {
-            const bg = c as Background;
+        this.backgrounds.getEntities().forEach((bg, index) => {
             bg.tilePositionX += levels[this.params.levelIdx].backgrounds[index][LevelsDataBgIdxs.SCROLL_SCALE];
         });
     }

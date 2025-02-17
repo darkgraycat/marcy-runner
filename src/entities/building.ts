@@ -1,4 +1,4 @@
-import { TileEntity, TilePhysEntity } from "../shared/factories";
+import { GroupEntity, TileEntity, TilePhysEntity } from "../shared/factories";
 import { SpriteKey, EventKey } from "../shared/keys";
 import { randomBool, randomElement, randomInt } from "../shared/utils";
 
@@ -32,6 +32,12 @@ class InternalBody extends TilePhysEntity({
     }
 }
 
+class InternalBodyGroup extends GroupEntity({
+    class: InternalBody,
+    update: false,
+    capacity: 4,
+}) {}
+
 export class Building extends TilePhysEntity({
     key: SpriteKey.Buildings,
     size: [48, 32],
@@ -40,20 +46,20 @@ export class Building extends TilePhysEntity({
 }) {
     private roof: BuildingRoof;
     private decor: BuildingDecor;
-    private internalBodies: Phaser.GameObjects.Group;
+    private internalBodies: InternalBodyGroup;
 
-    constructor(scene: Phaser.Scene, col: number = 0, row: number = 0) {
+    constructor(scene: Phaser.Scene, col?: number, row?: number) {
         super(scene);
         this.roof = new BuildingRoof(scene);
         this.decor = new BuildingDecor(scene);
-        this.placeByTile(col, row)
+        this.placeByTile(col || 0, row || 0)
             .resizeByTile(1, row)
             .setOrigin(0, 0);
         this.body.checkCollision.down = false;
         this.body.checkCollision.left = false;
         this.body.checkCollision.right = false;
 
-        this.internalBodies = scene.add.group([
+        this.internalBodies = new InternalBodyGroup(scene, [
             new InternalBody(scene),
             new InternalBody(scene),
             new InternalBody(scene),
@@ -93,9 +99,8 @@ export class Building extends TilePhysEntity({
         return this.setFrame(randomInt(0, 6))
     }
 
-    getInternalBodies(): InternalBody[] {
-        // return this.bodies;
-        return this.internalBodies.getChildren() as InternalBody[];
+    getInternalBodies() {
+        return this.internalBodies.getEntities();
     }
 
     setTint(tint: number): this {
@@ -121,7 +126,7 @@ export class Building extends TilePhysEntity({
     updateBody(): this {
         this.internalBodies.setXY(this.x, this.y);
         this.internalBodies.incY(0, Building.config.tilesize[1]);
-        this.internalBodies.getChildren().forEach(ib => (ib as InternalBody).updateBody());
+        this.internalBodies.getEntities().forEach(ib => ib.updateBody());
         return super.updateBody();
     }
 }

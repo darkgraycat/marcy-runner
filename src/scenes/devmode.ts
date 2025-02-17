@@ -1,7 +1,7 @@
 import levels, { LevelsData, LevelsDataBgIdxs } from "../data/levels";
 import { Background } from "../entities/background";
 import { Building } from "../entities/building";
-import { Scene } from "../shared/factories";
+import { GroupEntity, Scene } from "../shared/factories";
 import { SceneKey } from "../shared/keys";
 
 const BGIDX_FRAME = 0;
@@ -9,6 +9,17 @@ const BGIDX_Y = 1;
 const BGIDX_COLOR = 2;
 const BGIDX_SCROLL_SCALE = 3;
 
+class BackgroundsGroup extends GroupEntity({
+    class: Background,
+    update: false,
+    capacity: 10,
+}) {}
+
+class BuildingsGroup extends GroupEntity({
+    class: Building,
+    update: true,
+    capacity: 10,
+}) { }
 
 const defaults = {
     levelIdx: 0,
@@ -17,8 +28,8 @@ const defaults = {
 export type DevmodeSceneParams = typeof defaults;
 
 export class DevmodeScene extends Scene<DevmodeSceneParams>(SceneKey.Devmode, defaults) {
-    backgrounds: Phaser.GameObjects.Group;
-    buildings: Phaser.GameObjects.Group;
+    private backgrounds: BackgroundsGroup;
+    private buildings: BuildingsGroup;
     levelData: LevelsData;
 
     create() {
@@ -29,18 +40,16 @@ export class DevmodeScene extends Scene<DevmodeSceneParams>(SceneKey.Devmode, de
 
         this.cameras.main.setBackgroundColor(0x222222);
 
-        this.backgrounds = this.add.group({ runChildUpdate: false });
-        for (const [frame, y, color, scrollScale] of level.backgrounds) {
-            this.backgrounds.add(new Background(this, frame, y, scrollScale).setTint(color))
-        }
 
-        this.buildings = this.add.group({ runChildUpdate: false });
-        for (let i = 0; i < 2; i++) {
-            this.buildings.add(new Building(this, i, 1.5)
-                .setTint(level.buildings)
-                .randomize()
-            );
-        }
+        this.backgrounds = new BackgroundsGroup(this).fillBy(
+            level.backgrounds,
+            (_, [frame, y, color, scrollScale]) => new Background(this, frame, y, scrollScale).setTint(color),
+        )
+
+        this.buildings = new BuildingsGroup(this).fill(
+            3,
+            (i) => new Building(this, i, 1.5).setTint(level.buildings).randomize(),
+        );
 
         this.cameras.main.setBackgroundColor(level.sky);
 
@@ -86,7 +95,7 @@ export class DevmodeScene extends Scene<DevmodeSceneParams>(SceneKey.Devmode, de
                 .on('change', ({ target }) => {
                     const color = parseInt(target.value.slice(1), 16);
                     this.levelData.backgrounds[i][BGIDX_COLOR] = color;
-                    (this.backgrounds.getChildren()[i] as Background).setTint(color);
+                    this.backgrounds.getEntities()[i].setTint(color);
                     console.log("update bg color", i, target.value);
                 });
 
@@ -94,7 +103,7 @@ export class DevmodeScene extends Scene<DevmodeSceneParams>(SceneKey.Devmode, de
                 .addListener('change')
                 .on('change', ({ target }) => {
                     const [frame, y, scrollScale] = target.value.split(' ');
-                    (this.backgrounds.getChildren()[i] as Background)
+                    this.backgrounds.getEntities()[i]
                         .setFrame(+frame)
                         .placeByTile(0, +y);
                     this.levelData.backgrounds[i][BGIDX_FRAME] = +frame;
@@ -118,7 +127,7 @@ export class DevmodeScene extends Scene<DevmodeSceneParams>(SceneKey.Devmode, de
             .on('change', ({ target }) => {
                 const color = parseInt(target.value.slice(1), 16);
                 this.levelData.buildings = color;
-                this.buildings.getChildren().forEach(b => (b as Building).setTint(color));
+                this.buildings.getEntities().forEach(b => b.setTint(color));
                 console.log("update buildings color", target.value);
             });
 
@@ -132,8 +141,7 @@ export class DevmodeScene extends Scene<DevmodeSceneParams>(SceneKey.Devmode, de
     }
 
     update(time: number, delta: number): void {
-        this.backgrounds.getChildren().forEach((c, index) => {
-            const bg = c as Background;
+        this.backgrounds.getEntities().forEach((bg, index) => {
             bg.tilePositionX += this.levelData.backgrounds[index][LevelsDataBgIdxs.SCROLL_SCALE];
         });
     }

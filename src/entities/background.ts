@@ -10,13 +10,13 @@ export class Background extends TileEntity({
     private scrollScale: number;
     private graphics: Phaser.GameObjects.Graphics;
 
-    constructor(scene: Phaser.Scene, frame: number, offset: number, scrollScale: number) {
+    constructor(scene: Phaser.Scene, frame?: number, offset?: number, scrollScale?: number) {
         super(scene);
         this.setScrollFactor(0)
-            .setFrame(frame)
+            .setFrame(frame || 0)
             .setSize(scene.scale.width, Background.config.size[1])
-            .placeByTile(0, offset)
-        this.scrollScale = scrollScale;
+            .placeByTile(0, offset || 0)
+        this.scrollScale = scrollScale || 0;
         this.graphics = scene.add.graphics();
         this.graphics.setScrollFactor(0);
     }

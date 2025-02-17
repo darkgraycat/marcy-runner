@@ -5,14 +5,42 @@ import { Collectable, CollectableKind } from "../entities/collectable";
 import { Player } from "../entities/player";
 import { Sun } from "../entities/sun";
 import { UiText } from "../entities/ui";
-import { Controller, Scene } from "../shared/factories";
+import { Controller, GroupEntity, Scene } from "../shared/factories";
 import { EventKey, SceneKey } from "../shared/keys";
-import { iterate, randomInt } from "../shared/utils";
+import { randomInt } from "../shared/utils";
 import { OverSceneParams } from "./over";
 import { DEBUG, GAMEPLAY } from "../shared/settings";
 import { Building } from "../entities/building";
 import { blockHeightGenerator } from "../shared/generators";
 import { EnemyDrone } from "../entities/enemydrone";
+
+class LevelController extends Controller({
+    keyJump: 'SPACE'
+}) { }
+
+class BackgroundsGroup extends GroupEntity({
+    class: Background,
+    update: true,
+    capacity: 10,
+}) {}
+
+class CollectablesGroup extends GroupEntity({
+    class: Collectable,
+    update: true,
+    capacity: 20,
+}) { }
+
+class BuildingsGroup extends GroupEntity({
+    class: Building,
+    update: true,
+    capacity: 40,
+}) { }
+
+class EnemyDronesGroup extends GroupEntity({
+    class: EnemyDrone,
+    update: true,
+    capacity: 20,
+}) { }
 
 const defaults = {
     moveVelocity: GAMEPLAY.initialMoveVelocity,
@@ -25,20 +53,16 @@ const defaults = {
     levelIdx: 0,
 };
 
-class LevelController extends Controller({
-    keyJump: 'SPACE'
-}) { }
-
 export type LevelSceneParams = typeof defaults;
 
 export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults) {
     private player: Player;
     private sun: Sun;
 
-    private enemyDrones: Phaser.GameObjects.Group;
-    private backgrounds: Phaser.GameObjects.Group;
-    private buildings: Phaser.GameObjects.Group;
-    private collectables: Phaser.GameObjects.Group;
+    private backgrounds: BackgroundsGroup;
+    private buildings: BuildingsGroup;
+    private collectables: CollectablesGroup;
+    private enemyDrones: EnemyDronesGroup;
 
     private blockGenerator: Generator<number, number, number>;
     private controller: LevelController;
@@ -91,34 +115,26 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
         /* #entities */
         this.sun = new Sun(this, width * 0.45, height * 0.25, 6);
 
-        this.backgrounds = this.add.group({ runChildUpdate: true });
-        for (const [frame, y, color, scrollScale] of level.backgrounds) {
-            this.backgrounds.add(new Background(this, frame, y, scrollScale).setTint(color))
-        }
+        this.backgrounds = new BackgroundsGroup(this).fillBy(
+            level.backgrounds,
+            (_, [frame, y, color, scrollScale]) => new Background(this, frame, y, scrollScale).setTint(color),
+        )
 
-        const totalBuildings = Math.ceil(width / Building.config.tilesize[0]);
-        this.buildings = this.add.group({ runChildUpdate: true });
-        iterate(totalBuildings, i =>
-            this.buildings.add(new Building(this, i | 0, 1.5)
-                .setTint(level.buildings)
-                .randomize()
-            )
+        this.buildings = new BuildingsGroup(this).fill(
+            Math.ceil(width / Building.config.tilesize[0]),
+            (i) => new Building(this, i, 1.5).setTint(level.buildings).randomize(),
         );
 
-        const totalCollectables = totalBuildings * 2;
-        this.collectables = this.add.group({ runChildUpdate: true });
-        iterate(totalCollectables, () =>
-            this.collectables.add(new Collectable(this).setPosition(-width, 0))
+        this.collectables = new CollectablesGroup(this).fill(
+            GAMEPLAY.collectableAmount,
+            () => new Collectable(this).setPosition(-width, 0),
         );
 
-        /* #enemies */
-        const totalDrones = GAMEPLAY.enemyDroneTotal;
-        this.enemyDrones = this.add.group({ runChildUpdate: true });
-        iterate(totalDrones, i =>
-            this.enemyDrones.add(new EnemyDrone(this).setPosition(-width, 0))
+        this.enemyDrones = new EnemyDronesGroup(this).fill(
+            GAMEPLAY.enemyDroneAmount,
+            () => new EnemyDrone(this).setPosition(-width, 0),
         );
 
-        /* #player */
         this.player = new Player(this)
             .setPosition(this.scale.width / 2, 64);
 
@@ -132,7 +148,7 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
         this.time.delayedCall(0, () => {
             this.physics.add.collider(this.buildings, this.player);
             this.physics.add.collider(this.enemyDrones, this.player);
-            this.physics.add.collider(this.buildings.getChildren().flatMap(b => (b as Building).getInternalBodies()), this.player);
+            this.physics.add.collider(this.buildings.getEntities().flatMap(b => b.getInternalBodies()), this.player);
             this.physics.add.overlap(this.collectables, this.player, this.handleCollect, null, this);
             this.physics.add.overlap(this.enemyDrones, this.player, this.handleEnemyDroneHurt, null, this);
         }, null, this);
@@ -220,8 +236,7 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
     }
 
     private handlePlayerRespawn() {
-        const entries = this.buildings.getChildren() as Building[];
-        const safeBuilding = entries
+        const safeBuilding = this.buildings.getEntities()
             .filter((b) => b.x > this.player.x && b.y < this.scale.height)
             .sort((a, b) => a.x - b.x)[0];
         if (safeBuilding) {
@@ -238,13 +253,13 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
 
         this.player.setActive(true).enableBody();
         this.enemyDrones
-            .getChildren()
-            .forEach(ed => (ed as EnemyDrone).setVisible(false).die());
+            .getEntities()
+            .forEach(ed => ed.setVisible(false).die());
         this.startRunning();
     }
 
     private handleBuildingRespawn() {
-        const building = this.buildings.getFirstDead() as Building;
+        const building = this.buildings.getEntity()
         if (!building) return;
 
         const [tileWidth] = Building.config.tilesize;
@@ -260,9 +275,9 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
                 : randomInt(1, 4); // 1, 2, or 3
 
             const collectables = this.collectables
-                .getChildren()
+                .getEntities()
                 .filter(c => !c.active)
-                .slice(0, amountToSpawn) as Collectable[];
+                .slice(0, amountToSpawn);
 
             if (collectables.length) {
                 // TODO: move logic into Collectable class, and define spawn based on type
@@ -287,10 +302,10 @@ export class LevelScene extends Scene<LevelSceneParams>(SceneKey.Level, defaults
 
         // respawn enemy drones
         if (building.y < this.scale.height * 0.9) {
-            const enemyDrone = this.enemyDrones.getFirstDead() as EnemyDrone;
+            const enemyDrone = this.enemyDrones.getEntity();
             if (enemyDrone) {
                 // TODO: implement drone generator
-                enemyDrone.respawn(building.x, randomInt(16, this.scale.height  * 0.75));
+                enemyDrone.respawn(building.x, randomInt(16, this.scale.height * 0.75));
             }
         }
     }

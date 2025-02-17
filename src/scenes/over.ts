@@ -1,11 +1,16 @@
 import { EventKey, SceneKey } from "../shared/keys";
-import { Scene } from "../shared/factories";
+import { GroupEntity, Scene } from "../shared/factories";
 import { Background } from "../entities/background";
 import { DEBUG } from "../shared/settings";
 import levels, { LevelsDataBgIdxs } from "../data/levels";
 import { UiRectButton, UiText } from "../entities/ui";
 import strings from "../data/strings";
 import { randomInt } from "../shared/utils";
+
+class BackgroundsGroup extends GroupEntity({
+    class: Background,
+    capacity: 10,
+}) {}
 
 const defaults = {
     finished: false,
@@ -19,7 +24,7 @@ const defaults = {
 export type OverSceneParams = typeof defaults;
 
 export class OverScene extends Scene<OverSceneParams>(SceneKey.Over, defaults) {
-    backgrounds: Phaser.GameObjects.Group;
+    private backgrounds: BackgroundsGroup;
 
     create() {
         super.create();
@@ -31,10 +36,11 @@ export class OverScene extends Scene<OverSceneParams>(SceneKey.Over, defaults) {
         /* #backgrounds */
         const level = levels[this.params.levelIdx];
         this.cameras.main.setBackgroundColor(level.sky);
-        this.backgrounds = this.add.group({ runChildUpdate: false });
-        for (const [frame, y, color, scrollScale] of level.backgrounds) {
-            this.backgrounds.add(new Background(this, frame, y, scrollScale).setTint(color))
-        }
+
+        this.backgrounds = new BackgroundsGroup(this).fillBy(
+            level.backgrounds,
+            (_, [frame, y, color, scrollScale]) => new Background(this, frame, y, scrollScale).setTint(color),
+        )
 
         /* #ui */
         const { width, height } = this.scale;
@@ -56,8 +62,7 @@ export class OverScene extends Scene<OverSceneParams>(SceneKey.Over, defaults) {
     }
 
     update(time: number, delta: number): void {
-        this.backgrounds.getChildren().forEach((c, index) => {
-            const bg = c as Background;
+        this.backgrounds.getEntities().forEach((bg, index) => {
             bg.tilePositionX += levels[this.params.levelIdx].backgrounds[index][LevelsDataBgIdxs.SCROLL_SCALE];
         });
     }

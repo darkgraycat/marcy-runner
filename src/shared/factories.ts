@@ -181,7 +181,7 @@ export type GroupEntityClass =
 export type GroupEntityCallback<T extends EntityClass | PhysEntityClass> = (entity: T) => void;
 
 export type GroupEntityConfig<T extends EntityClass | PhysEntityClass> = {
-    class: T;
+    class?: T;
     update?: boolean;
     capacity?: number;
     onCreate?: GroupEntityCallback<T>;
@@ -201,10 +201,24 @@ export function GroupEntity<T extends EntityClass | PhysEntityClass>(config: Gro
             });
             scene.add.existing(this);
         }
-        forEach<K = void>(callback: (child: InstanceType<T>, index?: number) => K) {
-            this.getChildren().forEach((go, i) => {
-                callback(go as any, i)
-            });
+        getEntities() {
+            return this.getChildren() as InstanceType<T>[];
+        }
+        getEntity(isAlive = false) {
+            return (isAlive
+                ? this.getFirstAlive()
+                : this.getFirstDead()
+            ) as InstanceType<T> | null;
+        }
+        fill(count: number, createCallback: (index?: number) => InstanceType<T>) {
+            for (let i = 0; i < count; i++)
+                this.add(createCallback(i));
+            return this;
+        }
+        fillBy<U>(configs: U[], createCallback: (index?: number, config?: U) => InstanceType<T>) {
+            for (let i = 0; i < configs.length; i++)
+                this.add(createCallback(i, configs[i]));
+            return this;
         }
     }
 }
@@ -241,8 +255,8 @@ export type UiElementEventHandler = (e?: Phaser.Input.Pointer) => void;
 export function UiElement(config: UiElementConfig) {
     return class UiElement extends Phaser.GameObjects.BitmapText {
         static readonly config = config;
-        private relativeScaleXY: Point;
-        private relativeOffsetXY: Point;
+        protected relativeScaleXY: Point;
+        protected relativeOffsetXY: Point;
         constructor(scene: Phaser.Scene, text?: string) {
             super(scene, 0, 0, config.font, text);
             scene.add

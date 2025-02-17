@@ -11,7 +11,6 @@ export class EnemyDrone extends PhysEntity({
     constructor(scene: Phaser.Scene) {
         super(scene);
         this.body.checkCollision.left = false;
-        this.body.checkCollision.right = false;
         this.body.checkCollision.down = false;
         this.anims.play(AnimationKey.EnemyDroneFly);
         this.setGravityY(-GAMEPLAY.gravity)

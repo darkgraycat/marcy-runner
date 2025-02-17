@@ -3,7 +3,7 @@ export const LevelsDataBgIdxs = {
     ROW: 1,
     COLOR: 2,
     SCROLL_SCALE: 3,
-};
+}
 
 export type LevelsData = {
     sky: number,
@@ -14,10 +14,7 @@ export type LevelsData = {
         color: number,
         scrollScale: number,
     ][],
-};
-
-const BACKGROUNDS_VARIATIONS = 2; // number of columns in SpriteKey.Backgrounds
-const BACKGROUNDS_LAYERS = 5; // number of rows in SpriteKey.Backgrounds
+}
 
 export default [
     { // 0 mountains and pines sunset
@@ -109,4 +106,4 @@ export default [
             [5, .50, 0xa7707c, 0.5],
         ],
     },
-] as LevelsData[];
+] as LevelsData[]
