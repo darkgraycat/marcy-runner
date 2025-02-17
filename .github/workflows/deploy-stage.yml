@@ -51,9 +51,12 @@ jobs:
         run: |
           mkdir -p ./stage
           mv ./temp ./stage/public
-      - name: Check files
+      - name: Check files 1
         run: |
-          ls -la
+          ls -la ./stage
+      - name: Check files 2
+        run: |
+          ls -la ./stage/public
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
