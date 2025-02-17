@@ -20,11 +20,6 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
-      - name: Prepare stage directory
-        run: |
-          mkdir -p temp/stage
-          mv public/* temp/stage/
-          mv temp/* public/
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
@@ -40,14 +35,16 @@ jobs:
       pages: write
       id-token: write
     environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}stage
+      name: stage
+      url: ${{ steps.deployment.outputs.page_url }}
     needs:
       - build
     steps:
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
+        with:
+          branch: gh-pages-stage
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
