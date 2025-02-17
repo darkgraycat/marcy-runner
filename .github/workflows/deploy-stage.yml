@@ -49,10 +49,12 @@ jobs:
           path: temp
       - name: Move contents to stage directory
         run: |
-          ls -la
           mkdir -p ./public/stage
           mv ./temp/* ./public/stage
           rm -rf temp
+      - name: Check files
+        run: |
+          ls -la
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
