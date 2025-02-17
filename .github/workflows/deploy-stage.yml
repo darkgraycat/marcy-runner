@@ -50,7 +50,7 @@ jobs:
       - name: Move contents to stage directory
         run: |
           mkdir -p ./stage
-          mv ./temp ./stage/public
+          mv ./temp/github-pages ./stage/public
       - name: Check files 1
         run: |
           ls -la ./stage
