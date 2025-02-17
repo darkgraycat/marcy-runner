@@ -20,10 +20,12 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
+      - name: Copy build to stage folder
+        run: cp -r ./public ./public/stage
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./public
+          path: ./public/stage
           if-no-files-found: error
           retention-days: 1
 
@@ -36,15 +38,13 @@ jobs:
       id-token: write
     environment:
       name: stage
-      url: https://darkgraycat.github.io/marcy-runner-stage/
+      url: ${{ steps.deployment.outputs.page_url }}stage
     needs:
       - build
     steps:
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
-        with:
-          branch: gh-pages-stage
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

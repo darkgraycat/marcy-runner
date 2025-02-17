@@ -48,7 +48,7 @@ jobs:
       id-token: write
     environment:
       name: production
-      url: https://darkgraycat.github.io/marcy-runner/
+      url: ${{steps.deployment.outputs.page_url}}
     needs:
       - build
       - cleanup
@@ -56,8 +56,6 @@ jobs:
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
-        with:
-          branch: gh-pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
