@@ -50,7 +50,7 @@ jobs:
       - name: Move contents to stage directory
         run: |
           mkdir -p ./public/stage
-          mv ./temp/* ./public/stage
+          mv ./temp/* ./public/stage/
           rm -rf temp
       - name: Check files
         run: |
