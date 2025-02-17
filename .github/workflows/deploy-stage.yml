@@ -22,9 +22,9 @@ jobs:
         run: npm run build
       - name: Prepare stage directory
         run: |
-          mkdir -p stage
-          mv public/* stage/
-          mv stage public/
+          mkdir -p temp/stage
+          mv public/* temp/stage/
+          mv temp/* public/
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
