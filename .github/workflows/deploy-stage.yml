@@ -21,7 +21,7 @@ jobs:
       - name: Build
         run: npm run build
       - name: Copy build to stage folder
-        run: cp -r ./public ./public/stage
+        run: cp -r ./public/* ./public/stage
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
