@@ -36,7 +36,7 @@ jobs:
       id-token: write
     environment:
       name: stage
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: https://darkgraycat.github.io/marcy-runner-stage/
     needs:
       - build
     steps:

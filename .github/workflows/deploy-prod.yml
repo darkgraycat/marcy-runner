@@ -48,7 +48,7 @@ jobs:
       id-token: write
     environment:
       name: production
-      url: ${{steps.deployment.outputs.page_url}}
+      url: https://darkgraycat.github.io/marcy-runner/
     needs:
       - build
       - cleanup
