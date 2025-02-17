@@ -49,9 +49,8 @@ jobs:
           path: temp
       - name: Move contents to stage directory
         run: |
-          mkdir -p ./public/stage
-          mv ./temp/* ./public/stage/
-          rm -rf temp
+          mkdir -p ./stage
+          mv ./temp ./stage/public
       - name: Check files
         run: |
           ls -la
